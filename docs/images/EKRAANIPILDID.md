@@ -4,4 +4,4 @@ Kõik siin loetletud failid on praegu hallid kohatäitjad (800×300). Tee ekraan
 
 | Fail | Kus kasutatakse | Mida näidata | Millal pildistada |
 |---|---|---|---|
-| `n07_keskserver_segamini.png` | `week07/lab.md`, B2 | `proxmox1` `/var/log/messages` lõpp, kus on read kahe hostinimega (`proxmox1` ja `proxmox2`) | `sudo tail -8 /var/log/messages` pärast B2 testi, enne B3 |
+| `n01_keskserver_segamini.png` | `week01/lab.md`, B2 | `proxmox1` `/var/log/messages` lõpp, kus on read kahe hostinimega (`proxmox1` ja `proxmox2`) | `sudo tail -8 /var/log/messages` pärast B2 testi, enne B3 |
