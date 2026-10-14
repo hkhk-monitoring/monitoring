@@ -2,7 +2,7 @@
 # Uus silt või fraas lisatakse siia samas PR-is, kus seda esimest korda kasutatakse.
 
 docs_dir: docs
-assets_dir: docs/assets          # pildid peavad olema siin (või alamkaustas)
+assets_dir: docs/images         # pildid peavad olema siin (või alamkaustas)
 
 sildid:
   tüüp:            # vähemalt üks nõutud
@@ -70,7 +70,7 @@ failitüübid:
       - ['\[\^[\w-]+\]', 'joonealune märkus praktikumis']
 
 # Faili ei kontrollita üldse
-välja_jäetud: ["**/index.md", "**/tags.md"]
+välja_jäetud: ["**/index.md", "**/tags.md", "**/EKRAANIPILDID.md"]
 
 # Keelatud fraasid (regex, tõstutundetu). Viga.
 keelatud_fraasid:
@@ -91,7 +91,7 @@ hoiatused:
   - ['—', 'mõttekriips, kasuta sidekriipsu']
   - ['\bmitte ainult\b.*\bvaid ka\b', 'võimalik "mitte X, vaid Y" konstruktsioon']
 
-pildinimi: '^(t\d{2}[a-z]?|p\d{2}|lab|diag|hero|logo)[_-][a-z0-9_]+\.(png|jpg|jpeg|svg|webp|gif)$'
+pildinimi: '^(n\d{2}|t\d{2}[a-z]?|p\d{2}|lab|diag|hero|logo)[_-][a-z0-9_]+\.(png|jpg|jpeg|svg|webp|gif)$'
 
 # oppevara.edu.ee soovitus: illustratsioon ~150 kB. Üle selle = hoiatus.
 pildi_max_kb: 300
