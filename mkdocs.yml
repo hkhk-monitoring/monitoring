@@ -1,5 +1,5 @@
 site_name: Süsteemide monitooring
-site_description: Kuidas masin oma seisundist räägib - mõõdikud, graafikud, alarmid ja logid
+site_description: Logid, mõõdikud ja jäljed - kuidas süsteem endast räägib ja kuidas seda kuulata
 site_author: Maria Talvik
 site_url: https://hkhk-monitoring.github.io/monitoring
 copyright: Maria Talvik &middot; CC BY-SA 4.0
@@ -86,7 +86,7 @@ nav:
   - Töökeskkond: kodulabor.md
 
 - Nädalad:
-  - N7 · Kuidas masin oma seisundist räägib:
+  - N7 · Masina päevik ja logid ühte kohta:
     - Loeng: week07/lecture.md
     - Labor: week07/lab.md
     - Kodutöö: week07/homework.md
