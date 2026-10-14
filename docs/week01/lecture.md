@@ -15,10 +15,11 @@ tags:
 
     - selgitada, miks logid on seire esimene signaal ja millele need vastavad;
     - lugeda logikirjest välja aja, masina, programmi, tõsiduse ja sõnumi;
-    - kirjeldada, kuidas journald ja rsyslog AlmaLinuxis koos töötavad;
+    - kirjeldada, kuidas journald, rsyslog ja auditd AlmaLinuxis koos töötavad ja kes tohib nende logisid lugeda;
     - kasutada logi päritolu (facility) ja tõsidust (severity), et otsustada, kuhu kirje läheb;
     - selgitada, miks logisid pööratakse (logrotate) ja mis juhtub, kui seda ei tehta;
-    - põhjendada, miks logid saadetakse keskserverisse, ja võrrelda UDP ja TCP saatmist.
+    - põhjendada, miks logid saadetakse keskserverisse, ja võrrelda UDP ja TCP saatmist;
+    - leida suurest logist vastus võttega "filtreeri, loenda, vaata".
 
 <figure markdown="span">
 ```mermaid
@@ -39,9 +40,9 @@ Kursusel on neli osa. Täna alustame vasakpoolsest sambast, **logidest**. Mõõd
 ## Sisukord
 
 1. [Mis juhtus kell 03:12?](#1-mis-juhtus-kell-0312)
-2. [Kaks päevikupidajat](#2-kaks-paevikupidajat)
+2. [Kolm logi ja kes neid loeb](#2-kolm-logi-ja-kes-neid-loeb)
 3. [Kust ja kui tõsine](#3-kust-ja-kui-tosine)
-4. [Päevik ei tohi kasvada lõputult](#4-paevik-ei-tohi-kasvada-loputult)
+4. [Logi ei tohi kasvada lõputult](#4-logi-ei-tohi-kasvada-loputult)
 5. [Logid ühte kohta](#5-logid-uhte-kohta)
 6. [Taust ja edasijõudnutele](#6-taust-ja-edasijoudnutele)
 
@@ -50,14 +51,14 @@ Kursusel on neli osa. Täna alustame vasakpoolsest sambast, **logidest**. Mõõd
 ## 1. Mis juhtus kell 03:12?
 
 !!! abstract "Miks see oluline on?"
-    Kui midagi läks öösel katki, ei olnud keegi seda nägemas. Ainus tunnistaja on masin ise ja tema päevik.
+    Kui midagi läks öösel katki, ei olnud keegi seda nägemas. Ainus tunnistaja on masin ise ja tema logi.
 
 `journalctl` ja `tail -f` oskad sa juba. Sel kursusel vaatame logisid teise pilguga: mitte "mis siin failis on", vaid "kuidas ma saan teada, mis juhtus, kui mind seal ei olnud".
 
 !!! example "Näidisstsenaarium"
     Kati teeb praktikat väikeses e-poes. Esmaspäeva hommikul ütleb juhataja: "Pood oli öösel pool tundi maas. Klient kirjutas kell 03:20. Mis juhtus?"
 
-    Kati logib serverisse ja küsib päevikult:
+    Kati logib serverisse ja küsib logilt:
 
     ```text
     Oct 13 03:12:04 pood kernel: Out of memory: Killed process 2211 (php-fpm)
@@ -69,7 +70,7 @@ Kursusel on neli osa. Täna alustame vasakpoolsest sambast, **logidest**. Mõõd
 
 Pane tähele, kes rikke esimesena avastas: klient. Seire mõte on, et **kasutaja ei tohi olla see, kes rikke esimesena avastab.** Kogu see kursus käib selle ühe lause ümber.
 
-Logi (log) on programmi päevik: iga rida on üks sündmus koos ajaga. Logid vastavad küsimusele **"mis juhtus?"**. Hiljem kursusel lisanduvad mõõdikud ("kui palju?") ja jäljed ("kust läbi?"), aga logid on alati esimene koht, kust otsima hakatakse.
+Logi (log) on programmi märkmik: iga rida on üks sündmus koos ajaga. Logid vastavad küsimusele **"mis juhtus?"**. Hiljem kursusel lisanduvad mõõdikud ("kui palju?") ja jäljed ("kust läbi?"), aga logid on alati esimene koht, kust otsima hakatakse.
 
 Igal logikirjel on samad osad:
 
@@ -85,18 +86,32 @@ nähtamatud, aga olemas:  päritolu = kern   tõsidus = err (3)
 
 Neli osa on reas näha. Kaks viimast (päritolu ja tõsidus) on peidus, aga just need otsustavad, kuhu kirje läheb. Nendest räägib osa 3.
 
+Hea logirida ütleb, mis juhtus, mitte lihtsalt, et programm on elus. Internetis liigub vana nali logist, mis näeb välja umbes nii:
+
+```text
+00:00:01 Pole midagi teatada.
+00:00:02 Logifailis on üks rida.
+00:00:03 Logifailis on kaks rida.
+...
+01:02:00 Logifailis on kolm tuhat seitsesada üheksateist rida.
+01:02:01 Midagi juhtus, aga logiskript oli ridade loendamisega liiga hõivatud.
+01:02:02 Logifailis on kolm tuhat seitsesada kakskümmend üks rida.
+```
+
+Täpselt see rida, mida oleks vaja olnud, jäi kirja panemata.
+
 !!! question "✅ Kontrolli ennast"
     1. Miks ei piisa Katil sellest, et pood praegu töötab?
     2. Mida ütleb Katile see, et rea 2 ja rea 3 vahel on 29 minutit?
 
 ---
 
-## 2. Kaks päevikupidajat
+## 2. Kolm logi ja kes neid loeb
 
 !!! abstract "Miks see oluline on?"
-    Kui tead, kes logi vastu võtab ja kuhu edasi saadab, tead ka, kus seda otsida ja kust saab selle teise masinasse suunata.
+    Kui tead, kes logi vastu võtab ja kuhu edasi saadab, tead ka, kus seda otsida, kust saab selle teise masinasse suunata ja kes peale sinu seda veel näeb.
 
-AlmaLinuxis peab päevikut kaks programmi korraga:
+AlmaLinuxis võtavad programmide logikirjeid vastu kaks programmi korraga:
 
 - **journald** (osa systemd-st) võtab vastu kõik: tuuma sõnumid, teenuste väljundi, `logger` käsu read. Hoiab neid kahendvormingus andmebaasis, mida loed käsuga `journalctl`.
 - **rsyslog** loeb journaldist kõik kirjed ja kirjutab need tavalistesse tekstifailidesse kaustas `/var/log/`. Lisaks oskab ta neid **võrgu kaudu teise masinasse saata**.
@@ -127,11 +142,27 @@ Kõik programmid räägivad journaldiga. rsyslog on journaldi järel ja otsustab
 
 *Tabel 1.1. journald ja rsyslog*
 
-Ubuntus on failide nimed teised (`/var/log/syslog`, `/var/log/auth.log`), aga põhimõte on sama.
+Ubuntus on failide nimed teised (`/var/log/syslog`, `/var/log/auth.log`), aga põhimõte on sama. AlmaLinuxis hoiab journald oma journalit vaikimisi mälus, kui kausta `/var/log/journal` pole. Siis kaob kõik taaskäivitusel. Laboris teed selle püsivaks.
+
+Kolmas on **auditi logi** (`/var/log/audit/audit.log`), mida peab tuuma auditisüsteem `auditd`. journald ja rsyslog salvestavad seda, mida programmid ise ütlevad. Audit salvestab seda, mida tuum nägi: kes avas faili kirjutamiseks, kes käivitas `sudo`-ga käsu. Iga auditi rea juures on `auid`, kasutaja, kes algselt sisse logis. See ei muutu ka siis, kui ta kasutab `sudo`-t. rsyslog ütleb "fail muutus", audit ütleb "**kasutaja mari** muutis seda `sudo truncate`-iga kell 03:15".
+
+Lisaks on sisselogimiste ajalugu kahes **kahendfailis**: `/var/log/wtmp` (kes logis sisse) ja `/var/log/btmp` (ebaõnnestunud katsed). Neid loeb käskudega `last` ja `lastb`, mitte `cat`-iga.
+
+| Logi | Küsimus | Loed | Kes tohib lugeda |
+|---|---|---|---|
+| journald | mis juhtus (kõik kirjed, väljadega) | `journalctl` | root, grupid `systemd-journal`, `wheel`, `adm` |
+| rsyslogi failid | mis juhtus (tekst, reeglite järgi jaotatud) | `less`, `grep`, `tail` | ainult root (`600`) |
+| auditi logi | kes tegi | `ausearch`, `aureport` | ainult root |
+| wtmp, btmp | kes logis sisse / proovis | `last`, `lastb` | `last` kõik, `lastb` root |
+
+*Tabel 1.2. Logid ja ligipääs*
+
+Logides on IP-aadressid, kasutajanimed ja vahel ka asju, mida seal olla ei tohiks, näiteks parool, mille keegi kirjutas kogemata kasutajanime lahtrisse. Seepärast loeb AlmaLinuxis tekstilogisid ainult root. Kui kolleeg vajab veaotsinguks journalit, lisa ta gruppi `systemd-journal`, mitte ära anna talle `sudo`-t.
 
 !!! question "✅ Kontrolli ennast"
     1. Kati käivitab `logger "tere"`. Kus kahes kohas see rida nüüd on?
     2. Miks on vaja rsyslogi, kui journald hoiab niikuinii kõike?
+    3. Keegi tühjendas `sudo`-ga turvalogi. Mis väljast leiad auditi logis, kes see oli, ja miks `uid` sind ei aita?
 
 ---
 
@@ -157,7 +188,7 @@ Igal kirjel on kaks silti.
 | 6 | `info` | informatsioon | söökla on avatud |
 | 7 | `debug` | detailid veaotsinguks | kes mis kell ukse avas |
 
-*Tabel 1.2. Tõsiduse tasemed*
+*Tabel 1.3. Tõsiduse tasemed*
 
 Kui küsid `journalctl -p warning`, saad kõik tasemed 0-4 ehk "hoiatus ja hullem".
 
@@ -177,12 +208,12 @@ Esimene rida saadab kõik sisselogimised faili `secure`. Teine saadab kõik tase
 
 ---
 
-## 4. Päevik ei tohi kasvada lõputult
+## 4. Logi ei tohi kasvada lõputult
 
 !!! abstract "Miks see oluline on?"
     Logi, mis kasvab igavesti, täidab lõpuks ketta. Täis ketas peatab programmid. Logi, mis peaks probleeme näitama, tekitab siis ise probleemi.
 
-Mati koolis on veebiserver, mis kirjutab iga päringu kohta rea. Päevas on see 200 MB, aastas 70 GB. Ühel päeval on ketas täis ja server lõpetab vastamise. Põhjus on päevik, mida keegi ei lugenud.
+Mati koolis on veebiserver, mis kirjutab iga päringu kohta rea. Päevas on see 200 MB, aastas 70 GB. Ühel päeval on ketas täis ja server lõpetab vastamise. Põhjus on logi, mida keegi ei lugenud.
 
 Lahendus on **logrotate**: programm, mis käib regulaarselt (tavaliselt kord ööpäevas) logifailid üle ja **pöörab** need. Praegune fail saab nimeks `.1`, vana `.1` saab `.2`, vanad pakitakse kokku ja kõige vanem kustutatakse.
 
@@ -208,9 +239,19 @@ Joonisel liigub fail iga pööramisega paremale. Kolmest vanemast fail kustutata
 | `missingok` | ära anna viga, kui faili pole |
 | `postrotate` | käsk pärast pööramist, tavaliselt "rsyslog, ava uus fail" |
 
-*Tabel 1.3. Logrotate'i põhivalikud*
+*Tabel 1.4. Logrotate'i põhivalikud*
 
-Kui kaua logisid hoida, sõltub sellest, milleks neid vaja on. Veaotsinguks piisab paarist nädalast. Sisselogimiste logisid hoitakse kauem (kuude või aastate kaupa), sest turvaintsident avastatakse sageli alles hiljem.
+Kui kaua logisid hoida, sõltub sellest, milleks neid vaja on. Suurtes firmades on selleks kolm taset:
+
+| Tase | Kui kaua | Kus | Milleks |
+|---|---|---|---|
+| kuum | päevad kuni kuud | kiire ketas, otsingusüsteem | igapäevane veaotsing ja seire |
+| soe | kuud kuni paar aastat | odavam ketas, pakitud | vanade juhtumite uurimine |
+| külm | aastaid | arhiiv | auditid ja seadused |
+
+*Tabel 1.5. Logide säilitamise tasemed*
+
+Sisselogimiste logisid hoitakse kauem kui veaotsingu logisid, sest turvaintsident avastatakse sageli alles nädalaid hiljem.
 
 !!! question "✅ Kontrolli ennast"
     1. Reegel on `daily` ja `rotate 7`. Mitu päeva vana logi leiad kettalt kõige rohkem?
@@ -221,7 +262,7 @@ Kui kaua logisid hoida, sõltub sellest, milleks neid vaja on. Veaotsinguks piis
 ## 5. Logid ühte kohta
 
 !!! abstract "Miks see oluline on?"
-    Masina enda päevik on kasutu, kui masin ise on kadunud või kui keegi on päeviku ära kustutanud. Keskserver hoiab koopiat kohas, kuhu probleem ei ulatu.
+    Masina enda logi on kasutu, kui masin ise on kadunud või kui keegi on logi ära kustutanud. Keskserver hoiab koopiat kohas, kuhu probleem ei ulatu.
 
 Kujuta ette kolme olukorda:
 
@@ -254,13 +295,30 @@ Saata saab kahel viisil:
 | Kui server on maas | kirjed kaovad | klient hoiab järjekorras ja saadab hiljem |
 | Sobib | palju vähetähtsaid kirjeid | turvalogid, kõik, mis ei tohi kaduda |
 
-*Tabel 1.4. UDP ja TCP logide saatmisel*
+*Tabel 1.6. UDP ja TCP logide saatmisel*
 
 Laboris kasutad TCP-d ja annad kliendile järjekorra, et logid ei kaoks ka siis, kui keskserver on hetkeks maas.
+
+Kolme masina logisid saab ajajärjekorda panna ainult siis, kui masinate kellad on sünkroonis. Kui `proxmox2` kell käib kaks minutit ees, näib, et viga juhtus enne põhjust. Automatiseerimise kursusel seadistasid chrony (nädal 4): see on ka seire eeldus.
+
+### Kuidas leida nõel heinakuhjast
+
+!!! quote "Vana tõde"
+    Rakendus kirjutas öösel 3 GB logi. Tekstiredaktor keeldub seda avamast.
+    *"Olgu siis. Hoia oma saladusi."*
+
+Keskserveris on varsti miljoneid ridu. Neid ei loeta, neilt **küsitakse**. Töövõte on alati sama:
+
+1. **Filtreeri:** jäta alles ainult see, mis puudutab küsimust (aeg, masin, programm, tõsidus, sõna).
+2. **Loenda:** mitu korda? kellelt kõige rohkem? mis minutil? (`grep -c`, `sort | uniq -c | sort -rn`)
+3. **Vaata:** alles nüüd loe paari rida, mis järele jäid.
+
+Kui rida on kujul `nimi=väärtus` (`staatus=500 ip=10.0.1.36`), on filtreerimine palju täpsem kui vaba teksti puhul: `grep 'staatus=500'` ei leia kogemata rida, kus `500` on hoopis id või aeg.
 
 !!! question "✅ Kontrolli ennast"
     1. Ründaja tühjendas `proxmox3`-s faili `/var/log/secure`. Kust leiad tema sisselogimise jäljed ja miks seal veel on?
     2. Miks valid turvalogide jaoks TCP, kuigi UDP on lihtsam?
+    3. Sul on 2 miljonit rida veebilogi ja küsimus "mis minutil oli kõige rohkem vigu?". Kirjelda filtreeri-loenda-vaata samme oma sõnadega.
 
 ---
 
@@ -270,7 +328,7 @@ See osa ei ole kohustuslik, aga kui tahad teada, kuidas seda tööd päriselt te
 
 **Krüpteerimine.** Port 514 saadab logid avatud tekstina. Päriselus kasutatakse TLS-i (port 6514), et keegi ei saaks logisid pealt kuulata ega võltsida. Vaata [rsyslogi dokumentatsioonist](https://docs.rsyslog.com/doc/) otsingusõna "TLS".
 
-**auditd.** rsyslog ütleb, et fail muutus. Tuuma auditisüsteem `auditd` ütleb, **kes** seda muutis, mis protsessiga ja mis õigustega. Seda nõuavad pangad ja muud reguleeritud valdkonnad.
+**Logide terviklikkus.** Ründaja, kes pääseb keskserverisse, saab ka seal logisid muuta. Selle vastu arvutatakse pööratud logidest räsi (`sha256sum`) ja hoitakse räsisid eraldi. Kui fail hiljem muutub, ei klapi räsi.
 
 **Struktureeritud logid.** Tekstirida on inimesele mugav, aga masinale raske lugeda. Paljud rakendused kirjutavad logi JSON-vormingus, kus iga väli on eraldi. N8-N9 näed, miks see logide otsimisel oluline on.
 
@@ -280,22 +338,24 @@ See osa ei ole kohustuslik, aga kui tahad teada, kuidas seda tööd päriselt te
 
 ## Kokkuvõte
 
-Logid vastavad küsimusele "mis juhtus?". AlmaLinuxis võtab kõik kirjed vastu journald ja rsyslog jagab need reeglite järgi failidesse. Päritolu ja tõsidus otsustavad, kuhu kirje läheb. Logrotate hoiab ära, et logid ketta täis kirjutaks. Keskserver hoiab koopiat ka siis, kui masin on kadunud või jäljed on kustutatud.
+Logid vastavad küsimusele "mis juhtus?", audit küsimusele "kes tegi?". AlmaLinuxis võtab kõik kirjed vastu journald ja rsyslog jagab need reeglite järgi failidesse. Logisid loeb ainult see, kellel on selleks õigus. Päritolu ja tõsidus otsustavad, kuhu kirje läheb. Logrotate hoiab ära, et logid ketta täis kirjutaks. Keskserver hoiab koopiat ka siis, kui masin on kadunud või jäljed on kustutatud.
 
 ### Logid ühe pilguga
 
 | Mõiste | Selgitus | Kus näed |
 |---|---|---|
-| **Logi (log)** | programmi päevik, iga rida on sündmus koos ajaga | `/var/log/`, `journalctl` |
-| **journald** | võtab vastu kõik kirjed, kahendvormingus | `journalctl` |
+| **Logi (log)** | programmi märkmik, iga rida on sündmus koos ajaga | `/var/log/`, `journalctl` |
+| **journald** | võtab vastu kõik kirjed ja hoiab neid journalis (kahendvorming) | `journalctl` |
 | **rsyslog** | jagab kirjed failidesse ja saadab võrku | `/etc/rsyslog.conf`, `/etc/rsyslog.d/` |
 | **Päritolu (facility)** | millisest süsteemi osast kirje tuli | `authpriv`, `kern`, `local0` |
 | **Tõsidus (severity)** | kui tõsine, 0 (hullem) kuni 7 | `journalctl -p err` |
 | **Reegel** | filter (päritolu.tõsidus) + tegevus (fail või võrk) | `authpriv.* /var/log/secure` |
 | **Logrotate** | pöörab, pakib ja kustutab vanu logisid | `/etc/logrotate.d/` |
 | **Keskserver** | võtab vastu kõigi masinate logid | `/var/log/remote/` |
+| **Audit** | kes tegi; `auid` ei muutu `sudo`-ga | `ausearch -k ... -i` |
+| **Filtreeri, loenda, vaata** | suure logi otsimise võte | `grep \| sort \| uniq -c` |
 
-*Tabel 1.5. Mõisted ühe pilguga*
+*Tabel 1.7. Mõisted ühe pilguga*
 
 ## 🎯 Lõplik kontroll
 
