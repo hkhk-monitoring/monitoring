@@ -3,4 +3,5 @@ site/
 .DS_Store
 __pycache__/
 *.pyc
-TODO.mdtests/.ssh_config
+TODO.md
+tests/.ssh_config
