@@ -20,6 +20,22 @@ tags:
     - selgitada, miks logisid pööratakse (logrotate) ja mis juhtub, kui seda ei tehta;
     - põhjendada, miks logid saadetakse keskserverisse, ja võrrelda UDP ja TCP saatmist.
 
+<figure markdown="span">
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e0f2f1','primaryBorderColor':'#00796b','primaryTextColor':'#212121','lineColor':'#26a69a'}}}%%
+graph TB
+    O["Observability<br/>miks see juhtus?"]
+    O --- L["Logid<br/>mis juhtus?"]
+    O --- M["Mõõdikud<br/>kui palju ja kui kaua?"]
+    O --- J["Jäljed<br/>kus päring aega kulutas?"]
+    classDef siin fill:#ffb300,stroke:#e65100,stroke-width:3px,color:#212121
+    class L siin
+```
+  <figcaption>Joonis 1.1. Kursuse neli osa: logid, mõõdikud ja jäljed on kolm sammast, observability on katus, mis paneb need kokku. Esile tõstetud sammas on see, millega täna tegeleme.</figcaption>
+</figure>
+
+Kursusel on neli osa. Täna alustame vasakpoolsest sambast, **logidest**. Mõõdikud tulevad kohtumistel 2-7, jäljed kohtumisel 10 ja kõik koos alates kohtumisest 11.
+
 ## Sisukord
 
 1. [Mis juhtus kell 03:12?](#1-mis-juhtus-kell-0312)
@@ -64,12 +80,12 @@ Oct 13 03:12:04   pood   kernel:   Out of memory: Killed process 2211 (php-fpm)
 
 nähtamatud, aga olemas:  päritolu = kern   tõsidus = err (3)
 ```
-  <figcaption>Joonis 7.1. Logikirje osad. Aeg, masin, programm ja sõnum on reas näha. Päritolu (facility) ja tõsidus (severity) on kirje küljes, aga tekstireal neid vaikimisi ei näidata.</figcaption>
+  <figcaption>Joonis 1.2. Logikirje osad. Aeg, masin, programm ja sõnum on reas näha. Päritolu (facility) ja tõsidus (severity) on kirje küljes, aga tekstireal neid vaikimisi ei näidata.</figcaption>
 </figure>
 
 Neli osa on reas näha. Kaks viimast (päritolu ja tõsidus) on peidus, aga just need otsustavad, kuhu kirje läheb. Nendest räägib osa 3.
 
-??? question "✅ Kontrolli ennast"
+!!! question "✅ Kontrolli ennast"
     1. Miks ei piisa Katil sellest, et pood praegu töötab?
     2. Mida ütleb Katile see, et rea 2 ja rea 3 vahel on 29 minutit?
 
@@ -87,7 +103,7 @@ AlmaLinuxis peab päevikut kaks programmi korraga:
 
 <figure markdown="span">
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ede7f6','primaryBorderColor':'#5e35b1','primaryTextColor':'#212121','lineColor':'#7e57c2'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e0f2f1','primaryBorderColor':'#00796b','primaryTextColor':'#212121','lineColor':'#26a69a'}}}%%
 graph LR
     P1["sshd"] --> J["journald<br/>journalctl"]
     P2["kernel"] --> J
@@ -97,7 +113,7 @@ graph LR
     R --> F2["/var/log/secure"]
     R -.->|"võrk, port 514"| K["keskserver<br/>proxmox1"]
 ```
-  <figcaption>Joonis 7.2. Logi teekond AlmaLinuxis: programmid kirjutavad journaldisse, rsyslog loeb sealt mooduli imjournal kaudu ja jagab kirjed reeglite järgi failidesse. Katkendjoon on võrguühendus, mille laboris ise seadistad.</figcaption>
+  <figcaption>Joonis 1.3. Logi tee AlmaLinuxis: programmid kirjutavad journaldisse, rsyslog loeb sealt mooduli imjournal kaudu ja jagab kirjed reeglite järgi failidesse. Katkendjoon on võrguühendus, mille laboris ise seadistad.</figcaption>
 </figure>
 
 Kõik programmid räägivad journaldiga. rsyslog on journaldi järel ja otsustab reeglite järgi, mis faili iga kirje läheb ja kas see saadetakse ka võrku.
@@ -109,11 +125,11 @@ Kõik programmid räägivad journaldiga. rsyslog on journaldi järel ja otsustab
 | Loed | `journalctl` | `less`, `grep`, `tail` |
 | Tugevus | kiire otsing välja järgi (`-u`, `-p`, `--since`) | reeglid, failid, saatmine võrku |
 
-*Tabel 7.1. journald ja rsyslog*
+*Tabel 1.1. journald ja rsyslog*
 
 Ubuntus on failide nimed teised (`/var/log/syslog`, `/var/log/auth.log`), aga põhimõte on sama.
 
-??? question "✅ Kontrolli ennast"
+!!! question "✅ Kontrolli ennast"
     1. Kati käivitab `logger "tere"`. Kus kahes kohas see rida nüüd on?
     2. Miks on vaja rsyslogi, kui journald hoiab niikuinii kõike?
 
@@ -141,7 +157,7 @@ Igal kirjel on kaks silti.
 | 6 | `info` | informatsioon | söökla on avatud |
 | 7 | `debug` | detailid veaotsinguks | kes mis kell ukse avas |
 
-*Tabel 7.2. Tõsiduse tasemed*
+*Tabel 1.2. Tõsiduse tasemed*
 
 Kui küsid `journalctl -p warning`, saad kõik tasemed 0-4 ehk "hoiatus ja hullem".
 
@@ -155,7 +171,7 @@ local0.warning              /var/log/pood-hoiatused.log
 
 Esimene rida saadab kõik sisselogimised faili `secure`. Teine saadab kõik tasemest `info` alates faili `messages`, aga mitte sisselogimisi (need sisaldavad tundlikku infot). Kolmas on sinu reegel: poe rakenduse hoiatused ja hullemad eraldi faili.
 
-??? question "✅ Kontrolli ennast"
+!!! question "✅ Kontrolli ennast"
     1. Rakendus kirjutab `local0.err`. Kas see jõuab reegli `local0.warning` faili? Miks?
     2. Miks hoitakse sisselogimiste logi (`secure`) eraldi ja rangemate õigustega?
 
@@ -172,14 +188,14 @@ Lahendus on **logrotate**: programm, mis käib regulaarselt (tavaliselt kord ö�
 
 <figure markdown="span">
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ede7f6','primaryBorderColor':'#5e35b1','primaryTextColor':'#212121','lineColor':'#7e57c2'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e0f2f1','primaryBorderColor':'#00796b','primaryTextColor':'#212121','lineColor':'#26a69a'}}}%%
 graph LR
     A["pood.log<br/>täna"] -->|"pööramine"| B["pood.log.1<br/>eile"]
     B --> C["pood.log.2.gz<br/>üleeile, pakitud"]
     C --> D["pood.log.3.gz"]
     D -->|"rotate 3"| X["kustutatakse"]
 ```
-  <figcaption>Joonis 7.3. Logrotate pöörab faili: iga pööramise järel liigub iga fail sammu edasi, vanemad pakitakse ja reegel `rotate 3` hoiab alles kolm vana faili.</figcaption>
+  <figcaption>Joonis 1.4. Logrotate pöörab faili: iga pööramise järel liigub iga fail sammu edasi, vanemad pakitakse ja reegel `rotate 3` hoiab alles kolm vana faili.</figcaption>
 </figure>
 
 Joonisel liigub fail iga pööramisega paremale. Kolmest vanemast fail kustutatakse, nii et kettal on alati kindel arv faile ja maht ei kasva lõputult.
@@ -192,11 +208,11 @@ Joonisel liigub fail iga pööramisega paremale. Kolmest vanemast fail kustutata
 | `missingok` | ära anna viga, kui faili pole |
 | `postrotate` | käsk pärast pööramist, tavaliselt "rsyslog, ava uus fail" |
 
-*Tabel 7.3. Logrotate'i põhivalikud*
+*Tabel 1.3. Logrotate'i põhivalikud*
 
 Kui kaua logisid hoida, sõltub sellest, milleks neid vaja on. Veaotsinguks piisab paarist nädalast. Sisselogimiste logisid hoitakse kauem (kuude või aastate kaupa), sest turvaintsident avastatakse sageli alles hiljem.
 
-??? question "✅ Kontrolli ennast"
+!!! question "✅ Kontrolli ennast"
     1. Reegel on `daily` ja `rotate 7`. Mitu päeva vana logi leiad kettalt kõige rohkem?
     2. Miks peab rsyslog pärast pööramist "uue faili avama"? Mis juhtuks, kui ta seda ei teeks?
 
@@ -217,17 +233,17 @@ Kõigi kolme lahendus on sama: iga masin saadab oma logid kohe ka **keskserveris
 
 <figure markdown="span">
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ede7f6','primaryBorderColor':'#5e35b1','primaryTextColor':'#212121','lineColor':'#7e57c2'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e0f2f1','primaryBorderColor':'#00796b','primaryTextColor':'#212121','lineColor':'#26a69a'}}}%%
 graph LR
     A["proxmox2<br/>rsyslog"] -->|"TCP 514"| S["proxmox1<br/>rsyslog keskserver"]
     B["proxmox3<br/>rsyslog"] -->|"TCP 514"| S
     S --> D1["/var/log/remote/proxmox2/sshd.log"]
     S --> D2["/var/log/remote/proxmox3/sshd.log"]
 ```
-  <figcaption>Joonis 7.4. Keskne logimine: `proxmox2` ja `proxmox3` saadavad iga kirje ka `proxmox1`-le, mis kirjutab need masina ja programmi järgi eraldi kaustadesse.</figcaption>
+  <figcaption>Joonis 1.5. Keskne logimine: `proxmox2` ja `proxmox3` saadavad iga kirje ka `proxmox1`-le, mis kirjutab need masina ja programmi järgi eraldi kaustadesse.</figcaption>
 </figure>
 
-Klient **saadab ise** (push): iga uus kirje läheb kohe võrku. Selline mudel tuleb kursusel veel ette (Zabbixi agent N10-s). N11-s näed vastupidist mudelit, kus server käib ise küsimas.
+Klient **saadab ise** (push): iga uus kirje läheb kohe võrku. Selline mudel tuleb kursusel veel ette (Zabbixi agent N4-s). N5-s näed vastupidist mudelit, kus server käib ise küsimas.
 
 Saata saab kahel viisil:
 
@@ -238,11 +254,11 @@ Saata saab kahel viisil:
 | Kui server on maas | kirjed kaovad | klient hoiab järjekorras ja saadab hiljem |
 | Sobib | palju vähetähtsaid kirjeid | turvalogid, kõik, mis ei tohi kaduda |
 
-*Tabel 7.4. UDP ja TCP logide saatmisel*
+*Tabel 1.4. UDP ja TCP logide saatmisel*
 
 Laboris kasutad TCP-d ja annad kliendile järjekorra, et logid ei kaoks ka siis, kui keskserver on hetkeks maas.
 
-??? question "✅ Kontrolli ennast"
+!!! question "✅ Kontrolli ennast"
     1. Ründaja tühjendas `proxmox3`-s faili `/var/log/secure`. Kust leiad tema sisselogimise jäljed ja miks seal veel on?
     2. Miks valid turvalogide jaoks TCP, kuigi UDP on lihtsam?
 
@@ -256,9 +272,9 @@ See osa ei ole kohustuslik, aga kui tahad teada, kuidas seda tööd päriselt te
 
 **auditd.** rsyslog ütleb, et fail muutus. Tuuma auditisüsteem `auditd` ütleb, **kes** seda muutis, mis protsessiga ja mis õigustega. Seda nõuavad pangad ja muud reguleeritud valdkonnad.
 
-**Struktureeritud logid.** Tekstirida on inimesele mugav, aga masinale raske lugeda. Paljud rakendused kirjutavad logi JSON-vormingus, kus iga väli on eraldi. N14-N15 näed, miks see logide otsimisel oluline on.
+**Struktureeritud logid.** Tekstirida on inimesele mugav, aga masinale raske lugeda. Paljud rakendused kirjutavad logi JSON-vormingus, kus iga väli on eraldi. N8-N9 näed, miks see logide otsimisel oluline on.
 
-**Edasi.** Failid keskserveris on esimene samm. N14 saadad samad logid Lokisse, kus saad neid sildi järgi otsida, ja N15 OpenSearchi, kus saad otsida iga sõna järgi.
+**Edasi.** Failid keskserveris on esimene samm. N8 saadad samad logid Lokisse, kus saad neid sildi järgi otsida, ja N9 OpenSearchi, kus saad otsida iga sõna järgi.
 
 ---
 
@@ -279,12 +295,12 @@ Logid vastavad küsimusele "mis juhtus?". AlmaLinuxis võtab kõik kirjed vastu 
 | **Logrotate** | pöörab, pakib ja kustutab vanu logisid | `/etc/logrotate.d/` |
 | **Keskserver** | võtab vastu kõigi masinate logid | `/var/log/remote/` |
 
-*Tabel 7.5. Mõisted ühe pilguga*
+*Tabel 1.5. Mõisted ühe pilguga*
 
 ## 🎯 Lõplik kontroll
 
 1. Selgita oma sõnadega, miks logid on seire esimene signaal ja millisele küsimusele need vastavad.
-2. Joonista paberile logikirje teekond programmist kuni keskserveri failini ja nimeta iga sammu juures, kes seda teeb.
+2. Joonista paberile logikirje tee programmist kuni keskserveri failini ja nimeta iga sammu juures, kes seda teeb.
 3. Kirjuta rsyslogi reegel, mis saadab rakenduse `local3` vead ja hullemad faili `/var/log/rakendus-vead.log`. Selgita, kumb pool on filter ja kumb tegevus.
 4. Mati server jäi seisma, sest ketas sai täis. Mis oli tõenäoline põhjus ja kuidas logrotate oleks seda takistanud?
 5. Nimeta kolm olukorda, kus masina enda logist ei ole abi, aga keskserverist on.
@@ -292,4 +308,4 @@ Logid vastavad küsimusele "mis juhtus?". AlmaLinuxis võtab kõik kirjed vastu 
 
 ---
 
-*Laboris uurid kõigepealt üht masinat: kus logid elavad, kuidas kirjutada oma reegel ja kuidas logi pöörata. Siis teed `proxmox1`-st keskserveri ja saadad sinna teiste sõlmede logid. Nüüd oled valmis laboriks! 🚀*
+*Laboris uurid kõigepealt üht masinat: kus logid elavad, kuidas kirjutada oma reegel ja kuidas logi pöörata. Siis teed `proxmox1`-st keskserveri ja saadad sinna teiste sõlmede logid.*

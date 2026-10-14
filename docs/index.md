@@ -4,7 +4,7 @@
 
 Server ei oska kurta. Ta kirjutab päevikut, näitab numbreid ja jätab jälgi. Sellel kursusel õpid neid lugema, ühte kohta koguma, pildiks tegema ja nende peale reageerima, et saaksid probleemist teada enne kasutajat.
 
-[Alusta kursusega](week07/lecture.md){ .btn-primary }
+[Alusta kursusega](week01/lecture.md){ .btn-primary }
 [Kursuse ülesehitus](syllabus.md){ .btn-secondary }
 </div>
 </div>
@@ -22,21 +22,21 @@ Server ei oska kurta. Ta kirjutab päevikut, näitab numbreid ja jätab jälgi. 
 
 ## Programm
 
-| Nädal | Mõisteplokk |
+| Kohtumine | Mõisteplokk |
 |---|---|
-| N7 | Masina päevik ja logid ühte kohta |
-| N8 | Keskne jälgimissüsteem |
-| N9 | Mõõdik, aegrida, agent *(veebiõpe)* |
-| N10 | Agent räägib serverile |
-| N11 | Server küsib ise |
-| N12 | Numbrid pildiks ja alarm |
-| N13 | Aegrea andmebaas teisiti |
-| N14 | Logid sildi järgi |
-| N15 | Logid täisotsinguga |
-| N19 | Päringu teekond |
-| N20 | Kolm sammast koos ja kas üldse töötab |
-| N21 | Turvamonitooring ja intsident |
-| N22 | Lõputöö ja kaitsmine |
+| N1 | Masina päevik ja logid ühte kohta |
+| N2 | Keskne jälgimissüsteem |
+| N3 | Mõõdik, aegrida, agent *(veebiõpe)* |
+| N4 | Agent räägib serverile |
+| N5 | Server küsib ise |
+| N6 | Numbrid pildiks ja alarm |
+| N7 | Aegrea andmebaas teisiti |
+| N8 | Logid sildi järgi |
+| N9 | Logid täisotsinguga |
+| N10 | Päringu teekond |
+| N11 | Kolm sammast koos ja kas üldse töötab |
+| N12 | Turvamonitooring ja intsident |
+| N13 | Lõputöö ja kaitsmine |
 
 Tunnid, tööriistad ja hindamine: [Kursuse ülesehitus](syllabus.md).
 

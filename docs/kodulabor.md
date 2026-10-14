@@ -36,22 +36,22 @@ Kolm `pong`-i. Lõpu koma `-i` järel on vajalik.
 
 ## Pordid
 
-Alates N8-st avad brauseris teenuseid sõlmes `proxmox1`. Kasuta sõlme IP-d, mille said automatiseerimise kursusel.
+Alates N2-st avad brauseris teenuseid sõlmes `proxmox1`. Kasuta sõlme IP-d, mille said automatiseerimise kursusel.
 
 | Teenus | Port | Alates |
 |---|---|---|
-| rsyslog (logide vastuvõtt) | 514/tcp | N7 |
-| Zabbix veebiliides | 8080 | N8 |
-| Zabbix agent | 10050 | N10 |
-| Prometheus | 9090 | N11 |
-| node_exporter | 9100 | N11 |
-| Grafana | 3000 | N12 |
-| Alertmanager | 9093 | N12 |
-| InfluxDB | 8086 | N13 |
-| Loki | 3100 | N14 |
-| OpenSearch Dashboards | 5601 | N15 |
-| Jaeger | 16686 | N19 |
-| Uptime Kuma | 3001 | N20 |
+| rsyslog (logide vastuvõtt) | 514/tcp | N1 |
+| Zabbix veebiliides | 8080 | N2 |
+| Zabbix agent | 10050 | N4 |
+| Prometheus | 9090 | N5 |
+| node_exporter | 9100 | N5 |
+| Grafana | 3000 | N6 |
+| Alertmanager | 9093 | N6 |
+| InfluxDB | 8086 | N7 |
+| Loki | 3100 | N8 |
+| OpenSearch Dashboards | 5601 | N9 |
+| Jaeger | 16686 | N10 |
+| Uptime Kuma | 3001 | N11 |
 
 *Tabel 2. Teenused ja pordid*
 

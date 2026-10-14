@@ -35,24 +35,24 @@ Kursuse lõpuks õppija:
 
 ## Kohtumised ühe pilguga
 
-| Nr | Nädal | h | Osa | Mõisteplokk | Tööriistad | Loeng / labor (min) |
-|---:|---|---:|---|---|---|---|
-| 1 | N7 | 4 | Logging | Masina päevik ja logid ühte kohta | journald, rsyslog, logrotate | 35 / 125 |
-| 2 | N8 | 2 | Monitoring | Keskne jälgimissüsteem | Zabbix server | 20 / 60 |
-| 3 | N9 | 2 | Monitoring | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, stress-ng, Zabbix | 20 / 60 |
-| 4 | N10 | 2 | Monitoring | Agent räägib serverile | Zabbix agent 2, Ansible | 20 / 60 |
-| 5 | N11 | 4 | Monitoring | Server küsib ise | Prometheus, node_exporter, PromQL | 35 / 125 |
-| 6 | N12 | 4 | Monitoring | Numbrid pildiks ja alarm | Grafana, Alertmanager | 35 / 125 |
-| 7 | N13 | 4 | Monitoring | Aegrea andmebaas teisiti | Telegraf, InfluxDB 3 | 35 / 125 |
-| 8 | N14 | 2 | Logging | Logid sildi järgi | Loki, Grafana Alloy | 20 / 60 |
-| 9 | N15 | 6 | Logging | Logid täisotsinguga | Elasticsearch/OpenSearch, Kibana/Dashboards | 45 / 200 |
-| 10 | N19 | 4 | Tracing | Päringu teekond | OpenTelemetry, Jaeger/Tempo | 35 / 125 |
-| 11 | N20 | 4 | Observability | Kolm sammast koos ja kas üldse töötab | Blackbox exporter, Uptime Kuma | 35 / 125 |
-| 12 | N21 | 4 | Observability | Turvamonitooring ja intsident | Wazuh | 35 / 125 |
-| 13 | N22 | 8 | Observability | Lõputöö ja kaitsmine | oma valik | 15 / 240 + 90 kaitsmisi |
-| | | **50** | | | | |
+| Nr | h | Osa | Mõisteplokk | Tööriistad | Loeng / labor (min) |
+|---:|---:|---|---|---|---|
+| 1 | 4 | Logging | Masina päevik ja logid ühte kohta | journald, rsyslog, logrotate | 35 / 125 |
+| 2 | 2 | Monitoring | Keskne jälgimissüsteem | Zabbix server | 20 / 60 |
+| 3 | 2 | Monitoring | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, stress-ng, Zabbix | 20 / 60 |
+| 4 | 2 | Monitoring | Agent räägib serverile | Zabbix agent 2, Ansible | 20 / 60 |
+| 5 | 4 | Monitoring | Server küsib ise | Prometheus, node_exporter, PromQL | 35 / 125 |
+| 6 | 4 | Monitoring | Numbrid pildiks ja alarm | Grafana, Alertmanager | 35 / 125 |
+| 7 | 4 | Monitoring | Aegrea andmebaas teisiti | Telegraf, InfluxDB 3 | 35 / 125 |
+| 8 | 2 | Logging | Logid sildi järgi | Loki, Grafana Alloy | 20 / 60 |
+| 9 | 6 | Logging | Logid täisotsinguga | Elasticsearch/OpenSearch, Kibana/Dashboards | 45 / 200 |
+| 10 | 4 | Tracing | Päringu teekond | OpenTelemetry, Jaeger/Tempo | 35 / 125 |
+| 11 | 4 | Observability | Kolm sammast koos ja kas üldse töötab | Blackbox exporter, Uptime Kuma | 35 / 125 |
+| 12 | 4 | Observability | Turvamonitooring ja intsident | Wazuh | 35 / 125 |
+| 13 | 8 | Observability | Lõputöö ja kaitsmine | oma valik | 15 / 240 + 90 kaitsmisi |
+| | **50** | | | | |
 
-*Tabel 0.2. Kohtumised (1 tund = 45 min). Iga kohtumine lõpeb 10-15-minutilise kokkuvõttega. Nädalad 16-18 on jõuluvaheaeg.*
+*Tabel 0.2. Kohtumised (1 tund = 45 min). Iga kohtumine lõpeb 10-15-minutilise kokkuvõttega. *
 
 Neljatunnise kohtumise labor on kahes osas: **A** on juhendatud, pärast pausi tuleb **B**, kus kasutad sama oskust muudetud olukorras. Kuuetunnisel kohtumisel on osad A, B ja C. Iga labori lõpus on lisaülesanded neile, kes saavad varem valmis, kergest päris raskeni.
 
@@ -62,7 +62,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 1. Masina päevik ja logid ühte kohta
 
-**4 h · Logging · N7**
+**4 h · Logging**
 
 **Mida õpime**
 
@@ -88,7 +88,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 2. Keskne jälgimissüsteem
 
-**2 h · Monitoring · N8**
+**2 h · Monitoring**
 
 **Mida õpime**
 
@@ -109,7 +109,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 3. Mõõdik, aegrida, agent
 
-**2 h · Monitoring · N9 · veebiõpe**
+**2 h · Monitoring · veebiõpe**
 
 **Mida õpime**
 
@@ -133,7 +133,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 4. Agent räägib serverile
 
-**2 h · Monitoring · N10**
+**2 h · Monitoring**
 
 **Mida õpime**
 
@@ -154,7 +154,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 5. Server küsib ise
 
-**4 h · Monitoring · N11**
+**4 h · Monitoring**
 
 **Mida õpime**
 
@@ -177,7 +177,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 6. Numbrid pildiks ja alarm
 
-**4 h · Monitoring · N12**
+**4 h · Monitoring**
 
 **Mida õpime**
 
@@ -200,7 +200,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 7. Aegrea andmebaas teisiti
 
-**4 h · Monitoring · N13**
+**4 h · Monitoring**
 
 **Mida õpime**
 
@@ -222,7 +222,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 8. Logid sildi järgi
 
-**2 h · Logging · N14**
+**2 h · Logging**
 
 **Mida õpime**
 
@@ -243,7 +243,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 9. Logid täisotsinguga
 
-**6 h · Logging · N15**
+**6 h · Logging**
 
 **Mida õpime**
 
@@ -266,7 +266,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 10. Päringu teekond
 
-**4 h · Tracing · N19**
+**4 h · Tracing**
 
 **Mida õpime**
 
@@ -287,7 +287,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 11. Kolm sammast koos ja kas üldse töötab
 
-**4 h · Observability · N20**
+**4 h · Observability**
 
 **Mida õpime**
 
@@ -308,7 +308,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 12. Turvamonitooring ja intsident
 
-**4 h · Observability · N21**
+**4 h · Observability**
 
 **Mida õpime**
 
@@ -331,7 +331,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ## 13. Lõputöö ja kaitsmine
 
-**8 h · Observability · N22**
+**8 h · Observability**
 
 Rühmad 2-3 inimest. Iga rühm saab süsteemi ja ehitab sellele tervikliku jälgimise.
 

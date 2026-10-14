@@ -66,13 +66,13 @@ grep -h "Invalid user" "$KAUST"/*/*.log \
 
 Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skripti, mida see teeb. Kui mõnest aru ei saa, käivita torujuhe järk-järgult (kõigepealt ainult `grep`, siis lisa järgmine osa).
 
-**5. samm:** viimased 5 viga. Keskserveri failides ei ole tõsidus reas kirjas (loeng, joonis 7.1), seega ei saa seda `grep`-iga otsida. Kasuta sõnu: otsi ridu, kus on `error`, `fail` või `ebaõnnestus` (tõstutundetult, `grep -i -E`). Näita ainult 5 viimast.
+**5. samm:** viimased 5 viga. Keskserveri failides ei ole tõsidus reas kirjas (loeng, joonis 1.2), seega ei saa seda `grep`-iga otsida. Kasuta sõnu: otsi ridu, kus on `error`, `fail` või `ebaõnnestus` (tõstutundetult, `grep -i -E`). Näita ainult 5 viimast.
 
-💭 **Mõtle:** Miks on sõnade järgi otsimine halvem kui tõsiduse järgi? Mis rea võid nii kahe silma vahele jätta? (Lisaülesanne 5 laboris lahendab selle.)
+**Mõtle:** Miks on sõnade järgi otsimine halvem kui tõsiduse järgi? Mis rea võid nii kahe silma vahele jätta? (Lisaülesanne 5 laboris lahendab selle.)
 
 ## 3. Vasta
 
-Pane raporti väljund ja vastused oma arvutis faili `n07-logid.md` uue pealkirja `## Kodutöö` alla:
+Pane raporti väljund ja vastused oma arvutis faili `n01-logid.md` uue pealkirja `## Kodutöö` alla:
 
 1. Kopeeri raporti väljund (``` plokki).
 2. Mis IP-lt tulid sissetungi katsed ja miks on see IP sinu laboris just see?
@@ -81,7 +81,7 @@ Pane raporti väljund ja vastused oma arvutis faili `n07-logid.md` uue pealkirja
 
 ## Esitamine
 
-Laadi Tahvlis selle kohtumise iseseisva töö alla üles `logiraport.sh` ja `n07-logid.md`.
+Laadi Tahvlis selle kohtumise iseseisva töö alla üles `logiraport.sh` ja `n01-logid.md`.
 
 ---
 

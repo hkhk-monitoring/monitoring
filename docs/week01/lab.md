@@ -22,7 +22,7 @@ tags:
     5. seadistada keskse logiserveri ja saata sinna kahe masina logid;
     6. leida keskserverist turvasündmuse jäljed.
 
-    **Mis valmib:** `proxmox1` võtab vastu `proxmox2` ja `proxmox3` logid ja hoiab neid masina kaupa eraldi. Sinu arvutis on fail `n07-logid.md` vastuste ja tõenditega.
+    **Mis valmib:** `proxmox1` võtab vastu `proxmox2` ja `proxmox3` logid ja hoiab neid masina kaupa eraldi. Sinu arvutis on fail `n01-logid.md` vastuste ja tõenditega.
 
 ---
 
@@ -31,15 +31,15 @@ tags:
 Loo oma arvutis töökaust ja ava see VS Code'is:
 
 ```bash
-mkdir -p ~/monitooring/n07
-cd ~/monitooring/n07
+mkdir -p ~/monitooring/n01
+cd ~/monitooring/n01
 code .
 ```
 
-Loo fail `n07-logid.md` ainult pealkirjaga. Sisu lisad laboris samm-sammult:
+Loo fail `n01-logid.md` ainult pealkirjaga. Sisu lisad laboris samm-sammult:
 
 ```markdown
-# N7 logid
+# N1 logid
 ```
 
 Kontrolli, et kõik kolm sõlme vastavad (sama tsükkel nagu automatiseerimise nädalal 1):
@@ -70,7 +70,7 @@ ssh proxmox2
 
 ### A1. Kus päevik elab?
 
-**Ennusta enne** ja kirjuta faili `n07-logid.md`: kas `proxmox2` päevik (journald) elab üle masina taaskäivituse või kaob see?
+**Ennusta enne** ja kirjuta faili `n01-logid.md`: kas `proxmox2` päevik (journald) elab üle masina taaskäivituse või kaob see?
 
 Kontrolli:
 
@@ -87,7 +87,7 @@ systemctl is-active rsyslog
 grep -n imjournal /etc/rsyslog.conf
 ```
 
-Rida `module(load="imjournal" ...)` ongi joonise 7.2 nool journaldist rsyslogi (loeng, osa 2).
+Rida `module(load="imjournal" ...)` ongi joonise 1.3 nool journaldist rsyslogi (loeng, osa 2).
 
 Vaata nüüd rsyslogi vaikimisi reegleid:
 
@@ -106,7 +106,7 @@ uucp,news.crit                                          /var/log/spooler
 local7.*                                                /var/log/boot.log
 ```
 
-💭 **Mõtle:** Miks on reas `/var/log/messages` lisatud `authpriv.none`? Mis juhtuks, kui see puuduks?
+**Mõtle:** Miks on reas `/var/log/messages` lisatud `authpriv.none`? Mis juhtuks, kui see puuduks?
 
 ### A2. Üks sündmus, kaks kohta
 
@@ -121,21 +121,21 @@ sudo tail -f /var/log/messages
 Terminal 2, kirjuta päevikusse:
 
 ```bash
-logger -t n07test "tere päevik"
+logger -t n01test "tere päevik"
 ```
 
-`-t n07test` paneb kirjele programmi nimeks `n07test`, et see oleks lihtne üles leida. Terminal 1-sse ilmub rida kohe.
+`-t n01test` paneb kirjele programmi nimeks `n01test`, et see oleks lihtne üles leida. Terminal 1-sse ilmub rida kohe.
 
 Nüüd leia sama rida journaldist (terminal 2):
 
 ```bash
-journalctl -t n07test
+journalctl -t n01test
 ```
 
 Mõlemas kohas on sama sündmus. Vaata nüüd, mida journald selle kirje kohta veel teab:
 
 ```bash
-journalctl -t n07test -o verbose -n 1
+journalctl -t n01test -o verbose -n 1
 ```
 
 Väljundis on terve hulk välju. Leia need kaks:
@@ -145,11 +145,11 @@ Väljundis on terve hulk välju. Leia need kaks:
     SYSLOG_FACILITY=1
 ```
 
-`PRIORITY=5` on tõsidus `notice` (loeng, tabel 7.2) ja `SYSLOG_FACILITY=1` on `user`. Need on joonise 7.1 "nähtamatud" osad. Tekstifailis neid ei näe, aga rsyslog kasutab neid reeglites.
+`PRIORITY=5` on tõsidus `notice` (loeng, tabel 1.2) ja `SYSLOG_FACILITY=1` on `user`. Need on joonise 1.2 "nähtamatud" osad. Tekstifailis neid ei näe, aga rsyslog kasutab neid reeglites.
 
 Peata terminal 1-s `tail -f` (`Ctrl+C`).
 
-✅ **Kontrollpunkt:** oskad sama `logger`-i rea üles leida nii `journalctl`-ist kui ka failist `/var/log/messages`. Kirjuta `n07-logid.md`-sse, kas ennustus läks täppi.
+✅ **Kontrollpunkt:** oskad sama `logger`-i rea üles leida nii `journalctl`-ist kui ka failist `/var/log/messages`. Kirjuta `n01-logid.md`-sse, kas ennustus läks täppi.
 
 ### A3. Turvasündmus
 
@@ -172,7 +172,7 @@ Esimene küsib journaldilt teenuse `sshd` kõiki kirjeid viimase 5 minuti kohta.
 
 Mõlemas peaks olema `Invalid user sissetungija from 192.168.35.x`. See IP on sinu arvuti oma.
 
-💭 **Mõtle:** Proovi `grep sissetungija /var/log/messages`. Miks seal seda rida pole? (Vihje: A1 reeglid.)
+**Mõtle:** Proovi `grep sissetungija /var/log/messages`. Miks seal seda rida pole? (Vihje: A1 reeglid.)
 
 ### A4. Seire pilguga: vead ja hoiatused
 
@@ -196,7 +196,7 @@ Hoiatused ja hullemad viimase tunni jooksul, ainult kokkuvõtlikult:
 journalctl -p warning --since "1 hour ago" -o short
 ```
 
-Kirjuta `n07-logid.md`-sse:
+Kirjuta `n01-logid.md`-sse:
 
 ```markdown
 ## A4
@@ -204,7 +204,7 @@ Kirjuta `n07-logid.md`-sse:
 - Kõige sagedasem viga (programm): ...
 ```
 
-💡 **Kui `journalctl -p err -b` on tühi:** see on hea uudis, masin on terve. Tekita endale viga: `logger -p user.err -t n07test "midagi läks katki"` ja kontrolli uuesti.
+**Kui `journalctl -p err -b` on tühi:** see on hea uudis, masin on terve. Tekita endale viga: `logger -p user.err -t n01test "midagi läks katki"` ja kontrolli uuesti.
 
 ### A5. Sinu rakenduse reegel
 
@@ -268,7 +268,7 @@ logger -p local0.warning -t pood "laos alla 5 toote"
 logger -p local0.err     -t pood "makse ebaõnnestus"
 ```
 
-Kirjuta ennustus `n07-logid.md`-sse, siis lisa reegel, kontrolli, taaskäivita ja testi. Reeglifail on nüüd:
+Kirjuta ennustus `n01-logid.md`-sse, siis lisa reegel, kontrolli, taaskäivita ja testi. Reeglifail on nüüd:
 
 ```text
 local0.warning    /var/log/pood-hoiatused.log
@@ -278,7 +278,7 @@ local0.*          /var/log/pood.log
 
 ✅ **Kontrollpunkt:** `pood-hoiatused.log`-is on kaks rida (warning ja err), `pood.log`-is kolm ja `messages`-is mitte ühtegi neist.
 
-💭 **Mõtle:** Miks läks `err` kirje ka hoiatuste faili, kuigi reeglis on kirjas `warning`?
+**Mõtle:** Miks läks `err` kirje ka hoiatuste faili, kuigi reeglis on kirjas `warning`?
 
 ### A6. Pööra logi
 
@@ -408,7 +408,7 @@ sudo firewall-cmd --permanent --add-port=514/tcp
 sudo firewall-cmd --reload
 ```
 
-💡 **Kui `firewall-cmd` ütleb `FirewallD is not running`:** tulemüür on selles sõlmes väljas, jäta see samm vahele.
+**Kui `firewall-cmd` ütleb `FirewallD is not running`:** tulemüür on selles sõlmes väljas, jäta see samm vahele.
 
 **Ära veel teisi masinaid seadista.** Mõtle enne: kui `proxmox2` saadab nüüd oma logid, kuhu need `proxmox1`-s jõuavad? (Vihje: A1 reeglid kehtivad kõigile kirjetele, ka võrgust tulnutele.) Hoiame selle küsimuse meeles ja kontrollime B2-s.
 
@@ -432,7 +432,7 @@ Number `90` paneb selle reegli viimaseks, pärast sinu `10-pood.conf`-i. Asenda 
 |---|---|
 | `*.*` | kõik kirjed, iga päritolu ja tõsidus |
 | `omfwd` | väljundmoodul, mis saadab edasi (forward) |
-| `protocol="tcp"` | tähitud kiri (loeng, tabel 7.4) |
+| `protocol="tcp"` | tähitud kiri (loeng, tabel 1.4) |
 | `queue.type="LinkedList"` | järjekord mälus: kui keskserver ei vasta, kirjed ootavad |
 | `action.resumeRetryCount="-1"` | proovi uuesti lõpmatuseni, ära loobu |
 
@@ -442,7 +442,7 @@ Kontrolli, taaskäivita ja saada test:
 
 ```bash
 sudo rsyslogd -N1 && sudo systemctl restart rsyslog
-logger -t n07test "tere keskserver, siin proxmox2"
+logger -t n01test "tere keskserver, siin proxmox2"
 ```
 
 Nüüd `proxmox1`-s:
@@ -454,8 +454,8 @@ sudo grep "siin proxmox2" /var/log/messages
 Rida on olemas, aga **segamini** `proxmox1` enda logidega. Kolme masina puhul on see segadus. Vastus B1 küsimusele: võrgust tulnud kirjed käivad läbi samade vaikimisi reeglite.
 
 <figure markdown="span">
-  ![proxmox1 failis messages on proxmox1 enda read ja proxmox2-st tulnud read segamini](../images/n07_keskserver_segamini.png)
-  <figcaption>Joonis 7.1. Oodatav tulemus: `proxmox1` faili `/var/log/messages` lõpus on read kahe erineva masinanimega.</figcaption>
+  ![proxmox1 failis messages on proxmox1 enda read ja proxmox2-st tulnud read segamini](../images/n01_keskserver_segamini.png)
+  <figcaption>Joonis 1.1. Oodatav tulemus: `proxmox1` faili `/var/log/messages` lõpus on read kahe erineva masinanimega.</figcaption>
 </figure>
 <!-- TODO Maria: ekraanipilt proxmox1-st, `sudo tail -8 /var/log/messages` pärast B2 testi; näha kaks erinevat hostinime. -->
 
@@ -488,16 +488,16 @@ input(type="imtcp" port="514" ruleset="kaugelt")
 
 Pane kolm tükki faili `/etc/rsyslog.d/50-keskserver.conf` õiges järjekorras: `module`, `template`, `ruleset`, `input`. Kontrolli, taaskäivita.
 
-Testi `proxmox2`-st uuesti (`logger -t n07test "nüüd oma kausta"`) ja vaata `proxmox1`-s:
+Testi `proxmox2`-st uuesti (`logger -t n01test "nüüd oma kausta"`) ja vaata `proxmox1`-s:
 
 ```bash
 sudo ls -R /var/log/remote/
-sudo cat /var/log/remote/proxmox2/n07test.log
+sudo cat /var/log/remote/proxmox2/n01test.log
 ```
 
-✅ **Kontrollpunkt:** kaustas `/var/log/remote/proxmox2/` on fail `n07test.log` sinu testreaga ja `messages`-isse uusi `proxmox2` ridu enam ei tule.
+✅ **Kontrollpunkt:** kaustas `/var/log/remote/proxmox2/` on fail `n01test.log` sinu testreaga ja `messages`-isse uusi `proxmox2` ridu enam ei tule.
 
-💡 **Kui kaust on tühi:** vaata `sudo journalctl -u rsyslog -n 20` (`proxmox1`). Kui näed `Permission denied`, kontrolli, kas kirjutasid tee täpselt `/var/log/remote/...` (SELinux lubab rsyslogil kirjutada ainult `/var/log` alla).
+**Kui kaust on tühi:** vaata `sudo journalctl -u rsyslog -n 20` (`proxmox1`). Kui näed `Permission denied`, kontrolli, kas kirjutasid tee täpselt `/var/log/remote/...` (SELinux lubab rsyslogil kirjutada ainult `/var/log` alla).
 
 ### B4. proxmox3 Ansiblega
 
@@ -519,9 +519,9 @@ Saada see `proxmox3`-sse ja taaskäivita rsyslog. Kirjuta kaks Ansible ad-hoc k�
       -a "name=rsyslog state=restarted"
     ```
 
-Testi: `ssh proxmox3 'logger -t n07test "siin proxmox3"'` ja kontrolli `proxmox1`-s, kas tekkis kaust `/var/log/remote/proxmox3/`.
+Testi: `ssh proxmox3 'logger -t n01test "siin proxmox3"'` ja kontrolli `proxmox1`-s, kas tekkis kaust `/var/log/remote/proxmox3/`.
 
-💭 **Mõtle:** Mis on ad-hoc käsu puudus võrreldes playbookiga, kui homme tuleb neljas masin? Kuidas teeksid selle playbookiga, mis taaskäivitab rsyslogi ainult siis, kui fail muutus? (Automatiseerimise nädal 4, handlerid.)
+**Mõtle:** Mis on ad-hoc käsu puudus võrreldes playbookiga, kui homme tuleb neljas masin? Kuidas teeksid selle playbookiga, mis taaskäivitab rsyslogi ainult siis, kui fail muutus? (Automatiseerimise nädal 4, handlerid.)
 
 ### B5. Intsident
 
@@ -548,7 +548,7 @@ ssh proxmox3 "sudo grep -c 'Invalid user' /var/log/secure"
 sudo grep -h "Invalid user" /var/log/remote/proxmox3/*.log
 ```
 
-Kirjuta `n07-logid.md`-sse:
+Kirjuta `n01-logid.md`-sse:
 
 ```markdown
 ## B5 intsident
@@ -568,7 +568,7 @@ Keskserver kogub kahe masina logisid, nii et tema kettal kasvavad logid kõige k
 - kas pöörata ajaga või suuruse järgi?
 - mitu vana faili hoida, kui turvasündmus avastatakse sageli alles nädalate pärast?
 
-Kontrolli `sudo logrotate -d /etc/logrotate.d/remote`-ga, et logrotate leiab mõlema masina failid. Kirjuta `n07-logid.md`-sse oma valikud ja ühe lausega põhjendus.
+Kontrolli `sudo logrotate -d /etc/logrotate.d/remote`-ga, et logrotate leiab mõlema masina failid. Kirjuta `n01-logid.md`-sse oma valikud ja ühe lausega põhjendus.
 
 ✅ **Kontrollpunkt:** `logrotate -d` väljundis on näha failid nii `proxmox2` kui ka `proxmox3` kaustast.
 
@@ -582,16 +582,16 @@ Järgmisel kohtumisel tuleb keskne jälgimissüsteem, mis kogub lisaks logidele 
 
 ## ✅ Lõpukontroll
 
-- [ ] `journalctl -t n07test` ja `/var/log/messages` näitavad sama testrida (`proxmox2`)
+- [ ] `journalctl -t n01test` ja `/var/log/messages` näitavad sama testrida (`proxmox2`)
 - [ ] `/etc/rsyslog.d/10-pood.conf` suunab `local0` kirjed `pood.log`-i ja hoiatused `pood-hoiatused.log`-i ning `messages`-isse neid ei jõua
 - [ ] `/etc/logrotate.d/pood` pöörab, pakib ja rsyslog kirjutab pärast pööramist uude faili
 - [ ] `proxmox1`-s on kaustad `/var/log/remote/proxmox2/` ja `/var/log/remote/proxmox3/`
 - [ ] B5: leidsid keskserverist kolm sissetungi katset, kuigi `proxmox3` enda turvalogi oli tühi
-- [ ] `n07-logid.md`-s on ennustused (A1, A2, A5, A6) ja vastused (A4, B5, B6)
+- [ ] `n01-logid.md`-s on ennustused (A1, A2, A5, A6) ja vastused (A4, B5, B6)
 
 ---
 
-## 🚀 Lisaülesanded
+## Lisaülesanded
 
 Kergemad on eespool. Tee nii palju, kui jõuad.
 
@@ -638,7 +638,7 @@ Kergemad on eespool. Tee nii palju, kui jõuad.
     ```
     ja reeglistikku: `action(type="omfile" file="/var/log/remote/koik.json" template="Json")`. Kontrolli: `sudo tail -1 /var/log/remote/koik.json | python3 -m json.tool`.
 
-**6. Hoiatus mitme ebaõnnestunud sisselogimise korral.** Kirjuta `proxmox1`-s skript, mis loeb `turvalogi.log`-ist (ülesanne 2) viimase 5 minuti `Invalid user` read ja kui neid on üle 5 ühelt IP-lt, kirjutab `logger -p authpriv.alert` hoiatuse. Käivita see iga minut `systemd` timeriga. See on väike sissetungituvastus, mille N21 teeb Wazuh päriselt.
+**6. Hoiatus mitme ebaõnnestunud sisselogimise korral.** Kirjuta `proxmox1`-s skript, mis loeb `turvalogi.log`-ist (ülesanne 2) viimase 5 minuti `Invalid user` read ja kui neid on üle 5 ühelt IP-lt, kirjutab `logger -p authpriv.alert` hoiatuse. Käivita see iga minut `systemd` timeriga. See on väike sissetungituvastus, mille N12 teeb Wazuh päriselt.
 
 **7. Krüpteeritud saatmine.** Seadista `proxmox2` ja `proxmox1` vahel TLS (port 6514, rsyslogi `gtls` draiver, isesigneeritud sertifikaat). Tõesta `tcpdump`-iga, et port 514-l sõnum oli loetav ja 6514-l enam mitte. Juhend: [rsyslogi dokumentatsioon](https://www.rsyslog.com/doc/), otsingusõna "TLS".
 

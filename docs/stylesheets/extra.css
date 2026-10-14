@@ -1,7 +1,7 @@
 /* ===== Avalehe hero ===== */
 .hero-section {
-  background-color: #241b4d;
-  background-image: linear-gradient(rgba(36, 27, 77, 0.55), rgba(36, 27, 77, 0.55)), url('../images/background.webp');
+  background-color: #004d40;
+  background-image: linear-gradient(135deg, #004d40 0%, #00796b 55%, #ff8f00 140%);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

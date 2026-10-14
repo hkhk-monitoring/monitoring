@@ -44,22 +44,22 @@ theme:
   palette:
   - media: "(prefers-color-scheme)"
     scheme: default
-    primary: deep purple
-    accent: pink
+    primary: teal
+    accent: amber
     toggle:
       icon: material/brightness-auto
       name: Vaheta tumele režiimile
   - media: "(prefers-color-scheme: light)"
     scheme: default
-    primary: deep purple
-    accent: pink
+    primary: teal
+    accent: amber
     toggle:
       icon: material/brightness-7
       name: Vaheta tumele režiimile
   - media: "(prefers-color-scheme: dark)"
     scheme: slate
-    primary: deep purple
-    accent: pink
+    primary: teal
+    accent: amber
     toggle:
       icon: material/brightness-4
       name: Vaheta heledasse režiimi
@@ -86,10 +86,10 @@ nav:
   - Töökeskkond: kodulabor.md
 
 - Nädalad:
-  - N7 · Masina päevik ja logid ühte kohta:
-    - Loeng: week07/lecture.md
-    - Labor: week07/lab.md
-    - Kodutöö: week07/homework.md
+  - N1 · Masina päevik ja logid ühte kohta:
+    - Loeng: week01/lecture.md
+    - Labor: week01/lab.md
+    - Kodutöö: week01/homework.md
 
 - Info:
   - Litsents: litsents.md
