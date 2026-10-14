@@ -72,16 +72,26 @@ Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skr
 
 ## 3. Vasta
 
-Pane raporti väljund ja vastused oma arvutis faili `n01-logid.md` uue pealkirja `## Kodutöö` alla:
+Vastused lähevad sinu labori 1 Classroomi repo `README.md` lõppu, osasse **Kodutöö** (küsimused on seal juba olemas). Kirjuta vastus iga `_kodutöö_` asemele:
 
-1. Kopeeri raporti väljund (``` plokki).
+1. Kopeeri raporti väljund ``` plokki.
 2. Mis IP-lt tulid sissetungi katsed ja miks on see IP sinu laboris just see?
 3. Kui sul oleks 50 masinat ja iga masin kirjutaks 1 GB logisid päevas, mis läheks sinu skriptiga katki? Nimeta kaks asja.
 4. Raport näitab, mis oli. Mida ta ei tee, mida tahaksid, et seiresüsteem teeks? (See on järgmiste kohtumiste teema.)
+5. Miks on sõnade järgi vigade otsimine halvem kui tõsiduse järgi? (Samm 5 "Mõtle" küsimus.)
 
 ## Esitamine
 
-Laadi Tahvlis selle kohtumise iseseisva töö alla üles `logiraport.sh` ja `n01-logid.md`.
+Kodutöö läheb samasse repo, kus on labor 1. Oma arvutis, repo juurkaustas:
+
+```bash
+scp proxmox1:logiraport.sh kodutoo/
+git add kodutoo/logiraport.sh README.md
+git commit -m "Kodutöö 1: logiraport"
+git push
+```
+
+Automaatkontroll näitab kodutöö kontrolle nimega **BOONUS**. Need annavad lisapunkte ega mõjuta labori 100 punkti.
 
 ---
 

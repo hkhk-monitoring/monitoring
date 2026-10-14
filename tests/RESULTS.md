@@ -4,11 +4,11 @@ Iga labor käiakse läbi skriptiga `tests/weekNN.sh`. Uuem tulemus asendab sama 
 
 ## week01 - Masina päevik ja logid ühte kohta
 
-- Käivitatud: 2026-10-14 20:52
+- Käivitatud: 2026-10-14 21:22
 - Keskkond: AlmaLinux 9.8 (Olive Jaguar) ×3 (SSH-konf: `tests/.ssh_config`), ansible [core 2.21.5]
 - Versioonid: rsyslog-8.2510.0-2.el9.aarch64 logrotate-3.18.0-12.el9.aarch64 openssh-server-9.9p1-9.el9_8.alma.1.aarch64 
-- Tulemus: **60 OK, 0 FAIL**
-- RAM proxmox1: rsyslogd 6.2 MB (lisakoormust ei ole); sõlm 954 MB kokku, 607 MB available
+- Tulemus: **82 OK, 0 FAIL**
+- RAM proxmox1: rsyslogd 6.4 MB (lisakoormust ei ole); sõlm 954 MB kokku, 609 MB available
 - Märkused: pärast esimest pööramist ilma postrotate'ita uus pood.log: puudub. Lõpus failid: /var/log/pood-hoiatused.log /var/log/pood.log /var/log/pood.log.1.gz /var/log/pood.log.2.gz /var/log/pood.log.3.gz . proxmox3 failid keskserveris: n01test.log python3.9.log rsyslogd.log sshd-session.log sudo.log systemd.log . L4: udp=100 tcp=100. L5 ootel ridu kohale: 3/3.
 - TESTIMATA: L7 (oma skript, lahendust pole antud), L8 (TLS), L9 (systemd-journal-remote).
 
@@ -73,5 +73,27 @@ Iga labor käiakse läbi skriptiga `tests/weekNN.sh`. Uuem tulemus asendab sama 
 | L6: JSON-is on tosidus=warning | OK | |
 | L4: logger -d (UDP) ja -T (TCP) jõuavad keskserverisse | OK | |
 | Kodutöö: logiraport.sh näitab masinaid, ridu, katseid ja vigu | OK | |
+| Classroom: K1. Kõik failid olemas ja pole tühjad (10 p) | OK | |
+| Classroom: K2. 10-pood.conf: hoiatuste reegel enne local0.* rida ja & stop (15 p) | OK | |
+| Classroom: K3. pood.logrotate: rotate 3, compress, postrotate HUP (15 p) | OK | |
+| Classroom: K4. 50-keskserver.conf: imtcp, mall %HOSTNAME%, ruleset, input seotud reeglistikuga (15 p) | OK | |
+| Classroom: K5. 90-keskserver.conf: omfwd, TCP, järjekord, lõputu kordus (10 p) | OK | |
+| Classroom: K6. a6-pood.txt: kolm pakitud vana faili, neljandat pole (10 p) | OK | |
+| Classroom: K7. b3-remote.txt: keskserveris on kahe masina kaustad (10 p) | OK | |
+| Classroom: K8. b5-intsident.txt: vähemalt kolm erinevat olematut kasutajat (10 p) | OK | |
+| Classroom: K9. README: vastused täidetud (5 p) | OK | |
+| Classroom: tühi starter saab 0 punkti (saab 0) | OK | |
+| Classroom pärast kodutööd: K1. Kõik failid olemas ja pole tühjad (10 p) | OK | |
+| Classroom pärast kodutööd: K2. 10-pood.conf: hoiatuste reegel enne local0.* rida ja & stop (15 p) | OK | |
+| Classroom pärast kodutööd: K3. pood.logrotate: rotate 3, compress, postrotate HUP (15 p) | OK | |
+| Classroom pärast kodutööd: K4. 50-keskserver.conf: imtcp, mall %HOSTNAME%, ruleset, input seotud reeglistikuga (15 p) | OK | |
+| Classroom pärast kodutööd: K5. 90-keskserver.conf: omfwd, TCP, järjekord, lõputu kordus (10 p) | OK | |
+| Classroom pärast kodutööd: K6. a6-pood.txt: kolm pakitud vana faili, neljandat pole (10 p) | OK | |
+| Classroom pärast kodutööd: K7. b3-remote.txt: keskserveris on kahe masina kaustad (10 p) | OK | |
+| Classroom pärast kodutööd: K8. b5-intsident.txt: vähemalt kolm erinevat olematut kasutajat (10 p) | OK | |
+| Classroom pärast kodutööd: K9. README: vastused täidetud (5 p) | OK | |
+| Classroom pärast kodutööd: BOONUS 1. Kodutöö: kodutoo/logiraport.sh olemas ja süntaks korras (0 p) | OK | |
+| Classroom pärast kodutööd: BOONUS 2. Kodutöö: skript otsib sissetungi katseid ja loendab IP kaupa (0 p) | OK | |
+| Classroom pärast kodutööd: BOONUS 3. Kodutöö: raporti väljund ja vastused README-s (0 p) | OK | |
 | Link töötab: https://docs.rsyslog.com/doc/ | OK | |
 
