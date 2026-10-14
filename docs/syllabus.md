@@ -19,7 +19,7 @@ graph LR
     C --> D["4. Reageeri<br/>alarm, inimene"]
     D -.->|"sama ring logidega,<br/>siis teenusega"| A
 ```
-  <figcaption>Joonis 1. Kursuse spiraal: iga signaal loetakse enne käsitsi, siis kogutakse, siis näidatakse ja lõpuks reageeritakse. Sama ring korratakse mõõdikute, logide ja teenuse kättesaadavusega.</figcaption>
+  <figcaption>Joonis 0.1. Kursuse spiraal: iga signaal loetakse enne käsitsi, siis kogutakse, siis näidatakse ja lõpuks reageeritakse. Sama ring korratakse mõõdikute, logide ja teenuse kättesaadavusega.</figcaption>
 </figure>
 
 Pildil on neli sammu, mis korduvad. Kõigepealt vaatad masina seisu ise käsurealt, siis paned masina seda ise koguma, siis teed sellest pildi ja lõpuks paned süsteemi ise häirekella lööma. Esimene ring käib mõõdikutega (protsessor, mälu, ketas), teine logidega ja kolmas teenuse kättesaadavusega.
