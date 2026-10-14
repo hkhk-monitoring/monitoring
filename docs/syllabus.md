@@ -37,7 +37,7 @@ Kursuse lõpuks õppija:
 
 | Nr | h | Osa | Mõisteplokk | Tööriistad | Loeng / labor (min) |
 |---:|---:|---|---|---|---|
-| 1 | 4 | Logging | Masina päevik ja logid ühte kohta | journald, rsyslog, logrotate | 35 / 125 |
+| 1 | 4 | Logging | Masina logid ja keskne logiserver | journald, rsyslog, logrotate | 35 / 125 |
 | 2 | 2 | Monitoring | Keskne jälgimissüsteem | Zabbix server | 20 / 60 |
 | 3 | 2 | Monitoring | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, stress-ng, Zabbix | 20 / 60 |
 | 4 | 2 | Monitoring | Agent räägib serverile | Zabbix agent 2, Ansible | 20 / 60 |
@@ -60,7 +60,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 ---
 
-## 1. Masina päevik ja logid ühte kohta
+## 1. Masina logid ja keskne logiserver
 
 **4 h · Logging**
 

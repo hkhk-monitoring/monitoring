@@ -1,0 +1,17 @@
+<svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="260" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#004d40">rsyslogi reegel = filter + tegevus</text>
+  <rect x="60" y="60" width="780" height="50" rx="6" fill="#263238"/>
+  <text x="80" y="92" font-family="JetBrains Mono, Menlo, monospace" font-size="16" fill="#ffe082">local0.warning</text>
+  <text x="260" y="92" font-family="JetBrains Mono, Menlo, monospace" font-size="16" fill="#80cbc4">action(type="omfile" file="/var/log/pood-hoiatused.log")</text>
+  <rect x="60" y="130" width="180" height="100" rx="8" fill="#fff8e1" stroke="#ff8f00"/>
+  <text x="150" y="155" text-anchor="middle" font-size="14" font-weight="700" fill="#e65100">FILTER</text>
+  <text x="150" y="178" text-anchor="middle" font-size="12" fill="#5d4037">local0 = päritolu</text>
+  <text x="150" y="198" text-anchor="middle" font-size="12" fill="#5d4037">warning = see tase</text>
+  <text x="150" y="216" text-anchor="middle" font-size="12" fill="#5d4037">ja tõsisemad (0-4)</text>
+  <rect x="260" y="130" width="580" height="100" rx="8" fill="#e0f2f1" stroke="#00796b"/>
+  <text x="550" y="155" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">TEGEVUS</text>
+  <text x="550" y="178" text-anchor="middle" font-size="12" fill="#263238">omfile = kirjuta faili      omfwd = saada võrku</text>
+  <text x="550" y="198" text-anchor="middle" font-size="12" fill="#263238">stop = ära töötle edasi</text>
+  <text x="550" y="216" text-anchor="middle" font-size="12" fill="#546e7a">reegleid loetakse ülevalt alla, kirje võib sobida mitmele</text>
+</svg>

@@ -58,14 +58,14 @@ failitüübid:
   loeng:
     globid: ["**/teooria/*.md", "**/loeng.md", "**/lecture.md"]
     nõutud:
-      - ['^!!! abstract', 'eesmärkide plokk (!!! abstract)']
-      - ['^## Kokkuvõte', '## Kokkuvõte']
-      - ['^## (Enesekontroll|🎯 Lõplik kontroll)', '## Enesekontroll']
+      - ['^(## |!!! abstract "|\?\?\? abstract ")Õpiväljundid', 'õpiväljundid (pealkiri või abstract)']
+      - ['^## (\d+\. )?Kokkuvõte', '## Kokkuvõte']
+      - ['(Kordamisküsimus|^## Küsimused enda kontrolliks|^## 🎯 Lõplik kontroll)', 'enesekontrolli küsimused']
   praktikum:
     globid: ["**/praktikumid/*.md", "**/lab.md", "**/praktikum*.md"]
     nõutud:
-      - ['^!!! abstract', 'eesmärkide plokk (!!! abstract)']
-      - ['^## Kokkuvõte', '## Kokkuvõte']
+      - ['^\?\?\? abstract "Õpiväljundid"', '??? abstract "Õpiväljundid"']
+      - ['^## Veaotsing', '## Veaotsing']
     keelatud:
       - ['\[\^[\w-]+\]', 'joonealune märkus praktikumis']
 

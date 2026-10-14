@@ -1,0 +1,19 @@
+<svg viewBox="0 0 900 290" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="290" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#004d40">Sama sündmus kahes logis</text>
+  <text x="450" y="52" text-anchor="middle" font-size="13" fill="#546e7a">kasutaja mari logib sisse, käivitab sudo truncate -s 0 /var/log/secure</text>
+  <rect x="30" y="75" width="400" height="190" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="230" y="102" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">journald / rsyslog</text>
+  <text x="230" y="122" text-anchor="middle" font-size="12" fill="#00695c">see, mida programm ise ütleb</text>
+  <text x="50" y="160" font-size="13" fill="#263238">• sudo kirjutab rea, kui ta seda teeb</text>
+  <text x="50" y="185" font-size="13" fill="#263238">• fail /var/log/secure on nüüd tühi</text>
+  <text x="50" y="210" font-size="13" fill="#263238">• tühjendamist ennast ei kirjuta keegi</text>
+  <text x="50" y="245" font-size="13" font-weight="700" fill="#b71c1c">Vastus: fail muutus</text>
+  <rect x="470" y="75" width="400" height="190" rx="10" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="670" y="102" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">auditd</text>
+  <text x="670" y="122" text-anchor="middle" font-size="12" fill="#6d4c41">see, mida tuum nägi</text>
+  <text x="490" y="160" font-size="13" fill="#263238">• reegel -w /var/log/secure -p wa -k turvalogi</text>
+  <text x="490" y="185" font-size="13" fill="#263238">• syscall, fail, programm, kellaaeg</text>
+  <text x="490" y="210" font-size="13" fill="#263238">• auid = mari (ei muutu sudo-ga)</text>
+  <text x="490" y="245" font-size="13" font-weight="700" fill="#1b5e20">Vastus: mari tühjendas kell 03:15</text>
+</svg>
