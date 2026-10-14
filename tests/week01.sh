@@ -250,6 +250,61 @@ echo "$KT" | sed 's/^/     | /' | head -20
 t_kt() { on 'proxmox2:' "$KT" && on 'proxmox3:' "$KT" && on 'from ' "$KT" && on 'makse ebaõnnestus' "$KT"; }
 samm "Kodutöö: logiraport.sh näitab masinaid, ridu, katseid ja vigu" t_kt
 
+# ---------------- Esitamine + Classroomi kontrollid ----------------
+STARTER=$(cd ../lab01-starter 2>/dev/null && pwd); CTESTS=$(cd ../classroom50/it24-monitooring 2>/dev/null && pwd)
+if [ -d "$STARTER" ] && [ -f "$CTESTS/lab01-tests.json" ]; then
+  R="$TMP/opilane"; cp -R "$STARTER" "$R"; rm -rf "$R/.git"
+  cp "$TMP/90-keskserver.conf" "$R/konf/"     # B4 scp
+  ( cd "$R"
+    scp -F "$CFG" -q proxmox2:/etc/rsyslog.d/10-pood.conf       konf/
+    scp -F "$CFG" -q proxmox2:/etc/logrotate.d/pood             konf/pood.logrotate
+    scp -F "$CFG" -q proxmox1:/etc/rsyslog.d/50-keskserver.conf konf/
+    scp -F "$CFG" -q proxmox1:/etc/logrotate.d/remote           konf/remote.logrotate
+    ssh "${SSHOPT[@]}" proxmox2 "sudo grep 'Invalid user' /var/log/secure"   > logid/a3-secure.txt
+    ssh "${SSHOPT[@]}" proxmox2 "ls /var/log/pood*"                          > logid/a6-pood.txt
+    ssh "${SSHOPT[@]}" proxmox1 "sudo ls -R /var/log/remote"                 > logid/b3-remote.txt
+    ssh "${SSHOPT[@]}" proxmox1 "sudo grep -rh 'Invalid user' /var/log/remote/proxmox3/" > logid/b5-intsident.txt
+    python3 - <<'PY'
+import re
+s=open('README.md',encoding='utf-8').read()
+i=[0]
+def f(m):
+    i[0]+=1; return 'Testvastus %d: rsyslog kirjutas pärast pööramist vanasse faili, sest hoiab seda lahti.'%i[0]
+open('README.md','w',encoding='utf-8').write(re.sub('_vastus_',f,s))
+PY
+  )
+  run_kontroll() {  # run_kontroll <tests.json> <õppija kaust> <silt>
+    local cnt n; cnt=$(python3 -c "import json,sys;print(len(json.load(open(sys.argv[1]))['tests']))" "$1")
+    for ((n=0; n<cnt; n++)); do
+      python3 -c "import json,sys;t=json.load(open(sys.argv[1]))['tests'][int(sys.argv[2])];open(sys.argv[3],'w').write(t['run']);print(t['name']+' ('+str(t['points'])+' p)')" "$1" $n "$TMP/k$n.sh" > "$TMP/nimi"
+      [ -n "${4:-}" ] && ! grep -q "^$4" "$TMP/nimi" && continue
+      samm "$3 $(cat "$TMP/nimi")" bash -c "cd '$2' && bash '$TMP/k$n.sh'"
+    done
+  }
+  run_kontroll "$CTESTS/lab01-tests.json" "$R" "Classroom:" K
+  # negatiivne kontroll: tühi starter peab kukkuma
+  E="$TMP/tyhi"; cp -R "$STARTER" "$E"; rm -rf "$E/.git"
+  TYHI=$(cd "$E" && python3 -c "
+import json,subprocess
+t=json.load(open('$CTESTS/lab01-tests.json'))['tests']
+print(sum(x['points'] for x in t if subprocess.run(['bash','-c',x['run']],capture_output=True).returncode==0))")
+  samm "Classroom: tühi starter saab 0 punkti (saab $TYHI)" test "$TYHI" -eq 0
+  # kodutöö samasse repo: skript kodutoo/ alla, raport ja vastused README osasse Kodutöö
+  scp -F "$CFG" -q proxmox1:logiraport.sh "$R/kodutoo/"
+  KT_FILE="$TMP/kt.txt"; echo "$KT" > "$KT_FILE"
+  python3 - "$R/README.md" "$KT_FILE" <<'PY'
+import sys
+p,kt=sys.argv[1],open(sys.argv[2],encoding='utf-8').read().strip()
+s=open(p,encoding='utf-8').read()
+s=s.replace('_kodutöö_',kt,1)
+s=s.replace('_kodutöö_','Skript loeb iga kord kõik read uuesti, 50 masina ja 1 GB päevas korral läheb see aeglaseks ja ketas saab täis; raport ei hoiata ise.')
+open(p,'w',encoding='utf-8').write(s)
+PY
+  run_kontroll "$CTESTS/lab01-tests.json" "$R" "Classroom pärast kodutööd:"
+else
+  echo "     (info: ../lab01-starter või classroom50 testid puuduvad, Classroomi kontrollid vahele jäetud)"
+fi
+
 # ---------------- Lingid ----------------
 for u in $(grep -ho 'https\?://[^) ]*' docs/week01/*.md | sort -u); do
   samm "Link töötab: $u" bash -c "curl -s -o /dev/null -L --max-time 15 -w '%{http_code}' '$u' | grep -q '^2'"
@@ -260,8 +315,7 @@ RAM=$(S proxmox1 'ps -o rss= -C rsyslogd | awk "{s+=\$1} END {printf \"%.1f MB\"
 MEM=$(S proxmox1 'free -m | awk "/Mem:/ {print \$2\" MB kokku, \"\$7\" MB available\"}"')
 echo "     (info: rsyslogd proxmox1-l $RAM; $MEM)"
 
-echo "== Koristus pärast"
-koristus
+if [ "${KEEP:-0}" = 1 ]; then echo "== KEEP=1: sõlmed jäävad labori lõppseisu"; else echo "== Koristus pärast"; koristus; fi
 
 # ---------------- RESULTS.md ----------------
 OS=$(S proxmox1 '. /etc/os-release; echo $PRETTY_NAME')

@@ -22,25 +22,21 @@ tags:
     5. seadistada keskse logiserveri ja saata sinna kahe masina logid;
     6. leida keskserverist turvasündmuse jäljed.
 
-    **Mis valmib:** `proxmox1` võtab vastu `proxmox2` ja `proxmox3` logid ja hoiab neid masina kaupa eraldi. Sinu arvutis on fail `n01-logid.md` vastuste ja tõenditega.
+    **Mis valmib:** `proxmox1` võtab vastu `proxmox2` ja `proxmox3` logid ja hoiab neid masina kaupa eraldi. Sinu Classroomi repos on `README.md` vastustega ning kaustades `konf/` ja `logid/` tõendid. Automaatkontroll annab kuni 100 punkti.
 
 ---
 
 ## Eeltöö
 
-Loo oma arvutis töökaust ja ava see VS Code'is:
+Ava õpetaja antud GitHub Classroomi link ja võta ülesanne vastu. Sulle tehakse oma repo, nagu automatiseerimise kursusel. Klooni see oma arvutisse ja ava VS Code'is:
 
 ```bash
-mkdir -p ~/monitooring/n01
-cd ~/monitooring/n01
+git clone <sinu-repo-url>
+cd <sinu-repo>
 code .
 ```
 
-Loo fail `n01-logid.md` ainult pealkirjaga. Sisu lisad laboris samm-sammult:
-
-```markdown
-# N1 logid
-```
+Repos on `README.md` (siia kirjutad laboris ennustused ja vastused, pealkirjad on juba olemas) ning tühjad kaustad `konf/` ja `logid/` (sinna kopeerid lõpus oma konfid ja väljundid, vt [Esitamine](#esitamine)).
 
 Kontrolli, et kõik kolm sõlme vastavad (sama tsükkel nagu automatiseerimise nädalal 1):
 
@@ -70,7 +66,7 @@ ssh proxmox2
 
 ### A1. Kus päevik elab?
 
-**Ennusta enne** ja kirjuta faili `n01-logid.md`: kas `proxmox2` päevik (journald) elab üle masina taaskäivituse või kaob see?
+**Ennusta enne** ja kirjuta faili `README.md`: kas `proxmox2` päevik (journald) elab üle masina taaskäivituse või kaob see?
 
 Kontrolli:
 
@@ -151,7 +147,7 @@ Väljundis on terve hulk välju. Leia need kaks:
 
 Peata terminal 1-s `tail -f` (`Ctrl+C`).
 
-✅ **Kontrollpunkt:** oskad sama `logger`-i rea üles leida nii `journalctl`-ist kui ka failist `/var/log/messages`. Kirjuta `n01-logid.md`-sse, kas ennustus läks täppi.
+✅ **Kontrollpunkt:** oskad sama `logger`-i rea üles leida nii `journalctl`-ist kui ka failist `/var/log/messages`. Kirjuta `README.md`-sse, kas ennustus läks täppi.
 
 ### A3. Turvasündmus
 
@@ -207,7 +203,7 @@ Hoiatused ja hullemad viimase tunni jooksul, ainult kokkuvõtlikult:
 journalctl -p warning --since "1 hour ago" -o short
 ```
 
-Kirjuta `n01-logid.md`-sse:
+Kirjuta `README.md`-sse:
 
 ```markdown
 ## A4
@@ -286,7 +282,7 @@ logger -p local0.warning -t pood "laos alla 5 toote"
 logger -p local0.err     -t pood "makse ebaõnnestus"
 ```
 
-Kirjuta ennustus `n01-logid.md`-sse, siis lisa reegel, kontrolli, taaskäivita ja testi. Reeglifail on nüüd:
+Kirjuta ennustus `README.md`-sse, siis lisa reegel, kontrolli, taaskäivita ja testi. Reeglifail on nüüd:
 
 ```text
 local0.warning    /var/log/pood-hoiatused.log
@@ -443,7 +439,7 @@ sudo ss -tlnp | grep 514
 
 Oodatav tulemus: rida, kus `0.0.0.0:514` ja `rsyslogd`. Keskserver kuulab.
 
-**Mõtle enne B2-te:** kui `proxmox2` saadab nüüd oma logid, kuhu need `proxmox1`-s jõuavad? (Vihje: A1 reeglid kehtivad kõigile kirjetele, ka võrgust tulnutele.) Kirjuta oma arvamus `n01-logid.md`-sse, kontrollime B2-s.
+**Mõtle enne B2-te:** kui `proxmox2` saadab nüüd oma logid, kuhu need `proxmox1`-s jõuavad? (Vihje: A1 reeglid kehtivad kõigile kirjetele, ka võrgust tulnutele.) Kirjuta oma arvamus `README.md`-sse, kontrollime B2-s.
 
 ### B2. proxmox2 saadab
 
@@ -578,10 +574,10 @@ sudo cat /var/log/remote/proxmox2/n01test.log
 
 `proxmox3` vajab täpselt sama faili, mis `proxmox2`-l. Käsitsi kopeerimise asemel kasuta Ansiblet, nagu automatiseerimise kursusel.
 
-Too fail oma arvutisse:
+Too fail oma arvutisse, otse repo kausta `konf/` (see on ka esitamise tõend):
 
 ```bash
-scp proxmox2:/etc/rsyslog.d/90-keskserver.conf .
+scp proxmox2:/etc/rsyslog.d/90-keskserver.conf konf/
 ```
 
 Saada see `proxmox3`-sse ja taaskäivita rsyslog. Kirjuta kaks Ansible ad-hoc käsku ise. Vajad mooduleid `ansible.builtin.copy` ja `ansible.builtin.service`, `-b` (sudo) ja inventory't `-i proxmox3,`. Meenuta automatiseerimise nädalat 3.
@@ -589,7 +585,7 @@ Saada see `proxmox3`-sse ja taaskäivita rsyslog. Kirjuta kaks Ansible ad-hoc k�
 ??? tip "Vihje, kui jääd kinni"
     ```bash
     ansible all -i proxmox3, -b -m ansible.builtin.copy \
-      -a "src=90-keskserver.conf dest=/etc/rsyslog.d/90-keskserver.conf"
+      -a "src=konf/90-keskserver.conf dest=/etc/rsyslog.d/90-keskserver.conf"
     ansible all -i proxmox3, -b -m ansible.builtin.service \
       -a "name=rsyslog state=restarted"
     ```
@@ -625,7 +621,7 @@ sudo grep -rh "Invalid user" /var/log/remote/proxmox3/
 
 `-r` otsib kõigist kausta failidest. Miks mitte `sudo grep ... /var/log/remote/proxmox3/*.log`? rsyslog loob kaustad õigustega `700` (ainult root). `*` laiendab sinu enda shell **enne** `sudo`-t ja sina kausta sisse ei näe, nii et grep saab failinime asemel tärni.
 
-Kirjuta `n01-logid.md`-sse:
+Kirjuta `README.md`-sse:
 
 ```markdown
 ## B5 intsident
@@ -645,9 +641,57 @@ Keskserver kogub kahe masina logisid, nii et tema kettal kasvavad logid kõige k
 - kas pöörata ajaga või suuruse järgi?
 - mitu vana faili hoida, kui turvasündmus avastatakse sageli alles nädalate pärast?
 
-Kontrolli `sudo logrotate -d /etc/logrotate.d/remote`-ga, et logrotate leiab mõlema masina failid. Kirjuta `n01-logid.md`-sse oma valikud ja ühe lausega põhjendus.
+Kontrolli `sudo logrotate -d /etc/logrotate.d/remote`-ga, et logrotate leiab mõlema masina failid. Kirjuta `README.md`-sse oma valikud ja ühe lausega põhjendus.
 
 ✅ **Kontrollpunkt:** `logrotate -d` väljundis on näha failid nii `proxmox2` kui ka `proxmox3` kaustast.
+
+---
+
+## Esitamine
+
+Kõik tõendid on sõlmedes. Kopeeri need oma repo kausta. Käivita **oma arvutis, repo juurkaustas**:
+
+```bash
+scp proxmox2:/etc/rsyslog.d/10-pood.conf      konf/
+scp proxmox2:/etc/logrotate.d/pood            konf/pood.logrotate
+scp proxmox1:/etc/rsyslog.d/50-keskserver.conf konf/
+scp proxmox1:/etc/logrotate.d/remote          konf/remote.logrotate
+```
+
+`konf/90-keskserver.conf` on sul B4-st juba olemas.
+
+Väljundid:
+
+```bash
+ssh proxmox2 "sudo grep 'Invalid user' /var/log/secure"   > logid/a3-secure.txt
+ssh proxmox2 "ls /var/log/pood*"                          > logid/a6-pood.txt
+ssh proxmox1 "sudo ls -R /var/log/remote"                 > logid/b3-remote.txt
+ssh proxmox1 "sudo grep -rh 'Invalid user' /var/log/remote/proxmox3/" > logid/b5-intsident.txt
+```
+
+Kontrolli, et ükski fail pole tühi (`wc -l logid/* konf/*`), siis:
+
+```bash
+git add README.md konf logid
+git commit -m "Labor 1: keskne logiserver"
+git push
+```
+
+Repos on automaatkontroll. Mõne minuti pärast näed GitHubis **Actions** all tulemust ja punkte. Kui mõni kontroll on punane, loe selle väljundit, paranda, tee uus commit ja push. Esitada võid nii mitu korda, kui vaja.
+
+| Kontroll | Punkte |
+|---|---|
+| Kõik failid olemas ja pole tühjad | 10 |
+| `10-pood.conf`: hoiatuste reegel enne `local0.*` rida, `& stop` | 15 |
+| `pood.logrotate`: `rotate 3`, `compress`, `postrotate` HUP-iga | 15 |
+| `50-keskserver.conf`: `imtcp`, mall `%HOSTNAME%`-iga, `ruleset`, `input` seotud reeglistikuga | 15 |
+| `90-keskserver.conf`: `omfwd`, TCP, järjekord, lõputu kordus | 10 |
+| `a6-pood.txt`: kolm pakitud vana faili, neljandat pole | 10 |
+| `b3-remote.txt`: kaustad `proxmox2` ja `proxmox3` | 10 |
+| `b5-intsident.txt`: vähemalt kolm erinevat olematut kasutajat | 10 |
+| `README.md`: ennustused ja vastused täidetud | 5 |
+
+*Tabel 3. Automaatkontroll*
 
 ---
 
@@ -664,7 +708,8 @@ Järgmisel kohtumisel tuleb keskne jälgimissüsteem, mis kogub lisaks logidele 
 - [ ] `/etc/logrotate.d/pood` pöörab, pakib ja rsyslog kirjutab pärast pööramist uude faili
 - [ ] `proxmox1`-s on kaustad `/var/log/remote/proxmox2/` ja `/var/log/remote/proxmox3/`
 - [ ] B5: leidsid keskserverist kolm sissetungi katset, kuigi `proxmox3` enda turvalogi oli tühi
-- [ ] `n01-logid.md`-s on ennustused (A1, A2, A5, A6) ja vastused (A4, B5, B6)
+- [ ] `README.md`-s on ennustused (A1, A2, A5, A6) ja vastused (A4, B5, B6)
+- [ ] repo on push'itud ja Actions näitab 100 punkti
 
 ---
 
