@@ -1,0 +1,152 @@
+site_name: Süsteemide monitooring
+site_description: Kuidas masin oma seisundist räägib - mõõdikud, graafikud, alarmid ja logid
+site_author: Maria Talvik
+site_url: https://hkhk-monitoring.github.io/monitoring
+copyright: Maria Talvik &middot; CC BY-SA 4.0
+
+# Ära ehita arhiivi saiti
+exclude_docs: |
+  _archive/
+  images/EKRAANIPILDID.md
+
+# Repository
+repo_name: hkhk-monitoring/monitoring
+repo_url: https://github.com/hkhk-monitoring/monitoring
+edit_uri: edit/main/docs/
+
+# Theme
+theme:
+  name: material
+  language: et
+  features:
+  - announce.dismiss
+  - content.action.edit
+  - content.action.view
+  - content.code.annotate
+  - content.code.copy
+  - content.code.select
+  - content.tabs.link
+  - content.tooltips
+  - navigation.footer
+  - navigation.instant
+  - navigation.instant.prefetch
+  - navigation.instant.progress
+  - navigation.prune
+  - navigation.sections
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.top
+  - navigation.tracking
+  - search.highlight
+  - search.share
+  - search.suggest
+  - toc.follow
+  palette:
+  - media: "(prefers-color-scheme)"
+    scheme: default
+    primary: deep purple
+    accent: pink
+    toggle:
+      icon: material/brightness-auto
+      name: Vaheta tumele režiimile
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: deep purple
+    accent: pink
+    toggle:
+      icon: material/brightness-7
+      name: Vaheta tumele režiimile
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: deep purple
+    accent: pink
+    toggle:
+      icon: material/brightness-4
+      name: Vaheta heledasse režiimi
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+    logo: material/monitor-dashboard
+
+# Plugins
+plugins:
+- search:
+    separator: '[\s\u200b\-_,:!=\[\]()`"/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+    lang: et
+
+# Navigation
+nav:
+- Kursus:
+  - Avaleht: index.md
+  - Kursuse ülesehitus: syllabus.md
+  - Töökeskkond: kodulabor.md
+
+- Nädalad:
+  - N7 · Kuidas masin oma seisundist räägib:
+    - Loeng: week07/lecture.md
+    - Labor: week07/lab.md
+    - Kodutöö: week07/homework.md
+
+- Info:
+  - Litsents: litsents.md
+
+# Markdown extensions
+markdown_extensions:
+- abbr
+- admonition
+- attr_list
+- def_list
+- footnotes
+- md_in_html
+- tables
+- toc:
+    permalink: false
+    title: Sisukord
+    toc_depth: 3
+- pymdownx.arithmatex:
+    generic: true
+- pymdownx.betterem:
+    smart_enable: all
+- pymdownx.caret
+- pymdownx.details
+- pymdownx.highlight:
+    anchor_linenums: true
+    line_spans: __span
+    pygments_lang_class: true
+- pymdownx.inlinehilite
+- pymdownx.keys
+- pymdownx.magiclink:
+    normalize_issue_symbols: true
+    repo_url_shorthand: true
+    user: hkhk-monitoring
+    repo: monitoring
+- pymdownx.mark
+- pymdownx.smartsymbols
+- pymdownx.snippets
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format ""
+- pymdownx.tabbed:
+    alternate_style: true
+    combine_header_slug: true
+    slugify: !!python/object/apply:pymdownx.slugs.slugify
+      kwds:
+        case: lower
+- pymdownx.tasklist:
+    custom_checkbox: true
+- pymdownx.tilde
+
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/hkhk-monitoring
