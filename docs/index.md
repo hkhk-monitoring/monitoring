@@ -24,7 +24,7 @@ Server ei oska kurta. Ta kirjutab logi, näitab numbreid ja jätab jälgi. Selle
 
 | Kohtumine | Mõisteplokk |
 |---|---|
-| N1 | Masina päevik ja logid ühte kohta |
+| N1 | Masina logid ja keskne logiserver |
 | N2 | Keskne jälgimissüsteem |
 | N3 | Mõõdik, aegrida, agent *(veebiõpe)* |
 | N4 | Agent räägib serverile |

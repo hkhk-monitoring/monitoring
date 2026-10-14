@@ -1,0 +1,33 @@
+<svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="ar4" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker></defs>
+  <rect width="900" height="330" fill="#ffffff"/>
+  <rect x="30" y="40" width="230" height="110" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="145" y="70" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox2</text>
+  <text x="145" y="92" text-anchor="middle" font-size="12" fill="#263238">rsyslog → omfwd</text>
+  <rect x="60" y="105" width="170" height="30" rx="5" fill="#ffffff" stroke="#90a4ae"/><text x="145" y="125" text-anchor="middle" font-size="11" fill="#546e7a">järjekord (queue) kettal/mälus</text>
+  <rect x="30" y="190" width="230" height="110" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="145" y="220" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox3</text>
+  <text x="145" y="242" text-anchor="middle" font-size="12" fill="#263238">rsyslog → omfwd (Ansible)</text>
+  <rect x="60" y="255" width="170" height="30" rx="5" fill="#ffffff" stroke="#90a4ae"/><text x="145" y="275" text-anchor="middle" font-size="11" fill="#546e7a">järjekord (queue) kettal/mälus</text>
+  <line x1="260" y1="95" x2="396" y2="150" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#ar4)"/>
+  <line x1="260" y1="245" x2="396" y2="185" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#ar4)"/>
+  <text x="318" y="100" text-anchor="middle" font-size="12" fill="#e65100">TCP 514</text>
+  <text x="318" y="252" text-anchor="middle" font-size="12" fill="#e65100">TCP 514</text>
+  <rect x="400" y="100" width="230" height="130" rx="10" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="515" y="140" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">proxmox1</text>
+  <text x="515" y="162" text-anchor="middle" font-size="12" fill="#5d4037">imtcp, port 514</text>
+  <text x="515" y="182" text-anchor="middle" font-size="12" fill="#5d4037">mall:</text><text x="515" y="198" text-anchor="middle" font-size="10" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">%HOSTNAME%/%PROGRAMNAME%</text>
+  <text x="515" y="218" text-anchor="middle" font-size="12" fill="#5d4037">tulemüür: 514/tcp lahti</text>
+  <g font-family="JetBrains Mono, Menlo, monospace" font-size="11" fill="#263238">
+    <rect x="655" y="60" width="225" height="210" rx="8" fill="#fafafa" stroke="#90a4ae"/>
+    <text x="670" y="85">/var/log/remote/</text>
+    <text x="680" y="108">├── proxmox2/</text>
+    <text x="680" y="128">│   ├── sshd-session.log</text>
+    <text x="680" y="148">│   └── pood.log</text>
+    <text x="680" y="168">├── proxmox3/</text>
+    <text x="680" y="188">│   └── sudo.log</text>
+    <text x="680" y="208">└── turvalogi.log</text>
+    <text x="670" y="245" fill="#546e7a">kaust 700: ainult root</text>
+  </g>
+  <line x1="630" y1="165" x2="650" y2="165" stroke="#ff8f00" stroke-width="2" marker-end="url(#ar4)"/>
+</svg>

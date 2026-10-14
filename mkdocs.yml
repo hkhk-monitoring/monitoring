@@ -86,7 +86,7 @@ nav:
   - Töökeskkond: kodulabor.md
 
 - Nädalad:
-  - N1 · Masina päevik ja logid ühte kohta:
+  - N1 · Masina logid ja keskne logiserver:
     - Loeng: week01/lecture.md
     - Labor: week01/lab.md
     - Kodutöö: week01/homework.md

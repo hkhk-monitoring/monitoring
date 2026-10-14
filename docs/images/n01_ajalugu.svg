@@ -1,0 +1,12 @@
+<svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="200" fill="#ffffff"/>
+  <line x1="40" y1="100" x2="860" y2="100" stroke="#00796b" stroke-width="3"/>
+  <g font-size="12" text-anchor="middle">
+    <circle cx="90" cy="100" r="8" fill="#00796b"/><text x="90" y="75" font-weight="700" fill="#004d40">1980ndad</text><text x="90" y="130" fill="#263238">syslog</text><text x="90" y="147" fill="#546e7a">sendmaili jaoks</text>
+    <circle cx="240" cy="100" r="8" fill="#00796b"/><text x="240" y="75" font-weight="700" fill="#004d40">1998</text><text x="240" y="130" fill="#263238">syslog-ng</text><text x="240" y="147" fill="#546e7a">filtrid, TCP</text>
+    <circle cx="390" cy="100" r="8" fill="#00796b"/><text x="390" y="75" font-weight="700" fill="#004d40">2001 / 2009</text><text x="390" y="130" fill="#263238">RFC 3164 / RFC 5424</text><text x="390" y="147" fill="#546e7a">vorming kirja</text>
+    <circle cx="540" cy="100" r="8" fill="#00796b"/><text x="540" y="75" font-weight="700" fill="#004d40">2004</text><text x="540" y="130" fill="#263238">rsyslog</text><text x="540" y="147" fill="#546e7a">moodulid, järjekorrad</text>
+    <circle cx="690" cy="100" r="8" fill="#00796b"/><text x="690" y="75" font-weight="700" fill="#004d40">2011</text><text x="690" y="130" fill="#263238">systemd-journald</text><text x="690" y="147" fill="#546e7a">väljad, kahendvorming</text>
+    <circle cx="820" cy="100" r="8" fill="#ff8f00"/><text x="820" y="75" font-weight="700" fill="#e65100">täna</text><text x="820" y="130" fill="#263238">Loki, OpenSearch</text><text x="820" y="147" fill="#546e7a">kohtumised 8-9</text>
+  </g>
+</svg>

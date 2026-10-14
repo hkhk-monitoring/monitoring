@@ -1,0 +1,23 @@
+<svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect x="0" y="0" width="900" height="330" fill="#ffffff"/>
+  <polygon points="450,20 820,100 80,100" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="450" y="70" text-anchor="middle" font-size="20" font-weight="700" fill="#004d40">Observability</text>
+  <text x="450" y="90" text-anchor="middle" font-size="13" fill="#00695c">Miks see juhtus? Kolm sammast koos</text>
+  <rect x="110" y="115" width="200" height="150" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="3"/>
+  <text x="210" y="150" text-anchor="middle" font-size="18" font-weight="700" fill="#e65100">Logid</text>
+  <text x="210" y="175" text-anchor="middle" font-size="13" fill="#5d4037">Mis juhtus?</text>
+  <text x="210" y="200" text-anchor="middle" font-size="12" fill="#6d4c41">sündmus + aeg</text>
+  <text x="210" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">täna siin</text>
+  <rect x="350" y="115" width="200" height="150" rx="8" fill="#ffffff" stroke="#00796b" stroke-width="2"/>
+  <text x="450" y="150" text-anchor="middle" font-size="18" font-weight="700" fill="#004d40">Mõõdikud</text>
+  <text x="450" y="175" text-anchor="middle" font-size="13" fill="#37474f">Kui palju ja kui kaua?</text>
+  <text x="450" y="200" text-anchor="middle" font-size="12" fill="#546e7a">number + aeg</text>
+  <text x="450" y="240" text-anchor="middle" font-size="12" fill="#546e7a">kohtumised 2-7</text>
+  <rect x="590" y="115" width="200" height="150" rx="8" fill="#ffffff" stroke="#00796b" stroke-width="2"/>
+  <text x="690" y="150" text-anchor="middle" font-size="18" font-weight="700" fill="#004d40">Jäljed</text>
+  <text x="690" y="175" text-anchor="middle" font-size="13" fill="#37474f">Kus päring aega kulutas?</text>
+  <text x="690" y="200" text-anchor="middle" font-size="12" fill="#546e7a">teekond teenuste vahel</text>
+  <text x="690" y="240" text-anchor="middle" font-size="12" fill="#546e7a">kohtumine 10</text>
+  <rect x="80" y="280" width="740" height="34" rx="6" fill="#00796b"/>
+  <text x="450" y="302" text-anchor="middle" font-size="13" fill="#ffffff">Masinad ja teenused, mida jälgime (proxmox1, proxmox2, proxmox3)</text>
+</svg>

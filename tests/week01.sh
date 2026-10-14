@@ -371,7 +371,7 @@ if [ "${KEEP:-0}" = 1 ]; then echo "== KEEP=1: sõlmed jäävad labori lõppseis
 # ================= RESULTS.md =================
 OS=$(S proxmox1 '. /etc/os-release; echo $PRETTY_NAME'); VER=$(S proxmox1 'rpm -q rsyslog logrotate audit openssh-server | tr "\n" " "')
 {
-  echo "## week01 - Masina päevik ja logid ühte kohta (labor: öövahetus)"
+  echo "## week01 - Masina logid ja keskne logiserver (labor: öövahetus)"
   echo
   echo "- Käivitatud: $(date '+%F %H:%M')"
   echo "- Keskkond: $OS ×3 (SSH-konf: \`${SSH_CONFIG:-~/.ssh/config}\`), $(ansible --version | head -1)"

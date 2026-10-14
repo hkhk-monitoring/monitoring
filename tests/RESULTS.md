@@ -2,20 +2,20 @@
 
 Iga labor käiakse läbi skriptiga `tests/weekNN.sh`. Uuem tulemus asendab sama nädala vana osa.
 
-## week01 - Masina päevik ja logid ühte kohta (labor: öövahetus)
+## week01 - Masina logid ja keskne logiserver (labor: öövahetus)
 
-- Käivitatud: 2026-10-14 22:09
+- Käivitatud: 2026-10-14 23:17
 - Keskkond: AlmaLinux 9.8 (Olive Jaguar) ×3 (SSH-konf: `tests/.ssh_config`), ansible [core 2.21.5]
 - Versioonid: rsyslog-8.2510.0-2.el9.aarch64 logrotate-3.18.0-12.el9.aarch64 audit-3.1.5-8.el9.aarch64 openssh-server-9.9p1-9.el9_8.alma.1.aarch64 
-- Tulemus: **111 OK, 1 FAIL**
+- Tulemus: **112 OK, 0 FAIL**
 - Märkused:
     - B4 Mõtle: grep -c 500 = 846, staatus=500 = 748
     - L3 kõige aeglasem: kell=03:14:22 ip=10.0.1.36 meetod=GET url=/api/makse staatus=500 aeg=4995ms id=027995
-    - öine külaline: proxmox3: 22:07:37 kasutajad=guest52 backup90 oracle33 cron=/etc/cron.d/varukoopia
+    - öine külaline: proxmox3: 23:15:30 kasutajad=test21 ubuntu90 test18 guest97 cron=/etc/cron.d/kontroll
     - auid B5-s: auid=lima 
     - L5: keskserver maas, kohale 3/3 ~35 s
-    - L4: UDP 50000 reast kohale 44090
-    - RAM proxmox1: rsyslogd 7.8 MB (50 000 rida veebilogi sees); 954 MB kokku, 615 MB available
+    - L4: UDP 50000 reast kohale 45906
+    - RAM proxmox1: rsyslogd 7.6 MB (50 000 rida veebilogi sees); 954 MB kokku, 608 MB available
 - TESTIMATA: L8 (oma valvur, lahendust pole antud), L9 (TLS), L10 (kettal püsiv järjekord: eeltestis jäid kirjed kettale ega jõudnud kohale; ülesanne on uurimuslik), L11 (räsid), L12 (systemd-journal-remote).
 
 | Samm | Tulemus | Väljund (FAIL korral) |
@@ -77,7 +77,7 @@ Iga labor käiakse läbi skriptiga `tests/weekNN.sh`. Uuem tulemus asendab sama 
 | B3: proxmox3 rida keskserveris (max 60 s) | OK | |
 | B3: proxmox3 auditctl -l = 3 | OK | |
 | B4: generaator 50000 rida | OK | |
-| B4: keskserveris 50000 rida (max 60 s) | **FAIL** | `bash: line 1: /var/log/remote/proxmox2/veeb.log: Permission denied bash: line 1: [: : integer expected ` |
+| B4: keskserveris 50000 rida (max 60 s) | OK | |
 | B4: cd keskserveri kausta ilma sudota ei õnnestu (700) | OK | |
 | B4: koopia kodukausta + chown | OK | |
 | B4.1-2: 50000 rida, 748 viga | OK | |
@@ -91,8 +91,8 @@ Iga labor käiakse läbi skriptiga `tests/weekNN.sh`. Uuem tulemus asendab sama 
 | B5: proxmox3 secure grep -c = 0 | OK | |
 | B5.1: keskserveris >= 3 kasutajat | OK | |
 | B5.1: turvalogi.log sisaldab proxmox3 katseid | OK | |
-| B5.2-3: audit: truncate ja /etc/cron.d/varukoopia | OK | |
-| B5.3: cron-töö jälg varukoopia.log keskserveris (max 90 s) | OK | |
+| B5.2-3: audit: truncate ja /etc/cron.d/kontroll | OK | |
+| B5.3: cron-töö jälg kontroll.log keskserveris (max 90 s) | OK | |
 | B6: logrotate -d leiab proxmox2, proxmox3, turvalogi | OK | |
 | Classroom: K1. Kõik failid olemas ja pole tühjad (10 p) | OK | |
 | Classroom: K2. 10-pood.conf: hoiatuste reegel enne local0.* rida ja & stop (10 p) | OK | |
