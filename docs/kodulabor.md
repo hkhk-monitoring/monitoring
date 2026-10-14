@@ -11,7 +11,7 @@ Kasutad samu kolme Proxmoxi sõlme, mis automatiseerimise kursusel. Uut masinat 
 | Masin | Roll |
 |---|---|
 | Sinu arvuti | VS Code, terminal, Ansible, Git, brauser |
-| `proxmox1` | seiresüsteem: Prometheus, Grafana, hiljem Loki (Docker Compose) |
+| `proxmox1` | keskserver: logiserver (rsyslog), seiresüsteemid (Docker Compose) |
 | `proxmox2`, `proxmox3` | jälgitavad masinad |
 
 *Tabel 1. Kes mida teeb*
@@ -40,14 +40,21 @@ Alates N8-st avad brauseris teenuseid sõlmes `proxmox1`. Kasuta sõlme IP-d, mi
 
 | Teenus | Port | Alates |
 |---|---|---|
-| Prometheus | 9090 | N8 |
-| node_exporter | 9100 | N8 |
-| Grafana | 3000 | N10 |
-| Alertmanager | 9093 | N13 |
-| Loki | 3100 | N15 |
+| rsyslog (logide vastuvõtt) | 514/tcp | N7 |
+| Zabbix veebiliides | 8080 | N8 |
+| Zabbix agent | 10050 | N10 |
+| Prometheus | 9090 | N11 |
+| node_exporter | 9100 | N11 |
+| Grafana | 3000 | N12 |
+| Alertmanager | 9093 | N12 |
+| InfluxDB | 8086 | N13 |
+| Loki | 3100 | N14 |
+| OpenSearch Dashboards | 5601 | N15 |
+| Jaeger | 16686 | N19 |
+| Uptime Kuma | 3001 | N20 |
 
 *Tabel 2. Teenused ja pordid*
 
 ## Mälu
 
-Seiresüsteem vajab `proxmox1`-l kursuse lõpuks umbes 1,5 GB mälu. Kontrolli `ssh proxmox1 free -h`, veerg `available`. Kui see on alla 2 GB, anna õpetajale teada.
+Iga seiresüsteem vajab `proxmox1`-l 0,5-2 GB mälu. Korraga jookseb ainult üks: enne uue käivitamist peata eelmine (`docker compose down`). Kontrolli `ssh proxmox1 free -h`, veerg `available`. Kui see on alla 3 GB, anna õpetajale teada.

@@ -2,300 +2,294 @@
 tags:
   - Loeng
   - Monitooring
+  - Logid
   - Linux
-  - Algaja
 ---
 
-# Kuidas masin oma seisundist räägib
+# Masina päevik ja logid ühte kohta
 
-*Server ei oska kurta. Ta näitab numbreid ja sinu töö on neid lugeda.*
+*Server kirjutab kõik üles. Küsimus on, kas sa leiad selle üles ja kas see on alles, kui sul seda vaja on.*
 
 !!! abstract "Õpiväljundid"
     Pärast seda loengut oskad:
 
-    - selgitada, miks serverit jälgitakse ja mis juhtub, kui seda ei tehta;
-    - eristada mõõdikut (üks number) ja aegrida (number ajas);
-    - kirjeldada nelja küsimust, mida serverilt alati küsitakse: kas ta on üleval, kas ta jõuab, kas tal on ruumi mõelda ja kas tal on ruumi hoida;
-    - tõlgendada koormust (load average) protsessorituumade arvu järgi;
-    - selgitada, miks Linuxi "vaba mälu" on väike ja miks see on normaalne;
-    - selgitada, kust käsud `top`, `free` ja `uptime` oma numbrid saavad.
+    - selgitada, miks logid on seire esimene signaal ja millele need vastavad;
+    - lugeda logikirjest välja aja, masina, programmi, tõsiduse ja sõnumi;
+    - kirjeldada, kuidas journald ja rsyslog AlmaLinuxis koos töötavad;
+    - kasutada logi päritolu (facility) ja tõsidust (severity), et otsustada, kuhu kirje läheb;
+    - selgitada, miks logisid pööratakse (logrotate) ja mis juhtub, kui seda ei tehta;
+    - põhjendada, miks logid saadetakse keskserverisse, ja võrrelda UDP ja TCP saatmist.
 
 ## Sisukord
 
-1. [Märteni skript oli juba monitooring](#1-marteni-skript-oli-juba-monitooring)
-2. [Mõõdik ja aegrida](#2-moodik-ja-aegrida)
-3. [Neli küsimust serverile](#3-neli-kusimust-serverile)
-4. [Kust numbrid tulevad](#4-kust-numbrid-tulevad)
-5. [Kuidas numbreid õigesti lugeda](#5-kuidas-numbreid-oigesti-lugeda)
-6. [Number üksi ei ütle midagi](#6-number-uksi-ei-utle-midagi)
-7. [Taust ja edasijõudnutele](#7-taust-ja-edasijoudnutele)
+1. [Mis juhtus kell 03:12?](#1-mis-juhtus-kell-0312)
+2. [Kaks päevikupidajat](#2-kaks-paevikupidajat)
+3. [Kust ja kui tõsine](#3-kust-ja-kui-tosine)
+4. [Päevik ei tohi kasvada lõputult](#4-paevik-ei-tohi-kasvada-loputult)
+5. [Logid ühte kohta](#5-logid-uhte-kohta)
+6. [Taust ja edasijõudnutele](#6-taust-ja-edasijoudnutele)
 
 ---
 
-## 1. Märteni skript oli juba monitooring
+## 1. Mis juhtus kell 03:12?
 
 !!! abstract "Miks see oluline on?"
-    Kui sa ei jälgi oma serverit, saad probleemist teada kasutajalt. Tavaliselt vihaselt ja tavaliselt liiga hilja.
+    Kui midagi läks öösel katki, ei olnud keegi seda nägemas. Ainus tunnistaja on masin ise ja tema päevik.
 
-Mäletad automatiseerimise kursusest Märteni `monitor.sh`-i? See kontrollis, kas nginx töötab, ja kirjutas tulemuse logifaili. Skript oli katki, aga idee oli õige: **masin kontrollib masinat, et inimene ei peaks.** Seda nimetataksegi seireks ehk monitooringuks (monitoring).
-
-Märteni skript vastas ainult ühele küsimusele: kas teenus käib, jah või ei. Päris elus see ei piisa.
+`journalctl` ja `tail -f` oskad sa juba. Sel kursusel vaatame logisid teise pilguga: mitte "mis siin failis on", vaid "kuidas ma saan teada, mis juhtus, kui mind seal ei olnud".
 
 !!! example "Näidisstsenaarium"
-    Kati teeb praktikat väikeses e-poes. Reede õhtul kell 21 läheb pood aeglaseks: leht laeb 15 sekundit. Nginx töötab, seega Märteni-tüüpi skript ütleks "kõik korras".
+    Kati teeb praktikat väikeses e-poes. Esmaspäeva hommikul ütleb juhataja: "Pood oli öösel pool tundi maas. Klient kirjutas kell 03:20. Mis juhtus?"
 
-    Kell 22 lahkuvad esimesed ostjad. Kell 23 kirjutab üks klient Facebooki, et "pood on katki". Esmaspäeva hommikul näeb Kati seda postitust ja logib serverisse. Ketas on 100% täis, sest logifail kasvas terve nädala.
+    Kati logib serverisse ja küsib päevikult:
 
-    Kui keegi oleks kolmapäeval vaadanud, oleks ta näinud: ketas 85%, kasvab 5% päevas. Viis minutit tööd, null kaotatud ostjat.
+    ```text
+    Oct 13 03:12:04 pood kernel: Out of memory: Killed process 2211 (php-fpm)
+    Oct 13 03:12:05 pood systemd[1]: php-fpm.service: Main process exited, status=9/KILL
+    Oct 13 03:41:17 pood systemd[1]: php-fpm.service: Scheduled restart job
+    ```
 
-<figure markdown="span">
-```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ede7f6','primaryBorderColor':'#5e35b1','primaryTextColor':'#212121','lineColor':'#7e57c2'}}}%%
-graph LR
-    A["Kolmapäev<br/>ketas 85%"] --> B["Reede 21:00<br/>ketas 100%<br/>pood aeglane"]
-    B --> C["Reede 23:00<br/>klient kurdab<br/>Facebookis"]
-    C --> D["Esmaspäev<br/>Kati saab teada"]
-    A -. "seirega: hoiatus siin" .-> E["Kati kustutab<br/>vanad logid<br/>5 minutit"]
-```
-  <figcaption>Joonis 7.1. Sama probleem kahe teekonnaga: ilma seireta saab Kati teada kasutajalt neli päeva hiljem, seirega märkab ta seda kaks päeva enne katkestust.</figcaption>
-</figure>
+    Kolm rida ja vastus on käes: kell 03:12 sai mälu otsa, tuum sulges veebipoe protsessi ja see käivitus uuesti alles 29 minutit hiljem. Ilma logideta oleks Kati vastus olnud "ei tea".
 
-Ülemine rida näitab, mis juhtus päriselt. Alumine katkendjoon näitab, mis oleks juhtunud, kui keegi oleks kolmapäeval ketta täituvust näinud.
+Pane tähele, kes rikke esimesena avastas: klient. Seire mõte on, et **kasutaja ei tohi olla see, kes rikke esimesena avastab.** Kogu see kursus käib selle ühe lause ümber.
 
-Seire eesmärk on lihtne: **tea enne kasutajat.** Kõik muu sel kursusel (graafikud, alarmid, logid) on selle ühe lause teenistuses.
+Logi (log) on programmi päevik: iga rida on üks sündmus koos ajaga. Logid vastavad küsimusele **"mis juhtus?"**. Hiljem kursusel lisanduvad mõõdikud ("kui palju?") ja jäljed ("kust läbi?"), aga logid on alati esimene koht, kust otsima hakatakse.
 
-??? question "✅ Kontrolli ennast"
-    1. Miks Märteni skript oleks Kati reede õhtul öelnud "kõik korras"?
-    2. Too oma elust üks näide, kus said probleemist teada liiga hilja, kuigi märgid olid varem olemas (telefoni aku, mäng, arvuti).
-
----
-
-## 2. Mõõdik ja aegrida
-
-!!! abstract "Miks see oluline on?"
-    Üks number ütleb, kus sa praegu oled. Numbrite rida ütleb, kuhu sa liigud. Seire töötab teisega.
-
-Mõtle telefoni akule. Ekraanil on **37%**. See on **mõõdik** (metric): üks mõõdetav suurus, millel on nimi ja väärtus.
-
-Kas 37% on hea või halb? Sellest numbrist üksi ei saa aru. Kui hommikul oli 100% ja praegu on kell 10, on midagi valesti. Kui hommikul oli 100% ja praegu on kell 22, on kõik hästi.
-
-Telefoni seadetes on aku graafik: sama number iga paari minuti järel terve päeva jooksul. Sellist numbrite rida koos ajatemplitega nimetatakse **aegreaks** (time series).
+Igal logikirjel on samad osad:
 
 <figure markdown="span">
 ```text
-aku %
-100 |█
- 80 |  █
- 60 |    █ █
- 40 |        █ █ █
- 20 |              █
-  0 +--------------------
-     8  10  12  14  16  18  kell
+Oct 13 03:12:04   pood   kernel:   Out of memory: Killed process 2211 (php-fpm)
+└──── aeg ────┘   └masin┘ └programm┘ └──────────────── sõnum ─────────────────┘
+
+nähtamatud, aga olemas:  päritolu = kern   tõsidus = err (3)
 ```
-  <figcaption>Joonis 7.2. Aegrida: sama mõõdik (aku laetus) mõõdetuna iga kahe tunni järel. Graafikult on näha, et kell 12-14 ei kulunud akut peaaegu üldse.</figcaption>
+  <figcaption>Joonis 7.1. Logikirje osad. Aeg, masin, programm ja sõnum on reas näha. Päritolu (facility) ja tõsidus (severity) on kirje küljes, aga tekstireal neid vaikimisi ei näidata.</figcaption>
 </figure>
 
-Graafikul on näha midagi, mida ükski üksik number ei näita: aku kulus kiiresti hommikul, keskpäeval peaaegu üldse mitte ja õhtul jälle. Arsti juures on sama loogika: üks palavikumõõtmine ütleb "38,5", aga palavikukõver ütleb, kas haigus läheb paremaks või halvemaks.
-
-Täna loed numbreid käsitsi, ühe kaupa. Järgmisel kohtumisel paned masina neid ise koguma, iga 15 sekundi järel, ja siis on sul aegrida.
+Neli osa on reas näha. Kaks viimast (päritolu ja tõsidus) on peidus, aga just need otsustavad, kuhu kirje läheb. Nendest räägib osa 3.
 
 ??? question "✅ Kontrolli ennast"
-    1. Mis vahe on mõõdikul ja aegreal? Too näide autost.
-    2. Kati nägi kolmapäeval "ketas 85%". Miks sellest üksi ei piisa, et öelda, millal ketas täis saab?
+    1. Miks ei piisa Katil sellest, et pood praegu töötab?
+    2. Mida ütleb Katile see, et rea 2 ja rea 3 vahel on 29 minutit?
 
 ---
 
-## 3. Neli küsimust serverile
+## 2. Kaks päevikupidajat
 
 !!! abstract "Miks see oluline on?"
-    Server mõõdab tuhandeid asju. Algaja upub neisse. Neli küsimust annavad sulle järjekorra, millest alustada.
+    Kui tead, kes logi vastu võtab ja kuhu edasi saadab, tead ka, kus seda otsida ja kust saab selle teise masinasse suunata.
 
-Auto armatuurlaual on kümneid tulesid, aga juht vaatab kõigepealt nelja: kiirus, kütus, mootori temperatuur ja kas mõni punane tuli põleb. Serveriga on sama.
+AlmaLinuxis peab päevikut kaks programmi korraga:
 
-| Küsimus | Mida mõõdetakse | Käsk | Võrdlus autoga |
-|---|---|---|---|
-| Kas ta on üleval? | tööaeg (uptime) | `uptime` | kas mootor käib |
-| Kas ta jõuab? | protsessori koormus | `uptime`, `top` | pöörded |
-| Kas tal on ruumi mõelda? | mälu (RAM) | `free -h` | kõrvalistuja süli: mis on käepärast |
-| Kas tal on ruumi hoida? | ketas | `df -h` | pagasiruum |
-
-*Tabel 7.1. Neli küsimust, mida igalt serverilt esimesena küsitakse*
-
-Mälu ja ketta erinevus ajab algajaid sageli segadusse. **Mälu** on kiire ja väike ning kaob, kui masin välja lülitada. Seal on asjad, millega praegu töötatakse. **Ketas** on aeglane ja suur ning jääb alles. Seal on asjad, mida hoitakse. Kui mälu saab täis, läheb masin aeglaseks. Kui ketas saab täis, lakkavad programmid töötamast, sest nad ei saa enam midagi kirjutada (nagu Kati e-poes).
-
-??? question "✅ Kontrolli ennast"
-    1. Kati e-pood jäi seisma täis ketta tõttu. Millise neljast küsimusest oleks ta pidanud esimesena küsima?
-    2. Miks täis mälu teeb masina aeglaseks, aga täis ketas peatab programmi?
-
----
-
-## 4. Kust numbrid tulevad
-
-!!! abstract "Miks see oluline on?"
-    Kui tead, kust number tuleb, tead ka, kuidas seda kontrollida. Järgmisel nädalal hakkab sama allikat lugema masin.
-
-Linuxis teab kõike masina kohta **tuum** (kernel): mitu protsessi ootab, kui palju mälu on kasutusel, kaua masin on üleval olnud. Tuum ei kirjuta neid numbreid kettale. Ta näitab neid kaustas **`/proc`**, mis näeb välja nagu tavaline kaust failidega, aga on tegelikult aken tuuma sisse. Iga kord, kui faili loed, paneb tuum sinna värsked numbrid.
+- **journald** (osa systemd-st) võtab vastu kõik: tuuma sõnumid, teenuste väljundi, `logger` käsu read. Hoiab neid kahendvormingus andmebaasis, mida loed käsuga `journalctl`.
+- **rsyslog** loeb journaldist kõik kirjed ja kirjutab need tavalistesse tekstifailidesse kaustas `/var/log/`. Lisaks oskab ta neid **võrgu kaudu teise masinasse saata**.
 
 <figure markdown="span">
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#ede7f6','primaryBorderColor':'#5e35b1','primaryTextColor':'#212121','lineColor':'#7e57c2'}}}%%
 graph LR
-    K["Linuxi tuum<br/>teab kõike"] --> P["/proc<br/>loadavg, meminfo,<br/>uptime, stat"]
-    P --> U["uptime"]
-    P --> F["free"]
-    P --> T["top"]
-    U --> S["sina"]
-    F --> S
-    T --> S
-    P -. "järgmine kohtumine" .-> N["node_exporter<br/>loeb sama /proc'i"]
+    P1["sshd"] --> J["journald<br/>journalctl"]
+    P2["kernel"] --> J
+    P3["logger"] --> J
+    J -->|"imjournal"| R["rsyslog<br/>reeglid"]
+    R --> F1["/var/log/messages"]
+    R --> F2["/var/log/secure"]
+    R -.->|"võrk, port 514"| K["keskserver<br/>proxmox1"]
 ```
-  <figcaption>Joonis 7.3. Käsud `uptime`, `free` ja `top` ei mõõda midagi ise. Nad loevad tuuma numbreid kaustast `/proc` ja vormistavad need inimesele loetavaks. Järgmisel kohtumisel teeb sama node_exporter.</figcaption>
+  <figcaption>Joonis 7.2. Logi teekond AlmaLinuxis: programmid kirjutavad journaldisse, rsyslog loeb sealt mooduli imjournal kaudu ja jagab kirjed reeglite järgi failidesse. Katkendjoon on võrguühendus, mille laboris ise seadistad.</figcaption>
 </figure>
 
-Joonisel on kõigil kolmel käsul sama allikas. Erinevus on ainult selles, kuidas nad numbrid sulle ette panevad.
+Kõik programmid räägivad journaldiga. rsyslog on journaldi järel ja otsustab reeglite järgi, mis faili iga kirje läheb ja kas see saadetakse ka võrku.
 
-| Fail | Mis seal on | Mis käsk seda loeb |
+| | journald | rsyslog |
 |---|---|---|
-| `/proc/uptime` | sekundid alates käivitusest | `uptime` |
-| `/proc/loadavg` | koormus 1, 5 ja 15 minuti keskmisena | `uptime`, `top` |
-| `/proc/meminfo` | mälu, umbes 50 rida | `free`, `top` |
-| `/proc/stat` | protsessori aeg alates käivitusest | `top` |
+| Vorming | kahendandmebaas | tekstifailid |
+| Asukoht | `/var/log/journal/` | `/var/log/messages`, `/var/log/secure` jt |
+| Loed | `journalctl` | `less`, `grep`, `tail` |
+| Tugevus | kiire otsing välja järgi (`-u`, `-p`, `--since`) | reeglid, failid, saatmine võrku |
 
-*Tabel 7.2. Olulisemad failid kaustas `/proc`*
+*Tabel 7.1. journald ja rsyslog*
 
-Ketta kohta küsib `df` tuumalt otse iga failisüsteemi kohta eraldi, seega ühte `/proc` faili seal pole. Põhimõte on sama: number tuleb tuumast.
+Ubuntus on failide nimed teised (`/var/log/syslog`, `/var/log/auth.log`), aga põhimõte on sama.
 
 ??? question "✅ Kontrolli ennast"
-    1. Miks `cat /proc/uptime` näitab iga kord erinevat numbrit, kuigi keegi faili ei muuda?
-    2. Kui `free` ja `top` näitavad mälu kohta veidi erinevaid numbreid, kumba usud? Kust saaksid kontrollida?
+    1. Kati käivitab `logger "tere"`. Kus kahes kohas see rida nüüd on?
+    2. Miks on vaja rsyslogi, kui journald hoiab niikuinii kõike?
 
 ---
 
-## 5. Kuidas numbreid õigesti lugeda
+## 3. Kust ja kui tõsine
 
 !!! abstract "Miks see oluline on?"
-    Kaks numbrit, koormus ja vaba mälu, lähevad algajatel kõige sagedamini valesti. Valesti loetud number on halvem kui lugemata number, sest sa paanitsed ilma põhjuseta või rahuned ilma põhjuseta.
+    Masin kirjutab tuhandeid ridu päevas. Kui kõik läheb ühte hunnikusse, ei leia sa olulist üles. Päritolu ja tõsidus lasevad kirjeid sorteerida enne, kui neid lugema hakkad.
 
-### Koormus ja poe kassad
+Igal kirjel on kaks silti.
 
-Käsk `uptime` näitab rea lõpus kolme numbrit:
+**Päritolu (facility)** ütleb, millisest süsteemi osast kirje tuli: `kern` (tuum), `authpriv` (sisselogimised, sudo), `cron` (ajastatud tööd), `daemon` (teenused). Sildid `local0` kuni `local7` on jäetud sinu enda rakendustele.
+
+**Tõsidus (severity)** ütleb, kui tõsine asi on, skaalal 0-7. Väiksem number on tõsisem:
+
+| Nr | Nimi | Tähendus | Näide koolist |
+|---|---|---|---|
+| 0 | `emerg` | süsteem ei tööta | maja põleb |
+| 1 | `alert` | tegutse kohe | tuletõrjesignalisatsioon |
+| 2 | `crit` | kriitiline | elekter on ära |
+| 3 | `err` | viga, aga muu töötab | ühes klassis projektor katki |
+| 4 | `warning` | võib probleemiks muutuda | printeril on toonerit 10% |
+| 5 | `notice` | tavaline, aga tähelepanuväärne | tunniplaan muutus |
+| 6 | `info` | informatsioon | söökla on avatud |
+| 7 | `debug` | detailid veaotsinguks | kes mis kell ukse avas |
+
+*Tabel 7.2. Tõsiduse tasemed*
+
+Kui küsid `journalctl -p warning`, saad kõik tasemed 0-4 ehk "hoiatus ja hullem".
+
+rsyslogi reegel ühendab need kaks: **vasakul on filter (päritolu.tõsidus), paremal on tegevus (kuhu kirje läheb).**
 
 ```text
- 10:14:02 up 3 days,  2:41,  1 user,  load average: 1.85, 0.92, 0.40
+authpriv.*                  /var/log/secure
+*.info;authpriv.none        /var/log/messages
+local0.warning              /var/log/pood-hoiatused.log
 ```
 
-Need on **koormus** (load average): keskmiselt mitu protsessi tahtis viimase 1, 5 ja 15 minuti jooksul protsessorit kasutada (kas töötas või ootas järjekorras).
+Esimene rida saadab kõik sisselogimised faili `secure`. Teine saadab kõik tasemest `info` alates faili `messages`, aga mitte sisselogimisi (need sisaldavad tundlikku infot). Kolmas on sinu reegel: poe rakenduse hoiatused ja hullemad eraldi faili.
 
-Mõtle poele. Kassad on protsessori **tuumad** (core). Ostjad on protsessid.
+??? question "✅ Kontrolli ennast"
+    1. Rakendus kirjutab `local0.err`. Kas see jõuab reegli `local0.warning` faili? Miks?
+    2. Miks hoitakse sisselogimiste logi (`secure`) eraldi ja rangemate õigustega?
 
-- 2 kassat, koormus 1: üks kassa töötab, teine ootab ostjat. Kõik on rahulik.
-- 2 kassat, koormus 2: mõlemad kassad töötavad, järjekorda pole. Täis, aga hea.
-- 2 kassat, koormus 6: mõlemad töötavad ja 4 inimest seisab järjekorras. Asjad venivad.
+---
+
+## 4. Päevik ei tohi kasvada lõputult
+
+!!! abstract "Miks see oluline on?"
+    Logi, mis kasvab igavesti, täidab lõpuks ketta. Täis ketas peatab programmid. Logi, mis peaks probleeme näitama, tekitab siis ise probleemi.
+
+Mati koolis on veebiserver, mis kirjutab iga päringu kohta rea. Päevas on see 200 MB, aastas 70 GB. Ühel päeval on ketas täis ja server lõpetab vastamise. Põhjus on päevik, mida keegi ei lugenud.
+
+Lahendus on **logrotate**: programm, mis käib regulaarselt (tavaliselt kord ööpäevas) logifailid üle ja **pöörab** need. Praegune fail saab nimeks `.1`, vana `.1` saab `.2`, vanad pakitakse kokku ja kõige vanem kustutatakse.
 
 <figure markdown="span">
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#ede7f6','primaryBorderColor':'#5e35b1','primaryTextColor':'#212121','lineColor':'#7e57c2'}}}%%
 graph LR
-    subgraph J["Järjekord (ootavad)"]
-        P3((P3))
-        P4((P4))
-        P5((P5))
-        P6((P6))
-    end
-    subgraph C["Protsessor: 2 tuuma"]
-        T1["Tuum 1<br/>P1"]
-        T2["Tuum 2<br/>P2"]
-    end
-    J --> C
+    A["pood.log<br/>täna"] -->|"pööramine"| B["pood.log.1<br/>eile"]
+    B --> C["pood.log.2.gz<br/>üleeile, pakitud"]
+    C --> D["pood.log.3.gz"]
+    D -->|"rotate 3"| X["kustutatakse"]
 ```
-  <figcaption>Joonis 7.4. Koormus 6 kahe tuumaga masinas: kaks protsessi töötavad, neli ootavad. Koormus jagatud tuumade arvuga on 3, mis tähendab, et masin on kolm korda üle koormatud.</figcaption>
+  <figcaption>Joonis 7.3. Logrotate pöörab faili: iga pööramise järel liigub iga fail sammu edasi, vanemad pakitakse ja reegel `rotate 3` hoiab alles kolm vana faili.</figcaption>
 </figure>
 
-Seega **koormus ilma tuumade arvuta ei tähenda midagi.** Tuumade arvu näitab käsk `nproc`. Rusikareegel: jaga koormus tuumade arvuga. Kuni 1 on korras, üle selle tekib järjekord.
+Joonisel liigub fail iga pööramisega paremale. Kolmest vanemast fail kustutatakse, nii et kettal on alati kindel arv faile ja maht ei kasva lõputult.
 
-Kolm numbrit koos näitavad suunda. Kui `1.85, 0.92, 0.40` (viimane minut on kõrgeim), siis koormus **kasvab**. Kui `0.40, 0.92, 1.85`, siis koormus **langeb** ja hullem on möödas.
+| Valik | Tähendus |
+|---|---|
+| `daily` / `weekly` / `size 10M` | millal pöörata: ajaga või suuruse järgi |
+| `rotate 7` | mitu vana faili alles hoida |
+| `compress` | vanad failid pakitakse (`.gz`) |
+| `missingok` | ära anna viga, kui faili pole |
+| `postrotate` | käsk pärast pööramist, tavaliselt "rsyslog, ava uus fail" |
 
-### Mälu: miks "vaba" on väike
+*Tabel 7.3. Logrotate'i põhivalikud*
 
-Käsk `free -h` näitab umbes nii:
-
-```text
-               total        used        free      shared  buff/cache   available
-Mem:           3.8Gi       1.1Gi       210Mi        12Mi       2.5Gi       2.4Gi
-```
-
-Algaja näeb `free 210Mi` ja ehmatab: ainult 210 megat vaba! Tegelikult on kõik korras.
-
-Linux ei lase mälul tühjalt seista. Kõik, mida programmid parasjagu ei kasuta, läheb **puhvrisse ja vahemällu** (buff/cache): seal hoitakse hiljuti loetud faile, et järgmine lugemine oleks kiire. Kui mõni programm vajab mälu, annab tuum selle vahemälust kohe ära.
-
-Seepärast vaata alati veergu **`available`**: see on mälu, mille programm saaks kohe kasutada. Selles näites 2.4 GiB, mis on täiesti piisav. Kui `available` läheb nulli lähedale, alles siis on mure.
+Kui kaua logisid hoida, sõltub sellest, milleks neid vaja on. Veaotsinguks piisab paarist nädalast. Sisselogimiste logisid hoitakse kauem (kuude või aastate kaupa), sest turvaintsident avastatakse sageli alles hiljem.
 
 ??? question "✅ Kontrolli ennast"
-    1. Kahel masinal on koormus 4. Ühel on 2 tuuma, teisel 8. Kumb on hädas ja miks?
-    2. Mida tähendab `load average: 0.20, 1.50, 3.80`? Kas olukord läheb paremaks või halvemaks?
-    3. Sõber saadab sulle `free -h` väljundi, kus `free` on 90 MiB ja `available` on 3 GiB. Mida talle vastad?
+    1. Reegel on `daily` ja `rotate 7`. Mitu päeva vana logi leiad kettalt kõige rohkem?
+    2. Miks peab rsyslog pärast pööramist "uue faili avama"? Mis juhtuks, kui ta seda ei teeks?
 
 ---
 
-## 6. Number üksi ei ütle midagi
+## 5. Logid ühte kohta
 
 !!! abstract "Miks see oluline on?"
-    Sama number võib ühes masinas tähendada "kõik hästi" ja teises "kohe kukub kokku". Selleks pead teadma, milline on sinu masina tavaline päev.
+    Masina enda päevik on kasutu, kui masin ise on kadunud või kui keegi on päeviku ära kustutanud. Keskserver hoiab koopiat kohas, kuhu probleem ei ulatu.
 
-Mati vastutab koolis varukoopiaserveri eest. Iga öö kell 02:00 pakib see kõik failid kokku ja protsessor on tund aega 95% hõivatud. Kas see on probleem? Ei, see on tavaline öö. Aga kui sama 95% on keskpäeval, kui ühtegi varukoopiat ei tehta, on midagi valesti.
+Kujuta ette kolme olukorda:
 
-Masina tavalist seisu nimetatakse **baasjooneks** (baseline). Ilma baasjooneta ei saa öelda, kas number on hea või halb. Baasjoone leiad ainult aegreast: pead nägema, mis toimub tavaliselt päeval, öösel ja nädalavahetusel.
+1. **Masin on kadunud.** `proxmox2` ketas läks katki. Logid, mis oleksid öelnud, miks, olid samal kettal.
+2. **Keegi kustutas jäljed.** Ründaja pääses `proxmox3`-sse. Esimene asi, mida ta tegi, oli `/var/log/secure` tühjendamine.
+3. **Sul on kolm masinat.** Viga tekkis veebiserveris, aga põhjus oli andmebaasis. Pead nägema mõlema logisid kõrvuti, ajajärjekorras.
 
-Siin on käsitsi vaatamise piir. `top` näitab ainult **praegust hetke**. Kui avad selle kolmapäeval kell 10, ei tea sa midagi sellest, mis juhtus öösel kell 3. Sellepärast jõuame järgmisel kohtumisel automaatse kogumiseni.
+Kõigi kolme lahendus on sama: iga masin saadab oma logid kohe ka **keskserverisse** (central log server). Sinu laboris on keskserver `proxmox1`.
 
-Testides tekitatakse koormus meelega. Tööriist **`stress-ng`** paneb protsessori, mälu või ketta tööle nii kauaks, kui ütled. Nii näed, mis juhtub numbritega, kui masin päriselt hätta jääb, ja tead hiljem, mida otsida. Seda teed täna laboris.
+<figure markdown="span">
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ede7f6','primaryBorderColor':'#5e35b1','primaryTextColor':'#212121','lineColor':'#7e57c2'}}}%%
+graph LR
+    A["proxmox2<br/>rsyslog"] -->|"TCP 514"| S["proxmox1<br/>rsyslog keskserver"]
+    B["proxmox3<br/>rsyslog"] -->|"TCP 514"| S
+    S --> D1["/var/log/remote/proxmox2/sshd.log"]
+    S --> D2["/var/log/remote/proxmox3/sshd.log"]
+```
+  <figcaption>Joonis 7.4. Keskne logimine: `proxmox2` ja `proxmox3` saadavad iga kirje ka `proxmox1`-le, mis kirjutab need masina ja programmi järgi eraldi kaustadesse.</figcaption>
+</figure>
+
+Klient **saadab ise** (push): iga uus kirje läheb kohe võrku. Selline mudel tuleb kursusel veel ette (Zabbixi agent N10-s). N11-s näed vastupidist mudelit, kus server käib ise küsimas.
+
+Saata saab kahel viisil:
+
+| | UDP | TCP |
+|---|---|---|
+| Võrdlus | tavaline kiri postkasti | tähitud kiri |
+| Kinnitus | ei ole, saadad ja unustad | server kinnitab kättesaamist |
+| Kui server on maas | kirjed kaovad | klient hoiab järjekorras ja saadab hiljem |
+| Sobib | palju vähetähtsaid kirjeid | turvalogid, kõik, mis ei tohi kaduda |
+
+*Tabel 7.4. UDP ja TCP logide saatmisel*
+
+Laboris kasutad TCP-d ja annad kliendile järjekorra, et logid ei kaoks ka siis, kui keskserver on hetkeks maas.
 
 ??? question "✅ Kontrolli ennast"
-    1. Miks Mati ei peaks varukoopiaserveri 95% protsessorikoormusest öösel muretsema?
-    2. Miks ei piisa sellest, et vaatad serverit `top`-iga kord päevas?
+    1. Ründaja tühjendas `proxmox3`-s faili `/var/log/secure`. Kust leiad tema sisselogimise jäljed ja miks seal veel on?
+    2. Miks valid turvalogide jaoks TCP, kuigi UDP on lihtsam?
 
 ---
 
-## 7. Taust ja edasijõudnutele
+## 6. Taust ja edasijõudnutele
 
 See osa ei ole kohustuslik, aga kui tahad teada, kuidas seda tööd päriselt tehakse, loe edasi.
 
-**USE-meetod.** Brendan Gregg pakkus välja lihtsa reegli: iga ressursi (protsessor, mälu, ketas, võrk) kohta küsi kolme asja. Kui palju see on kasutusel (Utilization), kas tekib järjekord (Saturation) ja kas on vigu (Errors). Sinu "neli küsimust" on selle lihtsustatud versioon. Loe lähemalt [Gregg'i lehelt](https://www.brendangregg.com/usemethod.html).
+**Krüpteerimine.** Port 514 saadab logid avatud tekstina. Päriselus kasutatakse TLS-i (port 6514), et keegi ei saaks logisid pealt kuulata ega võltsida. Vaata [rsyslogi dokumentatsioonist](https://www.rsyslog.com/doc/) otsingusõna "TLS".
 
-**Koormus ja ketas.** Linuxi koormuse sees on ka protsessid, mis ootavad ketast. Seega võib koormus olla kõrge ka siis, kui protsessor on peaaegu tühi. Seda näed `top`-is real `%Cpu(s)` väärtusena `wa` (wait).
+**auditd.** rsyslog ütleb, et fail muutus. Tuuma auditisüsteem `auditd` ütleb, **kes** seda muutis, mis protsessiga ja mis õigustega. Seda nõuavad pangad ja muud reguleeritud valdkonnad.
 
-**Tööriistade maailm.** Sel kursusel kasutame Prometheust, Grafanat ja Lokit. Lisaks on olemas Zabbix (vanem ja laialt levinud kõik-ühes süsteem), ELK (logide otsing), OpenTelemetry (päringu jälitamine läbi mitme teenuse) ja Kubernetes'i jaoks loodud seiresüsteemid. Mõisted, mida siin õpid, kehtivad kõigis neis. Tööriist vahetub, küsimused jäävad samaks.
+**Struktureeritud logid.** Tekstirida on inimesele mugav, aga masinale raske lugeda. Paljud rakendused kirjutavad logi JSON-vormingus, kus iga väli on eraldi. N14-N15 näed, miks see logide otsimisel oluline on.
+
+**Edasi.** Failid keskserveris on esimene samm. N14 saadad samad logid Lokisse, kus saad neid sildi järgi otsida, ja N15 OpenSearchi, kus saad otsida iga sõna järgi.
 
 ---
 
 ## Kokkuvõte
 
-Seire tähendab, et masin mõõdab masinat ja sina saad probleemist teada enne kasutajat. Kõik numbrid tulevad tuumast kausta `/proc` kaudu. Koormust loe alati tuumade arvu järgi, mälu puhul vaata `available` veergu. Üks number ütleb vähe, aegrida ja baasjoon ütlevad palju.
+Logid vastavad küsimusele "mis juhtus?". AlmaLinuxis võtab kõik kirjed vastu journald ja rsyslog jagab need reeglite järgi failidesse. Päritolu ja tõsidus otsustavad, kuhu kirje läheb. Logrotate hoiab ära, et logid ketta täis kirjutaks. Keskserver hoiab koopiat ka siis, kui masin on kadunud või jäljed on kustutatud.
 
-### Seisund ühe pilguga
+### Logid ühe pilguga
 
-| Mõiste | Selgitus | Kuidas näed |
+| Mõiste | Selgitus | Kus näed |
 |---|---|---|
-| **Seire (monitoring)** | masin jälgib masinat, et inimene teaks enne kasutajat | - |
-| **Mõõdik (metric)** | üks number, millel on nimi | `free -h` veerg `available` |
-| **Aegrida (time series)** | sama mõõdik mitu korda ajas | aku graafik telefonis |
-| **Koormus (load average)** | mitu protsessi tahab protsessorit, 1/5/15 min | `uptime` |
-| **Tuum (core)** | üks "kassa" protsessoris | `nproc` |
-| **available** | mälu, mida programm saab kohe kasutada | `free -h` |
-| **/proc** | aken tuuma, kust kõik käsud numbreid loevad | `cat /proc/loadavg` |
-| **Baasjoon (baseline)** | masina tavaline seis | ainult aegreast |
+| **Logi (log)** | programmi päevik, iga rida on sündmus koos ajaga | `/var/log/`, `journalctl` |
+| **journald** | võtab vastu kõik kirjed, kahendvormingus | `journalctl` |
+| **rsyslog** | jagab kirjed failidesse ja saadab võrku | `/etc/rsyslog.conf`, `/etc/rsyslog.d/` |
+| **Päritolu (facility)** | millisest süsteemi osast kirje tuli | `authpriv`, `kern`, `local0` |
+| **Tõsidus (severity)** | kui tõsine, 0 (hullem) kuni 7 | `journalctl -p err` |
+| **Reegel** | filter (päritolu.tõsidus) + tegevus (fail või võrk) | `authpriv.* /var/log/secure` |
+| **Logrotate** | pöörab, pakib ja kustutab vanu logisid | `/etc/logrotate.d/` |
+| **Keskserver** | võtab vastu kõigi masinate logid | `/var/log/remote/` |
 
-*Tabel 7.3. Mõisted ühe pilguga*
+*Tabel 7.5. Mõisted ühe pilguga*
 
 ## 🎯 Lõplik kontroll
 
-1. Selgita oma sõnadega, mis on seire ja miks Märteni "teenus töötab, jah/ei" kontrollist ei piisa.
-2. Selgita sõbrale poe kassade abil, mida tähendab koormus 3.0 neljatuumalises masinas.
-3. Miks Linux kasutab peaaegu kogu "vaba" mälu ära ja miks see ei ole viga?
-4. Kust saab `top` oma numbrid? Mida see tähendab, kui tahame numbreid hiljem automaatselt koguda?
-5. Kati ütleb: "Server on täna aeglane." Milliseid nelja küsimust küsid ja millise käsuga igaühele vastuse leiad?
-6. Miks on baasjoon vajalik ja miks seda käsitsi kontrollides ei näe?
+1. Selgita oma sõnadega, miks logid on seire esimene signaal ja millisele küsimusele need vastavad.
+2. Joonista paberile logikirje teekond programmist kuni keskserveri failini ja nimeta iga sammu juures, kes seda teeb.
+3. Kirjuta rsyslogi reegel, mis saadab rakenduse `local3` vead ja hullemad faili `/var/log/rakendus-vead.log`. Selgita, kumb pool on filter ja kumb tegevus.
+4. Mati server jäi seisma, sest ketas sai täis. Mis oli tõenäoline põhjus ja kuidas logrotate oleks seda takistanud?
+5. Nimeta kolm olukorda, kus masina enda logist ei ole abi, aga keskserverist on.
+6. Selgita sõbrale UDP ja TCP vahet logide saatmisel kirja ja tähitud kirja abil.
 
 ---
 
-*Laboris loed neid numbreid oma kolmest sõlmest, paned masina `stress-ng`-ga higistama ja vaatad, kuidas numbrid liiguvad. Nüüd oled valmis laboriks! 🚀*
+*Laboris uurid kõigepealt üht masinat: kus logid elavad, kuidas kirjutada oma reegel ja kuidas logi pöörata. Siis teed `proxmox1`-st keskserveri ja saadad sinna teiste sõlmede logid. Nüüd oled valmis laboriks! 🚀*

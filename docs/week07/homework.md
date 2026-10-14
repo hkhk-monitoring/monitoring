@@ -2,121 +2,93 @@
 tags:
   - Kodutöö
   - Monitooring
-  - Linux
+  - Logid
 ---
 
-# Kodutöö: oma väike mõõtja
+# Kodutöö: hommikune logiraport
 
 !!! abstract "Eesmärk"
-    Laboris lugesid numbreid siis, kui ise terminalis olid. Kodutöös kirjutad skripti, mis loeb samu numbreid iga 10 sekundi järel ja kirjutab need faili. Nii saad oma esimese **aegrea**: sama mõõdik mitu korda ajas (meenuta loengu osa 2).
+    Keskserver kogub nüüd kahe masina logisid. Keegi ei loe neid rida-realt. Kodutöös kirjutad `proxmox1`-s skripti, mis teeb logidest lühikese hommikuse raporti: kes saatis, kui palju vigu oli ja kas keegi proovis sisse murda.
 
-    Maht umbes 1 tund. Jätkad laboris alustatud kausta `~/monitooring/n07`.
+    Maht umbes 1 tund. Eeldus: labori osa B on tehtud (`/var/log/remote/proxmox2/` ja `/var/log/remote/proxmox3/` on olemas).
 
 ---
 
-## 1. Skript tükkhaaval
+## 1. Tekita andmeid
 
-Skript jookseb sõlmes `proxmox2`. Loo see seal (`ssh proxmox2`, siis `nano tervis.sh`) või VS Code Remote-SSH-ga.
-
-**1. samm:** üks rida, ainult kellaaeg ja koormus.
+Raport on huvitavam, kui logides on midagi. Sinu arvutist:
 
 ```bash
-#!/bin/bash
-aeg=$(date +%H:%M:%S)
-koormus=$(cut -d' ' -f1 /proc/loadavg)
-echo "$aeg,$koormus"
-```
-
-`cut -d' ' -f1` võtab tühikutega eraldatud reast esimese välja, ehk 1 minuti koormuse. Käivita `bash tervis.sh`. Oodatav tulemus on midagi sellist nagu `18:02:11,0.04`.
-
-**2. samm:** lisa vaba mälu megabaitides. Number on failis `/proc/meminfo` real `MemAvailable` (kilobaitides). Lisa skripti muutuja `malu` ja pane see `echo` reale koma järel (bashi muutuja nimes ei tohi olla täpitähti). Vihje:
-
-```bash
-awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo
-```
-
-**3. samm:** lisa ketta täituvus protsentides. Vihje: `df --output=pcent / | tail -1` annab näiteks ` 19%`. Eemalda tühik ja protsendimärk (`tr -d ' %'`), et jääks ainult number.
-
-**4. samm:** pane mõõtmine tsüklisse. Kogu senine sisu (peale esimese rea) läheb tsükli sisse:
-
-```bash
-while true; do
-  # sinu senised read siia
-  sleep 10
+ssh proxmox2 'for i in $(seq 20); do logger -p local0.info -t pood "tellimus $i"; done'
+ssh proxmox2 'logger -p local0.err -t pood "makse ebaõnnestus"'
+ssh proxmox3 'logger -p user.warning -t varundus "ketas 85% täis"'
+for u in admin oracle guest; do
+  ssh -o User=$u -o PubkeyAuthentication=no -o ConnectTimeout=5 proxmox2
 done
 ```
 
-Käivita, vaata paar rida ja peata `Ctrl+C`-ga.
+## 2. Skript tükkhaaval
 
-**5. samm:** lisa faili algusesse päis, et oleks teada, mis veerg mis on. Päis kirjutatakse **üks kord**, enne tsüklit:
+Kirjuta skript `proxmox1`-s (`nano ~/logiraport.sh`). Testi iga sammu järel: `sudo bash ~/logiraport.sh`.
 
-```bash
-echo "aeg,koormus,mälu_mb,ketas_pct"
-```
-
-Oodatav tulemus:
-
-```text
-aeg,koormus,mälu_mb,ketas_pct
-18:10:01,0.02,1344,19
-18:10:11,0.02,1343,19
-18:10:21,0.01,1344,19
-```
-
-Sellist vormingut nimetatakse CSV-ks (comma-separated values). Selle avab iga tabelarvutusprogramm.
-
-## 2. Kogu aegrida koormuse ajal
-
-Kasuta kahte terminali, mõlemas `ssh proxmox2`.
-
-Terminal 1, mõõtja kirjutab faili:
+**1. samm:** päis ja masinad, kes on logisid saatnud. Iga alamkaust `/var/log/remote/` all on üks masin:
 
 ```bash
-bash tervis.sh | tee aegrida.csv
+#!/bin/bash
+KAUST=/var/log/remote
+echo "=== Logiraport $(date '+%F %H:%M') ==="
+echo "Masinad:"
+ls "$KAUST"
 ```
 
-Oota 30 sekundit (kolm rahulikku rida). Siis terminal 2:
+**2. samm:** iga masina kohta ridade arv kokku. Lisa tsükkel:
 
 ```bash
-stress-ng --cpu $(nproc) --timeout 60s
+for m in "$KAUST"/*/; do
+  nimi=$(basename "$m")
+  read=$(cat "$m"*.log | wc -l)
+  echo "  $nimi: $read rida"
+done
 ```
 
-Kui see on lõppenud, oota veel 60 sekundit ja käivita:
+`"$m"*.log` tähendab kõiki `.log` faile selle masina kaustas.
+
+**3. samm:** iga masina kohta programm, kes kirjutas kõige rohkem. Vihje: failide suurus ridades on `wc -l "$m"*.log`, sorteeri `sort -n` ja võta eelviimane rida (viimane on "total"). Või lihtsam: `wc -l "$m"*.log | sort -n | tail -2 | head -1`.
+
+**4. samm:** sissetungi katsed. Loe kõigist masinatest `Invalid user` read ja loenda, mitu tuli mis IP-lt:
 
 ```bash
-stress-ng --vm 1 --vm-bytes 50% --timeout 40s
+echo "Sissetungi katsed (IP, mitu korda):"
+grep -h "Invalid user" "$KAUST"/*/*.log \
+  | grep -oE 'from [0-9.]+' \
+  | sort | uniq -c | sort -rn
 ```
 
-Oota pärast seda veel 60 sekundit ja peata mõõtja (`Ctrl+C`). Kopeeri fail oma arvutisse:
+Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skripti, mida see teeb. Kui mõnest aru ei saa, käivita torujuhe järk-järgult (kõigepealt ainult `grep`, siis lisa järgmine osa).
 
-```bash
-scp proxmox2:aegrida.csv ~/monitooring/n07/logid/
-scp proxmox2:tervis.sh ~/monitooring/n07/
-```
+**5. samm:** viimased 5 viga. Keskserveri failides ei ole tõsidus reas kirjas (loeng, joonis 7.1), seega ei saa seda `grep`-iga otsida. Kasuta sõnu: otsi ridu, kus on `error`, `fail` või `ebaõnnestus` (tõstutundetult, `grep -i -E`). Näita ainult 5 viimast.
 
-## 3. Loe oma aegrida
+💭 **Mõtle:** Miks on sõnade järgi otsimine halvem kui tõsiduse järgi? Mis rea võid nii kahe silma vahele jätta? (Lisaülesanne 5 laboris lahendab selle.)
 
-Ava `logid/aegrida.csv` ja vasta failis `n07-tervis.md` uue pealkirja `## Kodutöö` all:
+## 3. Vasta
 
-1. Mitmendal real (kell mis) hakkas koormus tõusma? Mitu rida (mitu korda 10 sekundit) kulus, et see jõuaks tippu?
-2. Mis oli koormuse tipp? Võrdle tuumade arvuga.
-3. Kas mälu testi ajal on `mälu_mb` langus näha? Kui suur?
-4. Kas ketta veerg muutus? Miks?
-5. Kui oleksid laboris vaadanud ainult üht `top`-i hetke, mida oleksid sellest aegreast näinud ja mida mitte?
-6. Kujuta ette, et sul on 50 serverit ja tahad seda tabelit iga 10 sekundi järel terve aasta. Nimeta kaks probleemi, mis sinu skriptiga tekiksid.
+Pane raporti väljund ja vastused oma arvutis faili `n07-logid.md` uue pealkirja `## Kodutöö` alla:
 
-Küsimus 6 on järgmise kohtumise teema.
+1. Kopeeri raporti väljund (``` plokki).
+2. Mis IP-lt tulid sissetungi katsed ja miks on see IP sinu laboris just see?
+3. Kui sul oleks 50 masinat ja iga masin kirjutaks 1 GB logisid päevas, mis läheks sinu skriptiga katki? Nimeta kaks asja.
+4. Raport näitab, mis oli. Mida ta ei tee, mida tahaksid, et seiresüsteem teeks? (See on järgmiste kohtumiste teema.)
 
 ## Esitamine
 
-Laadi Tahvlis selle kohtumise iseseisva töö alla üles kolm faili: `n07-tervis.md`, `tervis.sh` ja `logid/aegrida.csv`.
+Laadi Tahvlis selle kohtumise iseseisva töö alla üles `logiraport.sh` ja `n07-logid.md`.
 
 ---
 
 ## Lisapunktideks
 
-**A. Graafik.** Ava `aegrida.csv` tabelarvutusprogrammis (LibreOffice Calc, Excel, Google Sheets) ja tee koormusest joongraafik, kus x-teljel on aeg. Lisa pilt `n07-tervis.md` faili. Kas graafikult on midagi näha, mida tabelist kohe ei märganud?
+**A. Iga hommik kell 7.** Pane raport käima `systemd` timeriga iga päev kell 07:00 ja kirjutama tulemuse faili `/var/log/logiraport.log`. Kontrolli `systemctl list-timers`-iga, millal see järgmine kord käivitub.
 
-**B. Hoiatus.** Täienda `tervis.sh` nii, et kui koormus on suurem kui tuumade arv, lisatakse rea lõppu `HOIATUS`. Bash ei oska komakohaga arve võrrelda, seega kasuta `awk`-i või `bc`-d. See on sinu esimene alarm.
+**B. Ainult viimased 24 tundi.** Praegu loeb skript kõiki ridu. Muuda nii, et raportis on ainult viimase ööpäeva read. Vihje: logirea algus on kuupäev; `date -d yesterday '+%b %e'` annab eilse kuupäeva samas vormingus.
 
-**C. Kõik kolm sõlme.** Muuda skript nii, et see jookseb **sinu arvutis** ja küsib SSH kaudu numbreid kõigist kolmest sõlmest, lisades igale reale veeru `sõlm`. Mis juhtub mõõtmise täpsusega, kui üks sõlm vastab aeglaselt?
+**C. Raport Ansiblega.** Kirjuta playbook, mis paigaldab skripti ja timeri `proxmox1`-le, et seda saaks korrata ka uuele keskserverile.
