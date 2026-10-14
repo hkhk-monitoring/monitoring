@@ -1,0 +1,54 @@
+name: Materjalide kvaliteet
+
+on:
+  pull_request:
+    paths: ["docs/**", "stiil.yml", ".sonastik.txt", "mkdocs.yml"]
+  push:
+    branches: [main]
+    paths: ["docs/**", "stiil.yml", "mkdocs.yml"]
+
+jobs:
+  stiil:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Stiilikontroll
+        run: python scripts/lint.py
+
+  oigekiri:
+    runs-on: ubuntu-latest
+    continue-on-error: true          # ainult hoiatused, ei blokeeri merge'i
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install estnltk
+      - name: Õigekiri (ainult muudetud failid PR-is)
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            FILES=$(git diff --name-only --diff-filter=AM origin/${{ github.base_ref }}...HEAD -- 'docs/*.md' 'docs/**/*.md')
+            [ -z "$FILES" ] && { echo "Muudetud .md faile pole"; exit 0; }
+            python scripts/spellcheck.py $FILES
+          else
+            python scripts/spellcheck.py
+          fi
+
+  build:
+    needs: stiil
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install mkdocs-material
+      - name: MkDocs build (lingid ja hoiatused vigadena)
+        run: mkdocs build --strict

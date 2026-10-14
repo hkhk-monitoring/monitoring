@@ -1,0 +1,8 @@
+mkdocs>=1.5.0
+mkdocs-material>=9.5.0
+mkdocs-minify-plugin>=0.7.0
+pymdown-extensions>=10.0.0
+# Optional plugins (uncomment to enable):
+# mkdocs-glightbox>=0.3.5
+# pillow>=10.0.0
+# cairosvg>=2.7.0

@@ -1,0 +1,74 @@
+/* ===== Avalehe hero ===== */
+.hero-section {
+  background-color: #241b4d;
+  background-image: linear-gradient(rgba(36, 27, 77, 0.55), rgba(36, 27, 77, 0.55)), url('../images/background.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 460px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: -1.5rem -1.5rem 2.5rem -1.5rem;
+  border-radius: 0 0 12px 12px;
+}
+
+.hero-content {
+  color: #fff;
+  max-width: 640px;
+  padding: 2.5rem 2rem;
+}
+
+.hero-content h1 {
+  color: #fff;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 1rem;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.hero-content p {
+  font-size: 1.15rem;
+  margin: 0 0 1.6rem;
+  opacity: 0.95;
+}
+
+.hero-content .btn-primary,
+.hero-content .btn-secondary {
+  display: inline-block;
+  margin: 0.4rem;
+  padding: 12px 26px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.hero-content .btn-primary {
+  background-color: var(--md-primary-fg-color);
+  color: #fff;
+}
+
+.hero-content .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  color: #fff;
+}
+
+.hero-content .btn-secondary {
+  border: 2px solid #fff;
+  color: #fff;
+}
+
+.hero-content .btn-secondary:hover {
+  background: #fff;
+  color: var(--md-primary-fg-color);
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 { font-size: 2.1rem; }
+  .hero-content .btn-primary,
+  .hero-content .btn-secondary { display: block; margin: 0.6rem auto; width: 220px; }
+}

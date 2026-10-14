@@ -1,0 +1,98 @@
+# Stiilireeglite konfiguratsioon. Loeb scripts/lint.py.
+# Uus silt või fraas lisatakse siia samas PR-is, kus seda esimest korda kasutatakse.
+
+docs_dir: docs
+assets_dir: docs/assets          # pildid peavad olema siin (või alamkaustas)
+
+sildid:
+  tüüp:            # vähemalt üks nõutud
+    - Loeng
+    - Teooria
+    - Praktikum
+    - Labor
+    - Kodutöö
+    - Lisaülesanne
+    - Info
+  teema:           # vähemalt üks nõutud
+    - Linux
+    - Bash
+    - SSH
+    - Git
+    - Võrgud
+    - OSI
+    - TCP/IP
+    - IPv4
+    - Subnetting
+    - Ethernet
+    - Ruutimine
+    - CCNA
+    - PKI
+    - IP-aadressid
+    - VLAN
+    - Marsruutimine
+    - Turvalisus
+    - Tulemüür
+    - VPN
+    - TLS
+    - Sertifikaadid
+    - Ansible
+    - OpenTofu
+    - Docker
+    - CI/CD
+    - Jenkins
+    - GitHub Actions
+    - Monitooring
+    - Logid
+    - Proxmox
+    - Virtualiseerimine
+    - Pilv
+    - Veeb
+    - Andmebaasid
+    - Riistvara
+  tase:            # valikuline
+    - Algaja
+    - Edasijõudnu
+
+# Failitüübid: glob -> kohustuslikud mustrid (regex, kontrollitakse rea kaupa).
+failitüübid:
+  loeng:
+    globid: ["**/teooria/*.md", "**/loeng.md", "**/lecture.md"]
+    nõutud:
+      - ['^!!! abstract', 'eesmärkide plokk (!!! abstract)']
+      - ['^## Kokkuvõte', '## Kokkuvõte']
+      - ['^## (Enesekontroll|🎯 Lõplik kontroll)', '## Enesekontroll']
+  praktikum:
+    globid: ["**/praktikumid/*.md", "**/lab.md", "**/praktikum*.md"]
+    nõutud:
+      - ['^!!! abstract', 'eesmärkide plokk (!!! abstract)']
+      - ['^## Kokkuvõte', '## Kokkuvõte']
+    keelatud:
+      - ['\[\^[\w-]+\]', 'joonealune märkus praktikumis']
+
+# Faili ei kontrollita üldse
+välja_jäetud: ["**/index.md", "**/tags.md"]
+
+# Keelatud fraasid (regex, tõstutundetu). Viga.
+keelatud_fraasid:
+  - ['ei mõjuta hindamist', 'valikulisuse boilerplate']
+  - ['kui aega on vähe', 'meta-proosa']
+  - ['Kust alustada', 'meta-proosa']
+  - ['demüstifi', 'AI-vatt']
+  - ['mentaalne mudel', 'AI-vatt']
+  - ['vistseraal', 'AI-vatt']
+  - ['\bterraform (init|plan|apply|destroy)\b', 'kasuta käsku tofu']
+  - ['^#{1,3} Allikad\s*$', 'Allikad-sektsioon (viited käivad teksti sisse)']
+  - ['\bPäev \d+\b', 'kasuta "N. kohtumine"']
+  - ['\b(IT|IS|ITS|PI)\d?-\d{2}\b', 'kohordi tähis']
+  - ['\b(Sügis|Kevad)(semester)? 20\d\d\b', 'kuupäev/semester']
+
+# Hoiatused (CI ei kuku)
+hoiatused:
+  - ['—', 'mõttekriips, kasuta sidekriipsu']
+  - ['\bmitte ainult\b.*\bvaid ka\b', 'võimalik "mitte X, vaid Y" konstruktsioon']
+
+pildinimi: '^(t\d{2}[a-z]?|p\d{2}|lab|diag|hero|logo)[_-][a-z0-9_]+\.(png|jpg|jpeg|svg|webp|gif)$'
+
+# oppevara.edu.ee soovitus: illustratsioon ~150 kB. Üle selle = hoiatus.
+pildi_max_kb: 300
+keelatud_pildisufiksid: ['_v\d+\.', '_final\.', '_uus\.']
