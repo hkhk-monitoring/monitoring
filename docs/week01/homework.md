@@ -19,8 +19,8 @@ tags:
 Raport on huvitavam, kui logides on midagi. Sinu arvutist:
 
 ```bash
-ssh proxmox2 'for i in $(seq 20); do logger -p local0.info -t pood "tellimus $i"; done'
-ssh proxmox2 'logger -p local0.err -t pood "makse ebaõnnestus"'
+ssh proxmox2 'for i in $(seq 20); do logger -p user.info -t pood "tellimus $i"; done'
+ssh proxmox2 'logger -p user.err -t pood "makse ebaõnnestus"'
 ssh proxmox3 'logger -p user.warning -t varundus "ketas 85% täis"'
 for u in admin oracle guest; do
   ssh -o User=$u -o PubkeyAuthentication=no -o ConnectTimeout=5 proxmox2
@@ -31,14 +31,14 @@ done
 
 Kirjuta skript `proxmox1`-s (`nano ~/logiraport.sh`). Testi iga sammu järel: `sudo bash ~/logiraport.sh`.
 
-**1. samm:** päis ja masinad, kes on logisid saatnud. Iga alamkaust `/var/log/remote/` all on üks masin:
+**1. samm:** päis ja masinad, kes on logisid saatnud. Iga alamkaust `/var/log/remote/` all on üks masin (failid, mis on otse `/var/log/remote/` all, tulevad lisaülesannetest ja jäävad välja):
 
 ```bash
 #!/bin/bash
 KAUST=/var/log/remote
 echo "=== Logiraport $(date '+%F %H:%M') ==="
 echo "Masinad:"
-ls "$KAUST"
+ls -d "$KAUST"/*/
 ```
 
 **2. samm:** iga masina kohta ridade arv kokku. Lisa tsükkel:
@@ -68,7 +68,7 @@ Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skr
 
 **5. samm:** viimased 5 viga. Keskserveri failides ei ole tõsidus reas kirjas (loeng, joonis 1.2), seega ei saa seda `grep`-iga otsida. Kasuta sõnu: otsi ridu, kus on `error`, `fail` või `ebaõnnestus` (tõstutundetult, `grep -i -E`). Näita ainult 5 viimast.
 
-**Mõtle:** Miks on sõnade järgi otsimine halvem kui tõsiduse järgi? Mis rea võid nii kahe silma vahele jätta? (Lisaülesanne 5 laboris lahendab selle.)
+**Mõtle:** Miks on sõnade järgi otsimine halvem kui tõsiduse järgi? Mis rea võid nii kahe silma vahele jätta? (Labori lisaülesanne 6 lahendab selle.)
 
 ## 3. Vasta
 

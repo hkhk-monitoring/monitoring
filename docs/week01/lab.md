@@ -95,16 +95,18 @@ Vaata nüüd rsyslogi vaikimisi reegleid:
 grep -v -E '^#|^$' /etc/rsyslog.conf | grep /var/log
 ```
 
-Oodatav tulemus:
+Oodatav tulemus (AlmaLinux 9.8):
 
 ```text
-*.info;mail.none;authpriv.none;cron.none                /var/log/messages
-authpriv.*                                              /var/log/secure
-mail.*                                                  -/var/log/maillog
-cron.*                                                  /var/log/cron
-uucp,news.crit                                          /var/log/spooler
-local7.*                                                /var/log/boot.log
+*.info;mail.none;authpriv.none;cron.none action(type="omfile" file="/var/log/messages")
+authpriv.* action(type="omfile" file="/var/log/secure")
+mail.* action(type="omfile" file="/var/log/maillog" sync="on")
+cron.* action(type="omfile" file="/var/log/cron")
+uucp,news.crit action(type="omfile" file="/var/log/spooler")
+local7.* action(type="omfile" file="/var/log/boot.log")
 ```
+
+Iga rida on üks reegel: vasakul filter (päritolu.tõsidus), paremal tegevus. `action(type="omfile" file="...")` tähendab "kirjuta faili". Vanemates versioonides on paremal ainult faili tee (`/var/log/messages`), tähendus on sama.
 
 **Mõtle:** Miks on reas `/var/log/messages` lisatud `authpriv.none`? Mis juhtuks, kui see puuduks?
 
@@ -159,20 +161,29 @@ Tekita sündmus, mida turvalogi peaks nägema. **Oma arvutis** (mitte sõlmes!) 
 ssh -o User=sissetungija -o PubkeyAuthentication=no proxmox2
 ```
 
-Kui küsitakse parooli, sisesta suvaline tekst kolm korda. Ühendus ebaõnnestub.
+Kui küsitakse parooli, sisesta suvaline tekst kolm korda. Kui sõlmes on paroolisisselogimine keelatud, saad kohe `Permission denied (publickey,...)`. Mõlemal juhul ühendus ebaõnnestub ja sõlm paneb katse kirja.
 
 Tagasi `proxmox2` terminalis. Kus see katse nüüd on? Proovi kaht teed:
 
 ```bash
 sudo journalctl -u sshd --since "5 min ago"
-sudo grep sissetungija /var/log/secure
+sudo grep "Invalid user" /var/log/secure
 ```
 
-Esimene küsib journaldilt teenuse `sshd` kõiki kirjeid viimase 5 minuti kohta. Teine otsib rsyslogi failist nime järgi.
+Esimene küsib journaldilt teenuse `sshd` kõiki kirjeid viimase 5 minuti kohta. Teine otsib rsyslogi failist.
 
-Mõlemas peaks olema `Invalid user sissetungija from 192.168.35.x`. See IP on sinu arvuti oma.
+Oodatav tulemus mõlemas:
 
-**Mõtle:** Proovi `grep sissetungija /var/log/messages`. Miks seal seda rida pole? (Vihje: A1 reeglid.)
+```text
+Oct 14 20:36:39 proxmox2 sshd-session[4133]: Invalid user sissetungija from 192.168.35.x port 49970
+Oct 14 20:36:39 proxmox2 sshd-session[4133]: Connection closed by invalid user sissetungija 192.168.35.x port 49970 [preauth]
+```
+
+IP on sinu arvuti oma. Programmi nimi on uuemas OpenSSH-s `sshd-session`, vanemas `sshd`.
+
+Proovi nüüd otsida kasutajanime järgi: `sudo grep sissetungija /var/log/secure`. Tulemusi on rohkem kui enne. Mis read on juurde tulnud ja miks? (Vihje: vaata, mis programm need kirjutas.)
+
+**Mõtle:** Proovi `sudo grep "Invalid user" /var/log/messages`. Miks seal seda rida pole? (Vihje: A1 reeglid.)
 
 ### A4. Seire pilguga: vead ja hoiatused
 
@@ -216,19 +227,26 @@ Kujuta ette, et `proxmox2`-s jookseb e-pood, mis logib päritoluga `local0`. Tah
 sudo nano /etc/rsyslog.d/10-pood.conf
 ```
 
-Sisu on üks rida:
+Sisu on üks rida. Kirjuta see **meelega veaga**, nagu kiirustades juhtub (`locla0`, mitte `local0`):
 
 ```text
-local0.*    /var/log/pood.log
+locla0.*    /var/log/pood.log
 ```
 
-**2. samm.** Kontrolli süntaksit **enne** taaskäivitamist. Vigane konf võib rsyslogi seisma panna ja siis ei logi masin üldse midagi:
+**2. samm.** Kontrolli süntaksit **enne** taaskäivitamist. Vigane konf võib jätta reegli tööle panemata või halvemal juhul rsyslogi seisma panna, ja siis ei logi masin üldse midagi:
 
 ```bash
 sudo rsyslogd -N1
 ```
 
-Oodatav tulemus lõpeb reaga `End of config validation run. Bye.` Siis:
+Oodatav tulemus:
+
+```text
+rsyslogd: version 8.2510.0-2.el9, config validation run (level 1), master config /etc/rsyslog.conf
+rsyslogd: unknown facility name "locla0" [v8.2510.0-2.el9]
+```
+
+`-N1` kontrollib konfi ilma rsyslogi puutumata ja ütleb täpselt, mis on valesti. Paranda failis `locla0` → `local0` ja kontrolli uuesti. Nüüd lõpeb väljund reaga `End of config validation run. Bye.` Siis:
 
 ```bash
 sudo systemctl restart rsyslog
@@ -332,9 +350,18 @@ sudo tail -1 /var/log/pood.log
 sudo tail -1 /var/log/pood.log.1
 ```
 
-Kui rida on failis `pood.log.1` (või uut `pood.log`-i pole üldse), siis rsyslog kirjutab ikka vanasse faili. Ta hoiab faili lahti ega tea, et sellel on nüüd uus nimi (loeng, osa 4, küsimus 2).
+Oodatav tulemus: `tail ... pood.log` annab `No such file or directory` ja rida on hoopis failis `pood.log.1`. rsyslog kirjutab ikka vanasse faili. Ta hoiab faili lahti ega tea, et sellel on nüüd uus nimi (loeng, osa 4, küsimus 2).
 
-**5. samm.** Paranda: lisa reeglisse pakkimine, uue faili loomine ja käsk, mis ütleb rsyslogile "ava failid uuesti":
+**5. samm.** Korista enne parandamist. Kustuta pööratud failid ja **taaskäivita rsyslog**:
+
+```bash
+sudo rm -f /var/log/pood.log.*
+sudo systemctl restart rsyslog
+```
+
+Miks taaskäivitus? Kui kustutad faili, mida rsyslog hoiab lahti, kirjutab ta edasi kustutatud faili. Kettal seda enam pole, aga ruumi võtab see ikka, kuni rsyslog faili sulgeb. Pärast taaskäivitust avab ta uue `pood.log`-i.
+
+**6. samm.** Paranda konf: lisa pakkimine ja käsk, mis ütleb rsyslogile "ava failid uuesti":
 
 ```text
 /var/log/pood.log /var/log/pood-hoiatused.log {
@@ -363,7 +390,22 @@ Kirjuta jälle 300 rida, pööra ja kontrolli. Tee seda **neli korda**. **Ennust
 ls -l /var/log/pood*
 ```
 
-✅ **Kontrollpunkt:** uus `pood.log` saab pärast pööramist ridu, alles on kuni kolm vana faili ja vanemad on pakitud (`.gz`).
+Oodatav tulemus pärast neljandat korda:
+
+```text
+/var/log/pood-hoiatused.log  /var/log/pood.log  /var/log/pood.log.1.gz  /var/log/pood.log.2.gz  /var/log/pood.log.3.gz
+```
+
+Neljas kord lükkas kõige vanema faili välja (`rotate 3`). `pood-hoiatused.log` jäi pööramata, sest see on väiksem kui 10k.
+
+Lõpuks kontrolli, kuhu uus rida läheb:
+
+```bash
+logger -p local0.info -t pood "pärast HUP-i"
+sudo tail -1 /var/log/pood.log
+```
+
+✅ **Kontrollpunkt:** uus rida on `pood.log`-is, alles on kolm pakitud vana faili.
 
 ---
 
@@ -399,18 +441,9 @@ Kontrolli (`sudo rsyslogd -N1`), taaskäivita ja vaata, kas port on lahti:
 sudo ss -tlnp | grep 514
 ```
 
-Oodatav tulemus: rida, kus `0.0.0.0:514` ja `rsyslogd`.
+Oodatav tulemus: rida, kus `0.0.0.0:514` ja `rsyslogd`. Keskserver kuulab.
 
-Ava tulemüüris port. AlmaLinuxis on `firewalld`:
-
-```bash
-sudo firewall-cmd --permanent --add-port=514/tcp
-sudo firewall-cmd --reload
-```
-
-**Kui `firewall-cmd` ütleb `FirewallD is not running`:** tulemüür on selles sõlmes väljas, jäta see samm vahele.
-
-**Ära veel teisi masinaid seadista.** Mõtle enne: kui `proxmox2` saadab nüüd oma logid, kuhu need `proxmox1`-s jõuavad? (Vihje: A1 reeglid kehtivad kõigile kirjetele, ka võrgust tulnutele.) Hoiame selle küsimuse meeles ja kontrollime B2-s.
+**Mõtle enne B2-te:** kui `proxmox2` saadab nüüd oma logid, kuhu need `proxmox1`-s jõuavad? (Vihje: A1 reeglid kehtivad kõigile kirjetele, ka võrgust tulnutele.) Kirjuta oma arvamus `n01-logid.md`-sse, kontrollime B2-s.
 
 ### B2. proxmox2 saadab
 
@@ -450,6 +483,44 @@ Nüüd `proxmox1`-s:
 ```bash
 sudo grep "siin proxmox2" /var/log/messages
 ```
+
+Tõenäoliselt **ei leia midagi**. Keskserver kuulab, klient saadab, aga kohale ei jõua. Leia ise, kus see katkeb. Alusta kliendist (`proxmox2`): kas port 514 on `proxmox1`-s üldse kättesaadav?
+
+```bash
+timeout 3 bash -c '</dev/tcp/PROXMOX1-IP/514' && echo lahti || echo kinni
+```
+
+Bash proovib avada TCP-ühenduse. `nc`-d ei ole AlmaLinuxis vaikimisi olemas, aga see trikk töötab alati.
+
+Oodatav tulemus:
+
+```text
+bash: connect: No route to host
+kinni
+```
+
+Port on kinni, kuigi `ss` näitas, et rsyslog kuulab. Kes on kliendi ja serveri vahel? Vaata `proxmox1`-s:
+
+```bash
+sudo firewall-cmd --list-ports
+```
+
+Tühi rida: tulemüür ei luba ühtegi lisaporti. Ava 514/tcp:
+
+```bash
+sudo firewall-cmd --permanent --add-port=514/tcp
+sudo firewall-cmd --reload
+```
+
+Kontrolli `proxmox2`-st uuesti (`lahti`). Nüüd oota kuni minut ja otsi `proxmox1`-s uuesti:
+
+```bash
+sudo grep "siin proxmox2" /var/log/messages
+```
+
+Rida jõudis kohale, **kuigi saatsid selle siis, kui port oli kinni**. Klient hoidis seda järjekorras (`queue.type`) ja proovis uuesti (`resumeRetryCount`), umbes iga 30 sekundi järel.
+
+**Kui `firewall-cmd` ütleb `FirewallD is not running`:** tulemüür on sõlmes väljas, rida jõudis kohe kohale ja seda viga sa ei näe. Loe ülejäänu siiski läbi, kooli võrgus on tulemüür tavaliselt sees.
 
 Rida on olemas, aga **segamini** `proxmox1` enda logidega. Kolme masina puhul on see segadus. Vastus B1 küsimusele: võrgust tulnud kirjed käivad läbi samade vaikimisi reeglite.
 
@@ -495,7 +566,11 @@ sudo ls -R /var/log/remote/
 sudo cat /var/log/remote/proxmox2/n01test.log
 ```
 
+**Kui faili kohe ei tule:** sa taaskäivitasid keskserveri ja klient ühendub uuesti alles järgmisel katsel, kuni 30 sekundi pärast. Oota minut ja kontrolli uuesti. Kirje ei kao, see on kliendi järjekorras.
+
 ✅ **Kontrollpunkt:** kaustas `/var/log/remote/proxmox2/` on fail `n01test.log` sinu testreaga ja `messages`-isse uusi `proxmox2` ridu enam ei tule.
+
+**Mõtle:** Saada `proxmox2`-st poe kirje: `logger -p local0.info -t pood "tellimus 2001"`. Kas see jõuab keskserverisse? Miks? (Vihje: A5 4. samm ja failide järjekord kaustas `/etc/rsyslog.d/`.) Parandus on lisaülesanne 2.
 
 **Kui kaust on tühi:** vaata `sudo journalctl -u rsyslog -n 20` (`proxmox1`). Kui näed `Permission denied`, kontrolli, kas kirjutasid tee täpselt `/var/log/remote/...` (SELinux lubab rsyslogil kirjutada ainult `/var/log` alla).
 
@@ -545,8 +620,10 @@ ssh proxmox3 "sudo grep -c 'Invalid user' /var/log/secure"
 `proxmox3` väidab, et midagi ei juhtunud (0). Leia `proxmox1`-st, mis tegelikult juhtus:
 
 ```bash
-sudo grep -h "Invalid user" /var/log/remote/proxmox3/*.log
+sudo grep -rh "Invalid user" /var/log/remote/proxmox3/
 ```
+
+`-r` otsib kõigist kausta failidest. Miks mitte `sudo grep ... /var/log/remote/proxmox3/*.log`? rsyslog loob kaustad õigustega `700` (ainult root). `*` laiendab sinu enda shell **enne** `sudo`-t ja sina kausta sisse ei näe, nii et grep saab failinime asemel tärni.
 
 Kirjuta `n01-logid.md`-sse:
 
@@ -603,7 +680,18 @@ Kergemad on eespool. Tee nii palju, kui jõuad.
     ```
     Piirang käib failis `/etc/systemd/journald.conf` (või `/etc/systemd/journald.conf.d/*.conf`) reaga `SystemMaxUse=200M`, siis `sudo systemctl restart systemd-journald`. journald kustutab ise vanemaid kirjeid, kui piir täitub. See on journaldi oma logrotate.
 
-**2. Turvalogid eraldi.** Muuda keskserveri reeglistikku nii, et kõigi masinate `authpriv` kirjed lähevad lisaks ühte faili `/var/log/remote/turvalogi.log`. Nii näeb kõigi masinate sisselogimisi ühest kohast.
+**2. Poe logid keskserverisse.** B3 "Mõtle" küsimuses nägid, et `local0` kirjed `proxmox2`-st keskserverisse ei jõua. Paranda nii, et jõuavad, aga `proxmox2` enda `messages`-isse ikka ei lähe.
+
+??? success "Lahendus"
+    `10-pood.conf` reegel `& stop` lõpetab kirje töötlemise enne, kui rsyslog jõuab faili `90-keskserver.conf` juurde. Failid loetakse tähestiku järjekorras, seega piisab, kui saatmisreegel loetakse enne poe reeglit:
+    ```bash
+    sudo mv /etc/rsyslog.d/90-keskserver.conf /etc/rsyslog.d/05-keskserver.conf
+    sudo rsyslogd -N1 && sudo systemctl restart rsyslog
+    logger -p local0.info -t pood "tellimus 2002"
+    ```
+    `proxmox1`-s: `sudo cat /var/log/remote/proxmox2/pood.log`.
+
+**3. Turvalogid eraldi.** Muuda keskserveri reeglistikku nii, et kõigi masinate `authpriv` kirjed lähevad lisaks ühte faili `/var/log/remote/turvalogi.log`. Nii näeb kõigi masinate sisselogimisi ühest kohast.
 
 ??? success "Lahendus"
     Reeglistiku sees saab kasutada sama `päritolu.tõsidus` filtrit:
@@ -614,11 +702,11 @@ Kergemad on eespool. Tee nii palju, kui jõuad.
     }
     ```
 
-**3. Kas UDP kaotab?** Lisa `proxmox1`-le UDP sisend (`imudp`, port 514/udp, tulemüüris ka avada). Saada `proxmox2`-st 10 000 rida UDP kaudu otse `logger`-iga (`logger -n PROXMOX1-IP -P 514 -d`) ja loe, mitu kohale jõudis. Korda TCP-ga (`-T`). Kas vahe on? Mis siis, kui saadad kümme korda kiiremini?
+**4. Kas UDP kaotab?** Lisa `proxmox1`-le UDP sisend (`imudp`, port 514/udp, tulemüüris ka avada). Saada `proxmox2`-st 10 000 rida UDP kaudu otse `logger`-iga (`logger -n PROXMOX1-IP -P 514 -d`) ja loe, mitu kohale jõudis. Korda TCP-ga (`-T`). Kas vahe on? Mis siis, kui saadad kümme korda kiiremini?
 
-**4. Kui keskserver on maas.** Peata `proxmox1`-s rsyslog (`sudo systemctl stop rsyslog`). Saada `proxmox2`-st kolm rida `logger`-iga. Käivita rsyslog uuesti. **Ennusta enne:** kas need kolm rida jõuavad kohale? Kontrolli. Mis oli selles osa `queue.type` ja `resumeRetryCount`?
+**5. Kui keskserver on maas.** Peata `proxmox1`-s rsyslog (`sudo systemctl stop rsyslog`). Saada `proxmox2`-st kolm rida `logger`-iga. Käivita rsyslog uuesti. **Ennusta enne:** kas need kolm rida jõuavad kohale? Kontrolli, aga oota kuni minut: klient proovib uuesti umbes iga 30 sekundi järel. Mis oli selles osa `queue.type` ja `resumeRetryCount`?
 
-**5. JSON-vormingus kirjed.** Järgmistel kohtumistel lähevad logid otsingusüsteemidesse, mis eelistavad JSON-it. Tee keskserverisse teine mall, mis kirjutab iga kirje ühe JSON-reana faili `/var/log/remote/koik.json`.
+**6. JSON-vormingus kirjed.** Järgmistel kohtumistel lähevad logid otsingusüsteemidesse, mis eelistavad JSON-it. Tee keskserverisse teine mall, mis kirjutab iga kirje ühe JSON-reana faili `/var/log/remote/koik.json`.
 
 ??? success "Lahendus"
     ```text
@@ -638,11 +726,11 @@ Kergemad on eespool. Tee nii palju, kui jõuad.
     ```
     ja reeglistikku: `action(type="omfile" file="/var/log/remote/koik.json" template="Json")`. Kontrolli: `sudo tail -1 /var/log/remote/koik.json | python3 -m json.tool`.
 
-**6. Hoiatus mitme ebaõnnestunud sisselogimise korral.** Kirjuta `proxmox1`-s skript, mis loeb `turvalogi.log`-ist (ülesanne 2) viimase 5 minuti `Invalid user` read ja kui neid on üle 5 ühelt IP-lt, kirjutab `logger -p authpriv.alert` hoiatuse. Käivita see iga minut `systemd` timeriga. See on väike sissetungituvastus, mille N12 teeb Wazuh päriselt.
+**7. Hoiatus mitme ebaõnnestunud sisselogimise korral.** Kirjuta `proxmox1`-s skript, mis loeb `turvalogi.log`-ist (ülesanne 3) viimase 5 minuti `Invalid user` read ja kui neid on üle 5 ühelt IP-lt, kirjutab `logger -p authpriv.alert` hoiatuse. Käivita see iga minut `systemd` timeriga. See on väike sissetungituvastus, mille N12 teeb Wazuh päriselt.
 
-**7. Krüpteeritud saatmine.** Seadista `proxmox2` ja `proxmox1` vahel TLS (port 6514, rsyslogi `gtls` draiver, isesigneeritud sertifikaat). Tõesta `tcpdump`-iga, et port 514-l sõnum oli loetav ja 6514-l enam mitte. Juhend: [rsyslogi dokumentatsioon](https://www.rsyslog.com/doc/), otsingusõna "TLS".
+**8. Krüpteeritud saatmine.** Seadista `proxmox2` ja `proxmox1` vahel TLS (port 6514, rsyslogi `gtls` draiver, isesigneeritud sertifikaat). Tõesta `tcpdump`-iga, et port 514-l sõnum oli loetav ja 6514-l enam mitte. Juhend: [rsyslogi dokumentatsioon](https://docs.rsyslog.com/doc/), otsingusõna "TLS".
 
-**8. Päris raske: journald ilma rsyslogita.** systemd-l on oma keskne logimine (`systemd-journal-remote` ja `systemd-journal-upload`). Seadista see `proxmox3` ja `proxmox1` vahel kõrvuti rsyslogiga. Võrdle: mis on parem, mis halvem? Millal valiksid kumma?
+**9. Päris raske: journald ilma rsyslogita.** systemd-l on oma keskne logimine (`systemd-journal-remote` ja `systemd-journal-upload`). Seadista see `proxmox3` ja `proxmox1` vahel kõrvuti rsyslogiga. Võrdle: mis on parem, mis halvem? Millal valiksid kumma?
 
 ---
 
@@ -655,7 +743,8 @@ Kergemad on eespool. Tee nii palju, kui jõuad.
 | `pood.log` jääb tühjaks pärast pööramist | `postrotate` puudub, rsyslog kirjutab vanasse faili | A6 5. samm |
 | `ss -tlnp` ei näita porti 514 | `imtcp` moodul pole laetud | `module(load="imtcp")` peab olema enne `input` rida |
 | `proxmox1`-sse ei jõua midagi | tulemüür | `sudo firewall-cmd --list-ports` (`proxmox1`) |
-| Ühendus ikka ei tööta | vale IP või port kinni | `proxmox2`-st: `nc -zv PROXMOX1-IP 514` |
+| Ühendus ikka ei tööta | vale IP või port kinni | `proxmox2`-st: `timeout 3 bash -c '</dev/tcp/PROXMOX1-IP/514' && echo lahti` |
 | `/var/log/remote/` on tühi, `journalctl` näitab `Permission denied` | vale tee, SELinux | tee peab algama `/var/log/` |
 | Kaustanimi on IP, mitte `proxmox2` | sõlme hostinimi pole seatud | automatiseerimise nädal 1: `hostnamectl set-hostname` |
 | `ssh -o User=...` ei küsi parooli | paroolisisselogimine on keelatud | normaalne, `Invalid user` kirje tekib siiski |
+| `ssh -o User=...` logib sisse sinu tavakasutajana, `Invalid user` kirjet ei teki | `~/.ssh/config`-is on `ControlMaster`, ssh kasutab olemasolevat ühendust | lisa käsule `-o ControlPath=none` |

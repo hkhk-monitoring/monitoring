@@ -237,8 +237,8 @@ Kõigi kolme lahendus on sama: iga masin saadab oma logid kohe ka **keskserveris
 graph LR
     A["proxmox2<br/>rsyslog"] -->|"TCP 514"| S["proxmox1<br/>rsyslog keskserver"]
     B["proxmox3<br/>rsyslog"] -->|"TCP 514"| S
-    S --> D1["/var/log/remote/proxmox2/sshd.log"]
-    S --> D2["/var/log/remote/proxmox3/sshd.log"]
+    S --> D1["/var/log/remote/proxmox2/<br/>sshd-session.log, pood.log ..."]
+    S --> D2["/var/log/remote/proxmox3/<br/>sshd-session.log ..."]
 ```
   <figcaption>Joonis 1.5. Keskne logimine: `proxmox2` ja `proxmox3` saadavad iga kirje ka `proxmox1`-le, mis kirjutab need masina ja programmi järgi eraldi kaustadesse.</figcaption>
 </figure>
@@ -268,7 +268,7 @@ Laboris kasutad TCP-d ja annad kliendile järjekorra, et logid ei kaoks ka siis,
 
 See osa ei ole kohustuslik, aga kui tahad teada, kuidas seda tööd päriselt tehakse, loe edasi.
 
-**Krüpteerimine.** Port 514 saadab logid avatud tekstina. Päriselus kasutatakse TLS-i (port 6514), et keegi ei saaks logisid pealt kuulata ega võltsida. Vaata [rsyslogi dokumentatsioonist](https://www.rsyslog.com/doc/) otsingusõna "TLS".
+**Krüpteerimine.** Port 514 saadab logid avatud tekstina. Päriselus kasutatakse TLS-i (port 6514), et keegi ei saaks logisid pealt kuulata ega võltsida. Vaata [rsyslogi dokumentatsioonist](https://docs.rsyslog.com/doc/) otsingusõna "TLS".
 
 **auditd.** rsyslog ütleb, et fail muutus. Tuuma auditisüsteem `auditd` ütleb, **kes** seda muutis, mis protsessiga ja mis õigustega. Seda nõuavad pangad ja muud reguleeritud valdkonnad.
 
