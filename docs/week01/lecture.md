@@ -70,7 +70,7 @@ Logid on alati esimene koht, kust otsima hakatakse. Neid kirjutab iga programm, 
 
 ## 2. Logirida lähemalt
 
-Igal logikirjel on samad osad. Osa neist on tekstireal näha, osa on kirje küljes peidus.
+Logid võivad olla eri vormingus, kuid peaaegu alati on neis aeg, allikas ja sõnum. Siin vaatame syslogi kirjet, mis on Linuxis kõige levinum. Osa selle osadest on tekstireal näha, osa on kirje küljes peidus.
 
 <figure markdown="span">
   ![Logirea osad: aeg, masin, programm, sõnum, peidus päritolu ja tõsidus](../images/n01_logikirje.svg)
