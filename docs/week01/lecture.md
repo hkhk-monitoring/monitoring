@@ -6,7 +6,7 @@ tags:
   - Linux
 ---
 
-# Loeng: Masina päevik ja logid ühte kohta
+# Loeng: Linuxi logid ja keskne logiserver
 
 **Maht:** ~45 min iseseisvat lugemist, loe **enne** laborit
 **Tase:** kolmas kursus. `journalctl`, `tail -f`, `grep` ja `systemctl` on tuttavad, siin vaatame neid monitooringu pilguga.
@@ -307,7 +307,7 @@ local0.*    action(type="omfile" file="/var/log/pood.log")
 
 ## 8. Logifailid AlmaLinuxis ja kes neid loeb
 
-Kaust `/var/log/` on masina päevikute riiul. Tähtsamad failid AlmaLinuxis:
+Logifailid asuvad kaustas `/var/log/`. Tähtsamad failid AlmaLinuxis:
 
 | Fail | Mis seal on | Loed | Ubuntus |
 |---|---|---|---|
