@@ -64,6 +64,8 @@ Aga vaata, kes rikke esimesena avastas: klient. Kogu see kursus käib ühe lause
 
 Kursusel on neli osa. **Logid** vastavad küsimusele "mis juhtus?": iga rida on üks sündmus koos ajaga. **Mõõdikud** (kohtumised 2-7) vastavad küsimusele "kui palju ja kui kaua?": protsessori koormus, vaba mälu, päringute arv sekundis. **Jäljed** (kohtumine 10) näitavad, kuidas üks päring liikus läbi mitme teenuse ja kus see aega kulutas. Kui need kolm on koos ja omavahel seotud, saad küsida ka "miks see juhtus?". Seda nimetatakse observability'ks (jälgitavus).
 
+Logi sisaldab teavet süsteemis või rakenduses toimunud sündmuste kohta. Logide abil saab uurida, millal midagi juhtus, mis selle põhjustas ja kas süsteemi töös esines probleeme.
+
 Logid on alati esimene koht, kust otsima hakatakse. Neid kirjutab iga programm, nende jaoks ei pea midagi paigaldama ja need on olemas juba siis, kui monitooringut veel ei ole.
 
 ---
@@ -74,7 +76,7 @@ Logid võivad olla eri vormingus, kuid peaaegu alati on neis aeg, allikas ja sõ
 
 <figure markdown="span">
   ![Logirea osad: aeg, masin, programm, sõnum, peidus päritolu ja tõsidus](../images/n01_logikirje.svg)
-  <figcaption>Joonis 1.2. Logirea anatoomia. Aeg, masin, programm ja sõnum on reas näha. Päritolu (facility) ja tõsidus (severity) on kirje küljes, aga tekstifaili neid vaikimisi ei kirjutata.</figcaption>
+  <figcaption>Joonis 1.2. Syslogi kirje osad. Aeg, masin, programm ja sõnum on reas näha. Päritolu (facility) ja tõsidus (severity) on kirje küljes, aga tekstifaili neid vaikimisi ei kirjutata.</figcaption>
 </figure>
 
 - **Aeg** ütleb, millal sündmus juhtus. Ilma ajata ei saa sündmusi järjekorda panna ega teise masina logidega võrrelda.
