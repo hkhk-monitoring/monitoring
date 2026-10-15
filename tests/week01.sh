@@ -15,7 +15,9 @@ cd "$(dirname "$0")/.."
 CFG="${SSH_CONFIG:-$HOME/.ssh/config}"; CFG="$(cd "$(dirname "$CFG")" && pwd)/$(basename "$CFG")"
 SSHOPT=(-F "$CFG" -o BatchMode=yes -o ConnectTimeout=10)
 RUN=$(date +%H%M%S)
-S() { local h=$1; shift; ssh "${SSHOPT[@]}" "$h" "RUN=$RUN; $*"; }
+S() { local h=$1; shift; ssh "${SSHOPT[@]}" "$h" "RUN=$RUN; H2=${H2:-}; H3=${H3:-}; $*"; }
+# Keskserver teeb kaustad masina päris nime järgi (%HOSTNAME%), mitte SSH aliase järgi
+H2=$(S proxmox2 hostname 2>/dev/null); H3=$(S proxmox3 hostname 2>/dev/null); H2=${H2:-proxmox2}; H3=${H3:-proxmox3}
 SISSE() { ssh "${SSHOPT[@]}" -o ControlMaster=no -o ControlPath=none -o PubkeyAuthentication=no -o User="$1" "$2" true >/dev/null 2>&1; }
 export ANSIBLE_SSH_ARGS="-F $CFG" ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_STDOUT_CALLBACK=minimal ANSIBLE_PYTHON_INTERPRETER=auto_silent
 STARTER=$(cd ../lab01-starter 2>/dev/null && pwd); CTESTS=$(cd ../classroom50/it24-monitooring 2>/dev/null && pwd)
@@ -153,7 +155,7 @@ if [ "$FW" = running ]; then
   samm "B2: firewall-cmd --list-ports tühi" bash -c "[ -z \"\$(ssh ${SSHOPT[*]} proxmox1 'sudo firewall-cmd --list-ports' | tr -d ' ')\" ]"
   S proxmox1 'sudo firewall-cmd -q --permanent --add-port=514/tcp && sudo firewall-cmd -q --reload'
 else info "firewalld väljas, tulemüüri viga ei testitud"; fi
-samm "B2: järjekorras oodanud rida kohal (max 60 s)" oota S proxmox1 'sudo grep -q "siin proxmox2 $RUN" /var/log/remote/proxmox2/n01test.log'
+samm "B2: järjekorras oodanud rida kohal (max 60 s)" oota S proxmox1 'sudo grep -q "siin proxmox2 $RUN" /var/log/remote/$H2/n01test.log'
 samm "B2: kaugrida ei läinud proxmox1 messages-isse" S proxmox1 '! sudo grep -q "siin proxmox2 $RUN" /var/log/messages'
 S proxmox2 'logger -p local0.info -t pood "tellimus 2001 $RUN"'; sleep 3
 samm "B2 Mõtle: & stop -> 2001 ei jõua keskserverisse" S proxmox1 '! sudo grep -rq "tellimus 2001 $RUN" /var/log/remote/'
@@ -192,16 +194,16 @@ YML
 samm "B3: playbook 1. käivitus failed=0" bash -c "cd '$R' && ANSIBLE_STDOUT_CALLBACK=default ansible-playbook -i proxmox3, konf/keskserver.yml | grep -q 'failed=0'"
 samm "B3: playbook 2. käivitus changed=0" bash -c "cd '$R' && ANSIBLE_STDOUT_CALLBACK=default ansible-playbook -i proxmox3, konf/keskserver.yml | grep -q -E 'changed=0 .*failed=0'"
 S proxmox3 'logger -t n01test "siin proxmox3 $RUN"'
-samm "B3: proxmox3 rida keskserveris (max 60 s)" oota S proxmox1 'sudo grep -q "siin proxmox3 $RUN" /var/log/remote/proxmox3/n01test.log'
+samm "B3: proxmox3 rida keskserveris (max 60 s)" oota S proxmox1 'sudo grep -q "siin proxmox3 $RUN" /var/log/remote/$H3/n01test.log'
 samm "B3: proxmox3 auditctl -l = 3" bash -c "[ \$(ssh ${SSHOPT[*]} proxmox3 'sudo auditctl -l' | grep -c -E 'logikonf|turvalogi|ajastus') -eq 3 ]"
 
 # ================= B4 =================
 scp -F "$CFG" -q "$R/tooriistad/tee-suur-logi.sh" proxmox2:
 samm "B4: generaator 50000 rida" bash -c "ssh ${SSHOPT[*]} proxmox2 'bash tee-suur-logi.sh > /tmp/veeb.log; wc -l < /tmp/veeb.log' | grep -qx 50000"
 S proxmox2 "logger -n $P1 -P 514 -T -t veeb -f /tmp/veeb.log"
-samm "B4: keskserveris 50000 rida (max 60 s)" oota bash -c "[ \"\$(ssh ${SSHOPT[*]} proxmox1 'sudo cat /var/log/remote/proxmox2/veeb.log | wc -l')\" -ge 50000 ]"
-samm "B4: cd keskserveri kausta ilma sudota ei õnnestu (700)" bash -c "ssh ${SSHOPT[*]} proxmox1 'cd /var/log/remote/proxmox2' 2>&1 | grep -q 'Permission denied'"
-samm "B4: koopia kodukausta + chown" S proxmox1 'sudo cp /var/log/remote/proxmox2/veeb.log ~/ && sudo chown $USER ~/veeb.log && test -r ~/veeb.log'
+samm "B4: keskserveris 50000 rida (max 60 s)" oota bash -c "[ \"\$(ssh ${SSHOPT[*]} proxmox1 'sudo cat /var/log/remote/$H2/veeb.log | wc -l')\" -ge 50000 ]"
+samm "B4: cd keskserveri kausta ilma sudota ei õnnestu (700)" bash -c "ssh ${SSHOPT[*]} proxmox1 'cd /var/log/remote/$H2' 2>&1 | grep -q 'Permission denied'"
+samm "B4: koopia kodukausta + chown" S proxmox1 'sudo cp /var/log/remote/$H2/veeb.log ~/ && sudo chown $USER ~/veeb.log && test -r ~/veeb.log'
 q() { S proxmox1 "cd ~ && $1"; }
 A1=$(q "wc -l < veeb.log"); A2=$(q "grep -c 'staatus=500' veeb.log")
 A3=$(q "grep 'staatus=500' veeb.log | grep -o 'kell=..:..' | sort | uniq -c | sort -rn | head -1")
@@ -233,21 +235,21 @@ else
   KCRON=/etc/cron.d/uuendus
 fi
 samm "B5: proxmox3 secure grep -c = 0" bash -c "[ \"\$(ssh ${SSHOPT[*]} proxmox3 \"sudo grep -c 'Invalid user' /var/log/secure\")\" = 0 ]"
-t_b5k() { [ "$(S proxmox1 'sudo grep -rh "Invalid user" /var/log/remote/proxmox3/' | grep -oE 'Invalid user [^ ]+' | sort -u | wc -l)" -ge 3 ]; }
+t_b5k() { [ "$(S proxmox1 'sudo grep -rh "Invalid user" /var/log/remote/$H3/' | grep -oE 'Invalid user [^ ]+' | sort -u | wc -l)" -ge 3 ]; }
 samm "B5.1: keskserveris >= 3 kasutajat" oota t_b5k
 samm "B5.1: turvalogi.log sisaldab proxmox3 katseid" S proxmox1 'sudo grep -q "proxmox3 .*Invalid user" /var/log/remote/turvalogi.log'
 t_b5a() { local o; o=$(S proxmox3 'sudo ausearch --input-logs -k turvalogi -i; sudo ausearch --input-logs -k ajastus -i'); on 'comm=truncate' "$o" && on "$KCRON" "$o"; }
 samm "B5.2-3: audit: truncate ja $KCRON" t_b5a
 CT=$(basename "$KCRON")
-samm "B5.3: cron-töö jälg $CT.log keskserveris (max 90 s)" bash -c "for i in \$(seq 18); do ssh ${SSHOPT[*]} proxmox1 'sudo test -s /var/log/remote/proxmox3/$CT.log' && exit 0; sleep 5; done; exit 1"
-S proxmox1 'sudo grep -rh "Invalid user" /var/log/remote/proxmox3/' > "$R/logid/b5-intsident.txt"
+samm "B5.3: cron-töö jälg $CT.log keskserveris (max 90 s)" bash -c "for i in \$(seq 18); do ssh ${SSHOPT[*]} proxmox1 'sudo test -s /var/log/remote/$H3/$CT.log' && exit 0; sleep 5; done; exit 1"
+S proxmox1 'sudo grep -rh "Invalid user" /var/log/remote/$H3/' > "$R/logid/b5-intsident.txt"
 S proxmox3 'sudo ausearch --input-logs -k turvalogi -i; sudo ausearch --input-logs -k ajastus -i' > "$R/logid/b5-audit.txt"
 info "auid B5-s: $(grep -o 'auid=[^ ]*' "$R/logid/b5-audit.txt" | sort -u | tr '\n' ' ')"
 if [ -f "$KYLALINE" ]; then SSH_OPTS="-F $CFG" bash "$KYLALINE" --koristus proxmox3 >/dev/null; else S proxmox3 'sudo rm -f /etc/cron.d/uuendus'; fi
 
 # ================= B6 =================
 S proxmox1 'printf "/var/log/remote/*/*.log /var/log/remote/turvalogi.log {\n    daily\n    rotate 30\n    compress\n    dateext\n    missingok\n    notifempty\n    postrotate\n        /usr/bin/systemctl kill -s HUP rsyslog.service >/dev/null 2>&1 || true\n    endscript\n}\n" | sudo tee /etc/logrotate.d/remote >/dev/null'
-t_b6() { local o; o=$(S proxmox1 'sudo logrotate -d /etc/logrotate.d/remote 2>&1'); on '/var/log/remote/proxmox2/' "$o" && on '/var/log/remote/proxmox3/' "$o" && on 'turvalogi.log' "$o"; }
+t_b6() { local o; o=$(S proxmox1 'sudo logrotate -d /etc/logrotate.d/remote 2>&1'); on "/var/log/remote/$H2/" "$o" && on "/var/log/remote/$H3/" "$o" && on 'turvalogi.log' "$o"; }
 samm "B6: logrotate -d leiab proxmox2, proxmox3, turvalogi" t_b6
 
 # ================= Esitamine + Classroom =================
@@ -285,11 +287,11 @@ fi
 # ================= Lisaülesanded =================
 samm "L1: journald piir 200M" S proxmox2 'journalctl --disk-usage | grep -q -i "take up"; sudo mkdir -p /etc/systemd/journald.conf.d; printf "[Journal]\nSystemMaxUse=200M\n" | sudo tee /etc/systemd/journald.conf.d/piir.conf >/dev/null; sudo systemctl restart systemd-journald && systemctl is-active systemd-journald'
 S proxmox2 'sudo mv /etc/rsyslog.d/90-keskserver.conf /etc/rsyslog.d/05-keskserver.conf; sudo rsyslogd -N1 >/dev/null 2>&1 && sudo systemctl restart rsyslog; logger -p local0.info -t pood "tellimus 2002 $RUN"'
-samm "L2: 05- -> 2002 keskserveris (max 60 s)" oota S proxmox1 'sudo grep -q "tellimus 2002 $RUN" /var/log/remote/proxmox2/pood.log'
+samm "L2: 05- -> 2002 keskserveris (max 60 s)" oota S proxmox1 'sudo grep -q "tellimus 2002 $RUN" /var/log/remote/$H2/pood.log'
 samm "L2: 2002 ei ole proxmox2 messages-is" S proxmox2 '! sudo grep -q "tellimus 2002 $RUN" /var/log/messages'
 S proxmox2 'sudo mv /etc/rsyslog.d/05-keskserver.conf /etc/rsyslog.d/90-keskserver.conf; sudo systemctl restart rsyslog'
 S proxmox1 'sudo systemctl stop rsyslog'; S proxmox2 'for i in 1 2 3; do logger -t n01test "ootel $i $RUN"; done'; sleep 2; S proxmox1 'sudo systemctl start rsyslog'
-L5=0; for i in $(seq 18); do L5=$(S proxmox1 'sudo cat /var/log/remote/proxmox2/n01test.log 2>/dev/null | grep -c "ootel . $RUN"'); [ "${L5:-0}" -ge 3 ] && break; sleep 5; done
+L5=0; for i in $(seq 18); do L5=$(S proxmox1 'sudo cat /var/log/remote/$H2/n01test.log 2>/dev/null | grep -c "ootel . $RUN"'); [ "${L5:-0}" -ge 3 ] && break; sleep 5; done
 info "L5: keskserver maas, kohale $L5/3 ~$((i*5)) s"
 samm "L5: mälujärjekord toob 3/3 (max 90 s)" test "${L5:-0}" -ge 3
 S proxmox1 'cat <<'"'"'EOF'"'"' | sudo tee /etc/rsyslog.d/49-json.conf >/dev/null
@@ -315,7 +317,7 @@ S proxmox1 'sudo rm -f /etc/rsyslog.d/49-json.conf; sudo sed -i "/koik.json/d" /
 samm "L7: aureport -au" S proxmox3 'sudo aureport --input-logs -au | grep -q -i "authentication report"'
 S proxmox1 'printf "module(load=\"imudp\")\ninput(type=\"imudp\" port=\"514\" ruleset=\"kaugelt\")\n" | sudo tee /etc/rsyslog.d/52-udp.conf >/dev/null; sudo firewall-cmd -q --permanent --add-port=514/udp 2>/dev/null; sudo firewall-cmd -q --reload 2>/dev/null; sudo systemctl restart rsyslog'; sleep 2
 S proxmox2 "logger -n $P1 -P 514 -d -t veebudp -f /tmp/veeb.log"; sleep 8
-L4=$(S proxmox1 'sudo cat /var/log/remote/proxmox2/veebudp.log 2>/dev/null | wc -l'); info "L4: UDP 50000 reast kohale $L4"
+L4=$(S proxmox1 'sudo cat /var/log/remote/$H2/veebudp.log 2>/dev/null | wc -l'); info "L4: UDP 50000 reast kohale $L4"
 samm "L4: UDP jõuab vähemalt osaliselt" test "${L4:-0}" -gt 0
 
 # ================= Kodutöö =================

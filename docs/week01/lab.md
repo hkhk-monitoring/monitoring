@@ -527,7 +527,15 @@ Iga ülesanne ütleb, mis peab olema tehtud ja kuidas kontrollida. Kasuta loengu
 - kõik kirjed (`*.*`) TCP kaudu `proxmox1`-le;
 - kui keskserver ei vasta, ootavad kirjed järjekorras ja klient ei loobu kunagi.
 
-**Kontrolli:** `logger -t n01test "siin proxmox2"` ja `proxmox1`-s `sudo cat /var/log/remote/proxmox2/n01test.log`.
+!!! warning "Tähelepanu: kausta nimi on masina päris nimi"
+    `%HOSTNAME%` on masina enda nimi, mitte sinu SSH alias. `proxmox1-3` on ainult sinu `~/.ssh/config`-is, keskserver neid ei tea. Vaata päris nimed järele ja kasuta neid edaspidi `<proxmox2-nimi>` ja `<proxmox3-nimi>` asemel:
+
+    ```bash
+    ssh proxmox2 hostname
+    ssh proxmox3 hostname
+    ```
+
+**Kontrolli:** `logger -t n01test "siin proxmox2"` ja `proxmox1`-s `sudo cat /var/log/remote/<proxmox2-nimi>/n01test.log`.
 
 ??? tip "Vihje: saatmisreegel"
 
@@ -571,7 +579,7 @@ ansible-playbook -i proxmox3, konf/keskserver.yml
 ansible-playbook -i proxmox3, konf/keskserver.yml
 ```
 
-**Kontrolli:** `ssh proxmox3 'logger -t n01test "siin proxmox3"'` jõuab `proxmox1` kausta `/var/log/remote/proxmox3/`, `ssh proxmox3 "sudo auditctl -l"` näitab kolme reeglit.
+**Kontrolli:** `ssh proxmox3 'logger -t n01test "siin proxmox3"'` jõuab `proxmox1` kausta `/var/log/remote/<proxmox3-nimi>/`, `ssh proxmox3 "sudo auditctl -l"` näitab kolme reeglit.
 
 ??? tip "Vihje: playbooki ülesehitus"
 
@@ -620,10 +628,10 @@ Oct 14 21:36:09 proxmox2 veeb kell=03:12:07 ip=10.0.1.36 meetod=GET url=/api/mak
 
 Real on kaks kellaaega. Esimene (`Oct 14 21:36:09`) on aeg, mil kirje keskserverisse saadeti. Teine (`kell=03:12:07`) on rakenduse enda aeg, mil päring tehti. Uurimisel kasuta rakenduse aega.
 
-Keskserveri kaustad on `700`, `cd /var/log/remote/proxmox2` annab `Permission denied`. Pealegi on see tõend ja **tõendiga ei tööta originaali peal**. Tee `proxmox1`-s koopia:
+Keskserveri kaustad on `700`, `cd /var/log/remote/<proxmox2-nimi>` annab `Permission denied`. Pealegi on see tõend ja **tõendiga ei tööta originaali peal**. Tee `proxmox1`-s koopia:
 
 ```bash
-sudo cp /var/log/remote/proxmox2/veeb.log ~/
+sudo cp /var/log/remote/<proxmox2-nimi>/veeb.log ~/
 sudo chown $USER ~/veeb.log
 ```
 
@@ -672,13 +680,14 @@ ssh proxmox3 "echo '* * * * * root /usr/bin/logger -t uuendus kontroll' | sudo t
 3. Mis jäeti maha? Eemalda see.
 
 ```bash
-ssh proxmox1 "sudo grep -rh 'Invalid user' /var/log/remote/proxmox3/" > logid/b5-intsident.txt
+P3=$(ssh proxmox3 hostname)
+ssh proxmox1 "sudo grep -rh 'Invalid user' /var/log/remote/$P3/" > logid/b5-intsident.txt
 ssh proxmox3 "sudo ausearch -k turvalogi -i; sudo ausearch -k ajastus -i" > logid/b5-audit.txt
 ```
 
 ??? tip "Vihje"
 
-    `grep -r` otsib kõigist kausta failidest. `sudo grep ... /var/log/remote/proxmox3/*.log` ei tööta: `*` laiendab sinu shell enne `sudo`-t ja sina kausta ei näe. Maha jäetud asi kirjutab keskserverisse iga minut uue rea ja audit (`-k ajastus`) teab, kes selle tegi.
+    `grep -r` otsib kõigist kausta failidest. `sudo grep ... /var/log/remote/$P3/*.log` ei tööta: `*` laiendab sinu shell enne `sudo`-t ja sina kausta ei näe. Maha jäetud asi kirjutab keskserverisse iga minut uue rea ja audit (`-k ajastus`) teab, kes selle tegi.
 
 Kirjuta `README.md`-sse intsidendiraport: mis juhtus, millal, kust, kes kattis jäljed, mis jäeti maha ja kuidas sa selle leidsid.
 
@@ -812,4 +821,4 @@ Mõne minuti pärast näed GitHubis **Actions** all tulemust. Punase kontrolli k
 | kaustanimi on IP, mitte `proxmox2` | hostinimi seadmata | `hostnamectl set-hostname` |
 | `ssh -o User=...` logib sisse sinu kasutajana | `~/.ssh/config`-is on `ControlMaster` | `-o ControlPath=none` |
 | playbook: `Could not find or access '90-keskserver.conf'` | fail pole playbooki kõrval | kõik kausta `konf/` |
-| `cd /var/log/remote/proxmox2`: `Permission denied` | kaust on `700` | tee koopia (B4) |
+| `cd /var/log/remote/<proxmox2-nimi>`: `Permission denied` | kaust on `700` | tee koopia (B4) |
