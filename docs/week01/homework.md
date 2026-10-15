@@ -10,7 +10,7 @@ tags:
 !!! abstract "Eesmärk"
     Keskserver kogub nüüd kahe masina logisid. Keegi ei loe neid rida-realt. Kodutöös kirjutad `proxmox1`-s skripti, mis teeb logidest lühikese hommikuse raporti: kes saatis, kui palju vigu oli ja kas keegi proovis sisse murda.
 
-    Maht umbes 1 tund. Eeldus: labori osa B on tehtud (`/var/log/remote/proxmox2/` ja `/var/log/remote/proxmox3/` on olemas).
+    **Vabatahtlik.** Annab lisapunkte, labori 100 punkti see ei mõjuta. Maht umbes 1 tund. Eeldus: labori osa B on tehtud (`proxmox1`-s on kaustas `/var/log/remote/` proxmox2 ja proxmox3 nimedega kaustad).
 
 ---
 
