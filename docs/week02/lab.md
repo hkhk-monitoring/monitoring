@@ -99,7 +99,7 @@ Zabbixi manuaal on suur, PDF-ina üle 2000 lehekülje. Seda ei loeta algusest l�
     | Veebiliides leiab serveri | `ZBX_SERVER_HOST` |
     | Veebiliidese port konteineris | `8080` (`-p 80:8080`) |
 
-Kirjuta README-sse, mis image'id ja sildi leidsid ning mis manuaali osast.
+Ava oma repos (see, mille Enne alustamist osas kloonisid) fail `README.md`. Seal on iga sammu jaoks pealkiri ja küsimused. Jaotises **A1** kirjuta `_vastus_` asemele, mis image'id ja sildi leidsid ning mis manuaali osast (pealkiri).
 
 Nüüd tee fail valmis. Ühenda `proxmox1`-ga ja loo kaust:
 
