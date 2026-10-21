@@ -1,0 +1,43 @@
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="z1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker>
+    <marker id="z1g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00796b"/></marker>
+  </defs>
+  <rect width="900" height="360" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Zabbix: kes kellega räägib</text>
+  <!-- proxmox1 -->
+  <rect x="20" y="50" width="520" height="290" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="40" y="74" font-size="14" font-weight="700" fill="#e65100">proxmox1 · Docker Compose</text>
+  <rect x="40" y="95" width="200" height="80" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="140" y="125" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">veebiliides</text>
+  <text x="140" y="146" text-anchor="middle" font-size="12" fill="#5d4037">zabbix-web · näitab</text>
+  <text x="140" y="164" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">port 8080</text>
+  <rect x="310" y="95" width="200" height="80" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="410" y="125" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">server</text>
+  <text x="410" y="146" text-anchor="middle" font-size="12" fill="#5d4037">zabbix-server · kogub,</text>
+  <text x="410" y="164" text-anchor="middle" font-size="12" fill="#5d4037">kontrollib piire</text>
+  <rect x="175" y="240" width="200" height="80" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="275" y="270" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">andmebaas</text>
+  <text x="275" y="291" text-anchor="middle" font-size="12" fill="#5d4037">PostgreSQL · hoiab</text>
+  <text x="275" y="309" text-anchor="middle" font-size="11" fill="#5d4037">seadistus + kõik numbrid</text>
+  <line x1="150" y1="175" x2="230" y2="236" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#z1)"/>
+  <line x1="400" y1="175" x2="320" y2="236" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#z1)"/>
+  <line x1="240" y1="135" x2="306" y2="135" stroke="#90a4ae" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#z1)"/>
+  <text x="273" y="125" text-anchor="middle" font-size="11" fill="#546e7a">olek</text>
+  <!-- you -->
+  <rect x="40" y="0" width="0" height="0"/>
+  <!-- hosts -->
+  <rect x="600" y="70" width="280" height="70" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="740" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox2</text>
+  <text x="740" y="120" text-anchor="middle" font-size="12" fill="#263238">ping, agenti pole vaja · K2</text>
+  <rect x="600" y="160" width="280" height="70" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="740" y="188" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox3</text>
+  <text x="740" y="210" text-anchor="middle" font-size="12" fill="#263238">ping täna · agent K4 (port 10050)</text>
+  <rect x="600" y="250" width="280" height="60" rx="10" fill="#fafafa" stroke="#90a4ae" stroke-dasharray="5 4"/>
+  <text x="740" y="276" text-anchor="middle" font-size="13" font-weight="700" fill="#546e7a">proxy</text>
+  <text x="740" y="296" text-anchor="middle" font-size="11" fill="#546e7a">kaugkontoris, kursusel ei tee</text>
+  <line x1="510" y1="120" x2="596" y2="105" stroke="#00796b" stroke-width="2.5" marker-end="url(#z1g)"/>
+  <line x1="510" y1="150" x2="596" y2="195" stroke="#00796b" stroke-width="2.5" marker-end="url(#z1g)"/>
+  <line x1="510" y1="165" x2="596" y2="276" stroke="#90a4ae" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#z1g)"/>
+  <text x="555" y="100" text-anchor="middle" font-size="11" fill="#004d40">küsib</text>
+</svg>
