@@ -195,7 +195,7 @@ docker compose ps -a
 ??? question "Diagnoosi"
     Kes hoiab porti 8080? Leia see kahel viisil: `docker ps` (konteinerite pordid) ja `sudo ss -ltnp | grep 8080` (kõik, mis masinas kuulab). Miks tasub osata mõlemat?
 
-Paranda: peata see, kes porti hoiab, ja käivita uuesti. Kui sul käis päriselt N6 stack, peata see kaustas `~/lab06` käsuga `docker compose down`.
+Paranda: peata see, kes porti hoiab, ja käivita uuesti. Kui sul käib N6 stack, peata see kaustas `~/lab06` käsuga `docker compose down`.
 
 ```bash
 docker rm -f ankur
