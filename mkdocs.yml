@@ -82,7 +82,6 @@ plugins:
 nav:
 - Kursus:
   - Avaleht: index.md
-  - Kursuse ülesehitus: syllabus.md
   - Töökeskkond: kodulabor.md
 
 - Nädalad:

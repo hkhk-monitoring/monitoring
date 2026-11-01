@@ -1,11 +1,6 @@
-<div class="hero-section" markdown>
-<div class="hero-content" markdown>
 # Süsteemide monitooring
 
-[Alusta kursusega](week01/lecture.md){ .btn-primary }
-[Kursuse ülesehitus](syllabus.md){ .btn-secondary }
-</div>
-</div>
+[Alusta esimesest nädalast](week01/lecture.md) · [Teemad nädalate kaupa](#teemad-nadalate-kaupa)
 
 ## Mida sa õpid
 
@@ -20,23 +15,21 @@ Kursuse lõpuks oskad:
 
 ## Teemad nädalate kaupa
 
-| Kohtumine | Mõisteplokk |
-|---|---|
-| N1 | Masina logid ja keskne logiserver |
-| N2 | Keskne jälgimissüsteem |
-| N3 | Mõõdik, aegrida, agent *(veebiõpe)* |
-| N4 | Agent räägib serverile |
-| N5 | Server küsib ise |
-| N6 | Numbrid pildiks ja alarm |
-| N7 | Aegrea andmebaas teisiti |
-| N8 | Logid sildi järgi |
-| N9 | Logid täisotsinguga |
-| N10 | Päringu teekond |
-| N11 | Kolm sammast koos ja kas üldse töötab |
-| N12 | Turvamonitooring ja intsident |
-| N13 | Lõputöö ja kaitsmine |
-
-Tundide jaotus ja tööriistad on lehel [Kursuse ülesehitus](syllabus.md).
+| # | Teema | Tööriistad |
+|---|---|---|
+| N1 | Masina logid ja keskne logiserver | journald, rsyslog, logrotate, auditd |
+| N2 | Keskne jälgimissüsteem | Zabbix, Docker Compose |
+| N3 | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, Zabbix Cloud |
+| N4 | Agent räägib serverile | Zabbix agent 2, Ansible |
+| N5 | Server küsib ise | Prometheus, node_exporter, PromQL |
+| N6 | Numbrid pildiks ja alarm | Grafana, Alertmanager |
+| N7 | Aegrea andmebaas teisiti | Telegraf, InfluxDB |
+| N8 | Logid sildi järgi | Loki, Grafana Alloy |
+| N9 | Logid täisotsinguga | OpenSearch |
+| N10 | Päringu teekond | OpenTelemetry, Jaeger |
+| N11 | Kolm sammast koos ja kas üldse töötab | Blackbox exporter, Uptime Kuma |
+| N12 | Turvamonitooring ja intsident | Wazuh |
+| N13 | Lõputöö ja kaitsmine | rühma valik |
 
 ## Enne esimest tundi
 
@@ -46,3 +39,17 @@ Töökeskkond on sama, mis automatiseerimise kursusel. Enne esimest tundi kontro
 - arvutis on Ansible ja VS Code.
 
 Kui mõni neist ei tööta, järgi lehte [Töökeskkond](kodulabor.md).
+
+Tähtaja näed Classroom 50-s.
+
+## AI praktikumides
+
+- **Võib:** küsida AI-lt, mida mingi käsk või veateade tähendab, nagu küsiksid kaaslaselt.
+- **Ei või:** kopeerida AI-lt lahendusi järjest terminali, ilma et saaksid aru, mida need teevad.
+- **Keelatud:** AI-agendid, mis käivitavad käske sinu masinas (Copilot agent mode, Codex, Claude Code jms).
+
+Iga käsu kohta, mille käivitad, pead oskama öelda, mida see teeb.
+
+Laboritahvel loeb masinate logisid. Kui seal on agendi jäljed või palju kleebitud teksti, saad oma praktikumi repositooriumis issue'i. Siis näitad 7 päeva jooksul oma tööd suuliselt (2 minutit, tunnis või videokõnes): mida tegid ja miks. Kui sa seda näidata ei saa, teed praktikumi uuesti tunnis järelevalvega.
+
+Kehtib alates N3-st.
