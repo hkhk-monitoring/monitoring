@@ -55,7 +55,7 @@ for h in proxmox1 proxmox2 proxmox3; do echo "$h $(ssh $h hostname -I | cut -d' 
 
 ??? success "Oodatav tulemus"
 
-    Dockeri versioon ja mälurida, kus veerg `available` on vähemalt 1 GB. Seejärel kolm rida, näiteks `proxmox2 192.168.35.12`. Need IP-d lähevad osades A4 ja A5 Zabbixisse.
+    Dockeri versioon ja mälurida, kus veerg `available` on vähemalt 300 MB. Seejärel kolm rida, näiteks `proxmox2 192.168.35.12`. Need IP-d lähevad osades A4 ja A5 Zabbixisse.
 
 !!! tip "Kui `docker: command not found` või `permission denied`"
     Docker puudub või sinu kasutaja pole grupis `docker`. Tee automatiseerimise [N5 Osa 0](https://hkhk-automation.github.io/devops/week05/lab/) ja logi `proxmox1`-sse uuesti sisse.
@@ -294,7 +294,7 @@ Lisa samamoodi teine host **`proxmox3`**, template **ICMP Ping**, aga IP aadress
 
 Kontrolli serveri seest sama käsuga nagu A4-s: `docker compose exec zabbix-server fping <vale-IP>`. Mida see ütleb?
 
-Ava **Monitoring → Problems** ([Problems](https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/monitoring/problems)) ja oota 1–2 minutit.
+Ava **Monitoring → Problems** ([Problems](https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/monitoring/problems)) ja oota umbes 3 minutit. Ära paranda IP-d enne, kui probleem on nimekirjas, muidu probleemi ei teki ja osa A5 tõend jääb tühjaks.
 
 ??? success "Oodatav tulemus"
 
@@ -315,13 +315,13 @@ Paranda: **Data collection → Hosts → proxmox3**, pane õige IP, **Update**. 
 Zabbix hoiab kõike andmebaasis. Võta sealt tõend, et mõlemad hostid on olemas ja probleem tekkis ning lahenes. Oma arvutis repo kaustas:
 
 ```bash
-ssh proxmox1 "cd ~/zabbix && docker compose exec -T postgres psql -U zabbix -c \"SELECT host FROM hosts WHERE host LIKE 'proxmox%' ORDER BY host;\" -c \"SELECT name, to_timestamp(clock) AS algas, to_timestamp(r_clock) AS lahenes FROM problem ORDER BY clock;\"" > logid/a5-andmebaas.txt
+ssh proxmox1 "cd ~/zabbix && docker compose exec -T postgres psql -U zabbix -c \"SELECT host FROM hosts WHERE host LIKE 'proxmox%' ORDER BY host;\" -c \"SELECT name, to_timestamp(clock) AS algas, to_timestamp(NULLIF(r_clock, 0)) AS lahenes FROM problem ORDER BY clock;\"" > logid/a5-andmebaas.txt
 cat logid/a5-andmebaas.txt
 ```
 
 ??? success "Oodatav tulemus"
 
-    Esimeses tabelis on `proxmox2` ja `proxmox3`. Teises on rida *Unavailable by ICMP ping*, kus on olemas nii `algas` kui ka `lahenes`. Kui `lahenes` on tühi, pole probleem veel lahenenud: kontrolli IP-d ja oota veel minut.
+    Esimeses tabelis on `proxmox2` ja `proxmox3`. Teises on rida *Unavailable by ICMP ping*, kus on olemas nii `algas` kui ka `lahenes`. Kui `lahenes` on tühi, pole probleem veel lahenenud: kontrolli IP-d ja oota veel minut. Salvesta tõend samal päeval, sest Zabbix kustutab lahenenud probleemid sellest tabelist umbes ööpäeva pärast.
 
 ??? question "Mõtle"
     Sa pole kunagi andmebaasi midagi kirjutanud, ometi on seal sinu hostid ja probleem koos kellaaegadega. Kes need sinna kirjutas? Mis juhtub nende andmetega, kui teed `docker compose down`? Aga `docker compose down -v`?

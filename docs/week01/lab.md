@@ -91,6 +91,7 @@ Logimise tööriistad peavad igas sõlmes olemas olema. Tavapaigalduses on, aga 
 ssh proxmox2 "rpm -q rsyslog logrotate audit; systemctl is-active rsyslog auditd; systemctl list-timers logrotate.timer --no-pager"
 ansible all -i proxmox1,proxmox2,proxmox3, -b -m ansible.builtin.package -a "name=rsyslog,logrotate,audit state=present"
 ansible all -i proxmox1,proxmox2,proxmox3, -b -m ansible.builtin.service -a "name=rsyslog state=started enabled=true"
+ansible all -i proxmox1,proxmox2,proxmox3, -b -m ansible.builtin.service -a "name=auditd state=started enabled=true"
 ssh proxmox1 "hostname -I"
 ```
 
@@ -276,6 +277,8 @@ sudo grep "Invalid user" /var/log/messages
     Oct 14 20:36:39 proxmox2 sshd-session[4133]: Connection closed by invalid user sissetungija 192.168.35.x port 49970 [preauth]
     ```
     IP on sinu arvuti oma. Programm on uuemas OpenSSH-s `sshd-session`, vanemas `sshd`.
+
+    Logis näed ka ridu `Invalid user kontroll from 192.168.125.187`. See aadress on õpetaja kontrollserver (laboritahvel), mis loeb sinu masinate seisu iga minut. Need read ei ole rünnak.
 
     `journalctl -u sshd` näitab sama. `lastb -w` näitab katset kahendlogist `btmp` (ilma `-w`-ta oleks nimi `sissetun`). `last` näitab õnnestunud sisselogimisi ja taaskäivitusi.
 
@@ -673,6 +676,8 @@ ssh proxmox3 "echo '* * * * * root /usr/bin/logger -t uuendus kontroll' | sudo t
 
 `ssh proxmox3 "sudo grep -c 'Invalid user' /var/log/secure"` annab nüüd `0`.
 
+Kasutaja `kontroll` aadressilt `192.168.125.187` on õpetaja kontrollserver (laboritahvel, vt A4). Need read ei ole rünnak, jäta need intsidendiraportist välja.
+
 **Uurimine:**
 
 1. Mis juhtus? Leia keskserverist kõik kasutajanimed, IP ja kellaajad.
@@ -758,7 +763,14 @@ Mõne minuti pärast näed GitHubis **Actions** all tulemust. Punase kontrolli k
     sudo rsyslogd -N1 && sudo systemctl restart rsyslog
     logger -p local0.info -t pood "tellimus 2002"
     ```
-    Muuda failinimi ka playbookis.
+    Muuda failinimi ka playbookis ja kopeeri fail reposse nimega `konf/05-keskserver.conf`. Playbook peab `proxmox3`-st vana faili eemaldama, muidu saadab `proxmox3` iga rea kaks korda:
+    ```yaml
+    - name: Vana saatmisreegel ära
+      ansible.builtin.file:
+        path: /etc/rsyslog.d/90-keskserver.conf
+        state: absent
+      notify: Taaskäivita rsyslog
+    ```
 
 **3. Kõige aeglasem päring.** Leia B4 logist päring, mille `aeg=` on suurim.
 

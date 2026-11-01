@@ -64,6 +64,8 @@ grep -h "Invalid user" "$KAUST"/*/*.log \
   | sort | uniq -c | sort -rn
 ```
 
+Raportis on ka IP `192.168.125.187` (kasutaja `kontroll`). See on õpetaja kontrollserver (laboritahvel), mis loeb masinate seisu iga minut. Need read ei ole rünnak.
+
 Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skripti, mida see teeb. Kui mõnest aru ei saa, käivita torujuhe järk-järgult (kõigepealt ainult `grep`, siis lisa järgmine osa).
 
 **5. samm:** viimased 5 viga. Keskserveri failides ei ole tõsidus reas kirjas (loeng, joonis 1.2), seega ei saa seda `grep`-iga otsida. Kasuta sõnu: otsi ridu, kus on `error`, `fail` või `ebaõnnestus` (tõstutundetult, `grep -i -E`). Näita ainult 5 viimast.
