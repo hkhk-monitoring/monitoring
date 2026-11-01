@@ -7,12 +7,12 @@ tags:
 
 # Loeng: agent räägib serverile
 
-N2-s käivitasid Zabbixi ja see kontrollis pingiga, kas `proxmox2` ja `proxmox3` vastavad. N3-s nägid, et masina numbrid tulevad tuumast kausta `/proc` kaudu ja neid saab lugeda ainult masina seest. Täna paigaldad mõlemasse masinasse agendi, seod hostid valmis template'iga ja kirjutad oma trigger'i.
+N2-s käivitasid Zabbixi ja see kontrollis pingiga, kas `proxmox2` ja `proxmox3` vastavad. N3-s mõõtsid `proxmox2` sees käsitsi protsessorit, mälu ja ketast. Täna paigaldad mõlemasse masinasse agendi, seod hostid valmis template'iga ja kirjutad oma trigger'i.
 
 ??? abstract "Õpiväljundid"
     Pärast loengut ja praktikumi oskad:
 
-    - selgitada, mida teeb Zabbixi agent ja millised kolm seadet peavad selle konfiguratsioonifailis õiged olema;
+    - selgitada, mida teeb Zabbixi agent ja milliseid seadeid vajavad passiivne ja aktiivne kontroll;
     - eristada passiivset ja aktiivset agenti selle järgi, kes avab ühenduse ja milline port peab olema lahti;
     - valida hostile sobiva template'i ja kontrollida item'i väärtust masina seest;
     - kirjutada trigger'i avaldise ja valida sellele raskusastme;
@@ -20,34 +20,36 @@ N2-s käivitasid Zabbixi ja see kontrollis pingiga, kas `proxmox2` ja `proxmox3`
 
 ## 1. Ping ei näe masina sisse
 
-Ping näitab ainult seda, kas masin vastab. Ketas võib olla täis, kuigi masin vastab pingile ja Zabbix näitab rohelist. Ketta täituvus on kirjas tuumas ja seda saab lugeda ainult masina seest. Selleks on vaja programmi, mis töötab jälgitavas masinas, loeb numbrid ja annab need serverile. Seda programmi nimetatakse **agendiks** (agent).
+Ping näitab ainult seda, kas masin vastab. Ketas võib olla täis, kuigi masin vastab pingile ja Zabbix näitab rohelist. Ketta täituvust loed jälgitava masina sees, nagu N3-s käsuga `df -h`. Pidevaks mõõtmiseks on vaja programmi, mis töötab jälgitavas masinas, loeb numbrid ja annab need serverile. Seda programmi nimetatakse **agendiks** (agent).
 
-Zabbixil on kaks agenti. Vanem [Zabbix agent](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent) on kirjutatud C-s. Uuem [Zabbix agent 2](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent2) on kirjutatud Go-s ja oskab pluginate kaudu jälgida ka näiteks Dockerit, PostgreSQL-i ja MySQL-i. Põhilised item'id (protsessor, mälu, ketas, võrk) on mõlemal samad. Kursusel kasutad agent 2-t, sest uued pluginad tulevad ainult sinna.
+Zabbixil on kaks agenti. Vanem [Zabbix agent](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent) on kirjutatud C-s. Uuem [Zabbix agent 2](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent2) on kirjutatud Go-s ja oskab pluginate kaudu jälgida ka näiteks Dockerit, PostgreSQL-i ja MySQL-i. Põhilised item'id (protsessor, mälu, ketas, võrk) on mõlemal samad. Kursusel kasutad Zabbix agent 2 programmi, sest uued pluginad tulevad ainult sinna.
+
+Zabbixis on kolm mõistet, mida praktikumis kasutad. **Item** on ühe kogutava väärtuse seadistus: mida mõõta, millise võtmega ja kui tihti. **Trigger** on avaldis, mis otsustab kogutud väärtuste põhjal, kas on probleem. **Template** on korduskasutatav mall, mis annab hostile korraga palju item'eid ja trigger'eid.
 
 ??? question "Kontrolli ennast"
     N2 praktikumis oli hosti **Zabbix server** juures ZBX punane. Mida Zabbix seal proovis ja miks see ei õnnestunud?
 
 ## 2. Agendi paigaldus ja kolm seadet
 
-Agent tuleb Zabbixi ametlikust paketihoidlast. AlmaLinux 9 jaoks lisab pakett `zabbix-release` masinasse hoidla kirjelduse (`/etc/yum.repos.d/zabbix.repo`) ja allkirja võtme. Võtmega kontrollib `dnf`, et pakett tuleb Zabbixilt ja seda pole teel muudetud. Paigaldamise juhend on Zabbixi lehel [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=).
+Agent tuleb Zabbixi ametlikust paketihoidlast. AlmaLinux 9 jaoks lisab pakett `zabbix-release` masinasse hoidla kirjelduse (`/etc/yum.repos.d/zabbix.repo`) ja allkirjavõtme. Võtmega kontrollib `dnf`, et pakett tuleb Zabbixilt ja seda pole teel muudetud. Paigaldamise juhend on Zabbixi lehel [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=).
 
 Kui masinas on ka EPEL-i hoidla, on seal Zabbixi vanemad paketid. Zabbixi juhendi järgi lisa EPEL-i kirjeldusse rida `excludepkgs=zabbix*`, muidu võib `dnf` paigaldada vale versiooni.
 
-Agendi seaded on failis `/etc/zabbix/zabbix_agent2.conf`. Fail on pikk, kuid enamik ridu on kommentaarid. Agendi töötamiseks peavad õiged olema kolm seadet ([agent 2 parameetrid](https://www.zabbix.com/documentation/7.0/en/manual/appendix/config/zabbix_agent2)).
+Agendi seaded on failis `/etc/zabbix/zabbix_agent2.conf`. Fail on pikk, kuid enamik ridu on kommentaarid. Praktikumis muudad kolme põhiseadet. Passiivse kontrolli jaoks on vaja seadet `Server`, aktiivse kontrolli jaoks `ServerActive` ja `Hostname`. Kui `Server` on tühi, passiivseid kontrolle ei tehta, ja kui `ServerActive` on tühi, ei tehta aktiivseid ([agent 2 parameetrid](https://www.zabbix.com/documentation/7.0/en/manual/appendix/config/zabbix_agent2)).
 
 ??? note "Tabel 4.1. Agendi konfiguratsioonifaili kolm põhiseadet"
-    | Seade | Vaikimisi | Mida tähendab | Selles praktikumis |
+    | Seade | Paketi konfiguratsioonifailis | Mida tähendab | Selles praktikumis |
     |---|---|---|---|
     | `Server` | `127.0.0.1` | aadressid, kust agent lubab endalt küsida (passiivne agent) | `proxmox1` IP |
     | `ServerActive` | `127.0.0.1` | server, kuhu agent ise andmeid saadab (aktiivne agent) | `proxmox1` IP |
     | `Hostname` | `Zabbix server` | nimi, millega agent end serverile tutvustab | `proxmox2` või `proxmox3` |
 
-`Hostname` peab olema täpselt sama mis veebiliideses hosti väli **Host name**. Kui need erinevad, ei leia server õiget hosti ja aktiivse agendi andmed jäävad vastu võtmata. N2-s panid hostide nimeks `proxmox2` ja `proxmox3`, need lähevad ka agendi seadesse.
+`Hostname` peab olema täpselt sama mis veebiliideses hosti väli **Host name**, ka suur- ja väiketähed peavad klappima. Kui need erinevad, ei leia server õiget hosti ja aktiivse agendi andmed jäävad vastu võtmata. N2-s panid hostide nimeks `proxmox2` ja `proxmox3`, need lähevad ka agendi seadesse.
 
 Konfiguratsioonifaili õigused on `640` ja see kuulub grupile `zabbix`. Tavakasutaja faili lugeda ei saa, sest seal võivad olla paroolid, näiteks andmebaasi pluginate jaoks. Faili vaatamiseks kasuta `sudo`.
 
 ??? question "Kontrolli ennast"
-    Agent töötab, aga veebiliides ei näita `proxmox3` kohta ühtegi aktiivse agendi väärtust. Agendi failis on `Hostname=Proxmox3`. Mis on viga?
+    Agent töötab, aga `proxmox3` aktiivse kontrolli väärtused ei uuene. Mida võrdled agendi konfiguratsioonifailis ja veebiliideses? Millisest logifailist otsid rida, mis sinu oletust kinnitab?
 
 ## 3. Passiivne ja aktiivne agent
 
@@ -75,7 +77,7 @@ graph LR
 
 **Passiivne agent** (passive check) ootab pordil 10050. Server küsib iga item'i kohta eraldi ja agent vastab. Agent vastab ainult aadressidele, mis on seades `Server`. Jälgitava masina tulemüüris peab port 10050 olema lahti.
 
-**Aktiivne agent** (active check) küsib serverilt kõigepealt, milliseid item'eid temalt oodatakse ja kui tihti. Seejärel mõõdab ta ise ja saadab väärtused serveri porti 10051. Jälgitava masina tulemüüris ei pea ühtegi porti avama, sest ühendus läheb masinast välja. Server leiab õige hosti seade `Hostname` järgi.
+**Aktiivne agent** (active check) küsib serverilt kõigepealt, milliseid item'eid temalt oodatakse ja kui tihti. Seejärel mõõdab ta ise ja saadab väärtused serveri porti 10051. Aktiivse kontrolli jaoks ei pea jälgitavas masinas avama sissetulevat porti 10050. Agent peab saama ise ühenduse serveri porti 10051. Server leiab õige hosti seade `Hostname` järgi.
 
 ??? note "Tabel 4.2. Passiivne ja aktiivne agent"
     | | Passiivne | Aktiivne |
@@ -89,7 +91,7 @@ graph LR
 
 Üks agent oskab mõlemat korraga. Millist viisi kasutatakse, määrab item'i tüüp. Praktikumis kasutab `proxmox2` passiivset ja `proxmox3` aktiivset template'i, et saaksid erinevust ise näha. Kui sulged mõlemas masinas pordi 10050, jääb üks host andmeteta ja teine töötab edasi.
 
-Selle kursuse Zabbix server töötab Dockeri konteineris. Kui server küsib `proxmox2`-lt, näeb `proxmox2` päringu allikana `proxmox1` IP-d, sest Docker asendab konteineri aadressi masina aadressiga. Seepärast on seades `Server` just `proxmox1` IP.
+Selle kursuse Zabbix server töötab Dockeri konteineris. Dockeri vaikimisi võrgus (bridge) asendatakse konteinerist väljuva ühenduse lähteaadress masina aadressiga. Seepärast näeb `proxmox2` serveri päringu lähteaadressina `proxmox1` IP-aadressi ja see läheb seadesse `Server`. Kui agent päringu tagasi lükkab, on tegelik lähteaadress agendi logis `/var/log/zabbix/zabbix_agent2.log` real `connection from ... rejected`.
 
 ??? question "Kontrolli ennast"
     Kooli serverid on tulemüüri taga ja väljast ühendusi sisse ei lubata. Zabbix server on pilves. Kumba agenti kasutad ja miks?
@@ -104,7 +106,7 @@ Iga item'i taga on võti, mis ütleb agendile, mida mõõta.
     | Võti | Mida tagastab | Kust agent selle võtab |
     |---|---|---|
     | `system.cpu.load[all,avg1]` | 1 minuti koormus | `/proc/loadavg` |
-    | `vm.memory.size[available]` | kasutatav mälu baitides | `/proc/meminfo` |
+    | `vm.memory.size[available]` | programmidele kohe saadaval mälu baitides (nagu `free` veerg `available`) | `/proc/meminfo` |
     | `vfs.fs.size[/,pfree]` | juurfailisüsteemi vaba ruum protsentides | tuum, sama mis `df` |
     | `agent.ping` | 1, kui agent vastab | agent ise |
 
@@ -143,7 +145,7 @@ Igal trigger'il on [raskusaste](https://www.zabbix.com/documentation/7.0/en/manu
     | High | lahenda kohe | masin ei vasta |
     | Disaster | ettevõtte töö seisab | e-pood ei tööta |
 
-Kui väärtus kõigub piiri ümber (19, 21, 19, 21), tekib ja laheneb probleem iga minut. Selle vastu aitab [taastumise avaldis](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/expression#hysteresis) (recovery expression). Probleem tekib alla 20% juures, kuid laheneb alles siis, kui vaba ruumi on üle 25%. Seda nimetatakse **hüstereesiks**.
+Kui väärtus kõigub piiri ümber (19, 21, 19, 21), tekib ja laheneb probleem iga minut. Selle vastu aitab [taastumise avaldis](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/expression#hysteresis) (recovery expression). Probleem tekib alla 20% juures, kuid laheneb alles siis, kui vaba ruumi on üle 25%. Seda nimetatakse **hüstereesiks**. Probleem laheneb siis, kui probleemi avaldis ei ole enam tõene ja taastumise avaldis on tõene. Veebiliideses vali trigger'i juures **OK event generation: Recovery expression**, muidu teist avaldist ei kasutata.
 
 ??? question "Kontrolli ennast"
     Template'is on ketta trigger juba olemas (kasutusel üle 80%). Miks võib olla vaja oma trigger'it teise piiri või teise raskusastmega?
