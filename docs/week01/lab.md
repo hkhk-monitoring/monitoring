@@ -8,7 +8,7 @@ tags:
 
 # K1 · Praktikum: öövahetus
 
-Tänase lõpuks kogub `proxmox1` kahe masina logisid: `proxmox2` ja `proxmox3` saadavad iga kirje TCP kaudu keskserverisse, mis hoiab neid masina ja programmi kaupa eraldi. Kõik kolm masinat jälgivad auditiga, kes muudab logikonfi või turvalogi, ja journal elab üle taaskäivituse. `proxmox3` on seadistatud playbookiga. Öö lõpus leiad 50 000 reaga veebilogist ründaja ja lahendad intsidendi, kus masina enda logi oli tühjendatud.
+Tänase lõpuks kogub `proxmox1` kahe masina logisid: `proxmox2` ja `proxmox3` saadavad oma kirjed TCP kaudu keskserverisse, mis hoiab neid masina ja programmi kaupa eraldi. Kõik kolm masinat jälgivad auditiga, kes muudab logide konfiguratsiooni või turvalogi, ja journal säilib taaskäivitusel. `proxmox3` on seadistatud playbook'iga. Öö lõpus leiad 50 000 reaga veebilogist ründaja ja lahendad intsidendi, kus masina enda logi oli tühjendatud.
 
 <figure style="max-width:690px;margin:.8em auto" class="lx" markdown="0">
 <svg viewBox="0 0 690 220" role="img" aria-label="Labori ülesehitus: proxmox2 ja proxmox3 saadavad logid proxmox1 keskserverisse, sinu arvuti juhib Ansiblega" xmlns="http://www.w3.org/2000/svg">
@@ -200,9 +200,9 @@ sudo -u praktikant cat /var/log/secure
 
 ??? success "Oodatav tulemus"
 
-    Praktikant näeb nüüd journalit, aga `cat /var/log/secure` annab ikka `Permission denied`. See on vähima õiguse põhimõte: kolleeg saab veaotsinguks journali ilma `sudo`-ta ja ilma turvalogita.
+    Praktikant näeb nüüd journalit, aga `cat /var/log/secure` annab ikka `Permission denied`. See on vähima õiguse põhimõte: kasutaja saab veaotsinguks journali ilma `sudo`-ta ja ilma turvalogita.
 
-Kirjuta `README.md`-sse, miks on parem lisada kolleeg gruppi kui anda talle `sudo`. Pärast seda korista: `sudo userdel -r praktikant`.
+Kirjuta `README.md`-sse, miks on parem lisada kasutaja gruppi kui anda talle `sudo`. Pärast seda korista: `sudo userdel -r praktikant`.
 
 ### A3 · Journal, mis ei unusta
 
@@ -308,7 +308,7 @@ grep -v -E '^#|^$' /etc/rsyslog.conf | grep /var/log
     ```
     AlmaLinux 9.8 kasutab uut süntaksit (`action(...)`), vanemates on paremal ainult faili tee.
 
-E-pood logib päritoluga `local0`. Loo `/etc/rsyslog.d/10-pood.conf` **meelega veaga**, nagu kiirustades juhtub:
+E-pood logib päritoluga `local0`. Loo `/etc/rsyslog.d/10-pood.conf` **meelega veaga**:
 
 ```text
 locla0.*    /var/log/pood.log
@@ -417,9 +417,13 @@ sudo systemctl restart rsyslog       # (1)!
 }
 ```
 
-**Ennusta:** mitu `pood.log.*` faili on alles, kui kirjutad 300 rida ja pöörad neli korda?
+**Ennusta:** mitu `pood.log.*` faili on alles, kui kirjutad neli korda järjest 300 rida ja pöörad iga kord logi?
 
 ```bash
+for k in 1 2 3 4; do
+  for i in $(seq 300); do logger -p local0.info -t pood "tellimus $i"; done
+  sudo logrotate -v /etc/logrotate.d/pood
+done
 ls /var/log/pood*
 sudo zgrep -c "tellimus 150" /var/log/pood.log.*.gz
 ```
@@ -444,7 +448,10 @@ sudo auditctl -l
 
 1. `-w` jälgi faili või kausta, `-p wa` kirjutamine ja atribuutide muutmine, `-k` otsinguvõti. Hoiatus `Old style watch rules are slower` on normaalne.
 
-Terminal 1 vaatab, terminal 2 teeb seda, mida ründaja teeks:
+Terminal 1 vaatab, terminal 2 teeb seda, mida ründaja teeks.
+
+!!! warning "Käsk `truncate` tühjendab turvalogi"
+    Allpool olev `truncate` kustutab `/var/log/secure` kogu sisu ja seda ei saa taastada. Käivita see ainult `proxmox2`-s pärast seda, kui `auditctl -l` näitab reeglit `turvalogi`. Mujal seda käsku ei kasutata.
 
 ```bash
 sudo tail -f /var/log/audit/audit.log | grep --line-buffered -E 'logikonf|turvalogi'   # terminal 1
@@ -554,7 +561,7 @@ Iga ülesanne ütleb, mis peab olema tehtud ja kuidas kontrollida. Kasuta loengu
     ```bash
     timeout 3 bash -c '</dev/tcp/PROXMOX1-IP/514' && echo lahti || echo kinni
     ```
-    `No route to host` ja `kinni` tähendab, et pakett ei jõua rsyslogini, kuigi `ss` näitas, et rsyslog kuulab. Kliendi ja serveri vahel on tulemüür. Vaata `proxmox1`-s `sudo firewall-cmd --list-ports`.
+    `No route to host` ja `kinni` tähendab, et pakett ei jõua rsyslogini, kuigi `ss` näitas, et rsyslog kuulab. Kontrolli IP-aadressi ja tulemüüri. Selles praktikumis alusta `proxmox1` tulemüürist: `sudo firewall-cmd --list-ports`.
 
 ??? success "Oodatav tulemus"
 
@@ -638,7 +645,7 @@ sudo cp /var/log/remote/<proxmox2-nimi>/veeb.log ~/
 sudo chown $USER ~/veeb.log
 ```
 
-**Ülesanne.** Leia vastused ja kirjuta need faili `logid/b4-otsing.md` koos käsuga, millega leidsid:
+**Ülesanne.** Leia vastused `proxmox1`-s ja kirjuta need oma arvutis repositooriumi faili `logid/b4-otsing.md` koos käsuga, millega leidsid:
 
 1. Mitu rida on logis?
 2. Mitu päringut lõppes veaga `500`?
@@ -665,6 +672,9 @@ Eeldus: B1-B3 on tehtud, ehk `proxmox3` saadab logid keskserverisse ja auditi re
 Öövahetuse ajal võib õpetaja korraldada sinu `proxmox3`-le "külastuse". Sa ei tea, millal, kust ega mida tehakse. Kui õpetaja ütleb "nüüd" või tahvel näitab muutust, alusta uurimist.
 
 Kui teed laborit kodus või külastust ei tulnud, tee see ise oma arvutist:
+
+!!! warning "Käsk `truncate` tühjendab `proxmox3` turvalogi"
+    Turvalogi sisu kaob jäädavalt. Enne käivitamist kontrolli, et `ssh proxmox3 "sudo auditctl -l"` näitab reeglit `turvalogi`.
 
 ```bash
 for u in admin root2 test; do
@@ -738,7 +748,6 @@ Mõne minuti pärast näed GitHubis **Actions** all tulemust. Punase kontrolli k
     | K11. `b5-*.txt`: kasutajad keskserverist, `truncate` ja cron-fail auditist | 10 |
     | K12. `README.md`: ennustused ja vastused täidetud | 5 |
 
-    Kodutöö kontrollid on nimega `BOONUS` ja annavad lisapunkte.
 
 ## Lisaülesanded
 

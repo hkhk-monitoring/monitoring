@@ -8,17 +8,10 @@ tags:
 
 # Loeng: Linuxi logid ja keskne logiserver
 
-**Maht:** ~45 min iseseisvat lugemist, loe **enne** laborit
-**Tase:** kolmas kursus. `journalctl`, `tail -f`, `grep` ja `systemctl` on tuttavad, siin vaatame neid monitooringu pilguga.
+Automatiseerimise kursusel seadistasid samu masinaid käsitsi ja Ansible'iga. Nüüd vaatad, mida need masinad oma tööst üles kirjutavad, ja kogud nende logid ühte kohta.
 
-See leht on mõeldud iseseisvaks lugemiseks. Klassis käime põhiliini kiiremini üle, aga siit leiad kõik lahti seletatuna, koos näidetega, ja saad selle laboris spikrina lahti hoida.
-
-**Labor vajab peatükke 1-11.** Peatükk 12 (vastuse leidmine suurest logist) on vajalik labori teises pooles. Lõpus olev osa "Taust ja edasijõudnutele" on lugemismaterjal neile, kes tahavad teada, kuidas seda tööd töökohas tehakse.
-
----
-
-!!! abstract "Õpiväljundid"
-    Pärast seda materjali oskad:
+??? abstract "Õpiväljundid"
+    Pärast loengut ja praktikumi oskad:
 
     - selgitada, miks logid on seire esimene signaal ja millisele küsimusele need vastavad
     - lugeda logireast välja aja, masina, programmi, päritolu, tõsiduse ja sõnumi
@@ -30,32 +23,27 @@ See leht on mõeldud iseseisvaks lugemiseks. Klassis käime põhiliini kiiremini
     - põhjendada keskse logiserveri vajadust ja võrrelda UDP, TCP ja RELP saatmist
     - leida suurest logist vastus võttega "filtreeri, loenda, vaata"
 
----
-
-!!! info "Lisalugemine"
-    Kui tahad sama teemat teise nurga alt või rohkem detaile:
-
-    - [Linux Logging Complete Guide (devconnected)](https://devconnected.com/linux-logging-complete-guide/), inglisekeelne ülevaade tuuma logimisest, syslogi protokollist ja rsyslogist, palju jooniseid
-    - [rsyslogi ametlik dokumentatsioon](https://docs.rsyslog.com/doc/), konfi süntaks, moodulid ja näited
+??? info "Loe juurde"
+    - [Linux Logging Complete Guide (devconnected)](https://devconnected.com/linux-logging-complete-guide/), ingliskeelne ülevaade tuuma logimisest, syslogi protokollist ja rsyslogist, palju jooniseid
+    - [rsyslogi ametlik dokumentatsioon](https://docs.rsyslog.com/doc/), konfiguratsiooni süntaks, moodulid ja näited
     - [systemd/Journal (ArchWiki)](https://wiki.archlinux.org/title/Systemd/Journal), journald ja `journalctl` põhjalikult, kehtib ka AlmaLinuxis
-
----
 
 ## 1. Mis juhtus kell 03:12?
 
-Kati teeb praktikat väikeses e-poes. Esmaspäeva hommikul ütleb juhataja: "Pood oli öösel pool tundi maas. Klient kirjutas kell 03:20. Mis juhtus?"
+Väikese e-poe juhataja ütleb esmaspäeva hommikul: "Pood oli öösel pool tundi maas. Klient kirjutas kell 03:20. Mis juhtus?"
 
-Öösel ei olnud kedagi serveri juures. Ainus tunnistaja on masin ise ja see, mis ta üles kirjutas. Kati logib serverisse ja küsib logilt:
+Öösel ei olnud kedagi serveri juures. Vastuse leiab serveri logist:
 
 ```text
 Oct 13 03:12:04 pood kernel: Out of memory: Killed process 2211 (php-fpm)
 Oct 13 03:12:05 pood systemd[1]: php-fpm.service: Main process exited, status=9/KILL
 Oct 13 03:41:17 pood systemd[1]: php-fpm.service: Scheduled restart job
+Oct 13 03:41:18 pood systemd[1]: Started php-fpm.service - The PHP FastCGI Process Manager.
 ```
 
-Kolm rida ja vastus on käes. Kell 03:12 sai mälu otsa, tuum sulges veebipoe protsessi ja teenus käivitus uuesti alles 29 minutit hiljem. Ilma logideta oleks Kati vastus olnud "ei tea".
+Kell 03:12 sai mälu otsa ja tuum lõpetas veebipoe protsessi. Kell 03:41 ajastas systemd teenuse taaskäivitamise ja sekund hiljem teenus käivitus. Ilma logideta jääks juhataja küsimus vastuseta.
 
-Aga vaata, kes rikke esimesena avastas: klient. Kogu see kursus käib ühe lause ümber: **kasutaja ei tohi olla see, kes rikke esimesena avastab.** Selleks on vaja, et masinad räägiksid oma seisundist ise ja et keegi (või miski) neid kuulaks.
+Rikke avastas esimesena klient. Kursuse eesmärk on, et rike avastatakse enne kasutaja teadet. Selleks kogutakse masinate logid ja mõõdikud ühte kohta ning seadistatakse neile alarmid.
 
 <figure markdown="span">
   ![Observability on katus, logid, mõõdikud ja jäljed on kolm sammast](../images/n01_observability.svg)
@@ -66,9 +54,7 @@ Kursusel on neli osa. **Logid** vastavad küsimusele "mis juhtus?": iga rida on 
 
 Logi sisaldab teavet süsteemis või rakenduses toimunud sündmuste kohta. Logide abil saab uurida, millal midagi juhtus, mis selle põhjustas ja kas süsteemi töös esines probleeme.
 
-Logid on alati esimene koht, kust otsima hakatakse. Neid kirjutab iga programm, nende jaoks ei pea midagi paigaldama ja need on olemas juba siis, kui monitooringut veel ei ole.
-
----
+Rikke uurimist alustatakse tavaliselt logidest. Süsteemiteenused kirjutavad logisid juba vaikeseadistuses, nende jaoks ei pea midagi paigaldama ja need on olemas juba siis, kui monitooringut veel ei ole.
 
 ## 2. Logirida lähemalt
 
@@ -88,28 +74,24 @@ Logid võivad olla eri vormingus, kuid peaaegu alati on neis aeg, allikas ja sõ
 
 Kaks viimast on need, mille järgi rsyslog otsustab, kuhu kirje läheb. Nendest räägib peatükk 7.
 
-Vorming, mida joonisel näed, pärineb vanast syslogi standardist (RFC 3164[^rfc3164]). Uuem standard RFC 5424[^rfc5424] lisab täpse aja koos aastaarvu ja ajavööndiga (`2026-10-13T03:12:04.512+03:00`) ning struktureeritud andmed. Vanas vormingus puudub aastaarv ja ajavöönd. See on üks põhjus, miks kõigi masinate kellad peavad olema sünkroonis ja ühes ajavööndis: muidu ei saa kolme masina logisid omavahel võrrelda.
-
----
+Vorming, mida joonisel näed, pärineb vanast syslogi standardist (RFC 3164[^rfc3164]). Uuem standard RFC 5424[^rfc5424] lisab täpse aja koos aastaarvu ja ajavööndiga (`2026-10-13T03:12:04.512+03:00`) ning struktureeritud andmed. Vanas vormingus puudub aastaarv ja ajavöönd. Seetõttu peavad masinate kellad olema sünkroonis ja ajavöönd peab olema teada, muidu ei saa kolme masina logisid omavahel võrrelda.
 
 ## 3. Lühike ajalugu: syslogist journaldini
 
-AlmaLinuxis töötavad korraga kaks logisüsteemi, journald ja rsyslog. Esmapilgul tundub see topelt tööna, aga ajalugu seletab, miks nii on.
+AlmaLinuxis töötavad korraga kaks logisüsteemi, journald ja rsyslog. Esmapilgul tundub see topelttööna, aga ajalugu seletab, miks nii on.
 
 <figure markdown="span">
   ![Ajajoon: syslog 1980ndad, syslog-ng 1998, RFC-d 2001 ja 2009, rsyslog 2004, journald 2011](../images/n01_ajalugu.svg)
   <figcaption>Joonis 1.3. Linuxi logimise ajalugu: iga uus tööriist lahendas eelmise puuduse, aga vanad ei kadunud kuhugi.</figcaption>
 </figure>
 
-**syslog** tekkis 1980ndatel e-posti serveri sendmail jaoks ja sai kiiresti kõigi Unix-süsteemide ühiseks logimisviisiks. Idee oli lihtne: programm saadab teksti, syslogi deemon kirjutab selle faili või saadab teise masinasse UDP kaudu. Päritolu ja tõsidus pärinevad juba sellest ajast.
+**syslog** tekkis 1980ndatel e-posti serveri sendmaili jaoks ja sai kiiresti kõigi Unix-süsteemide ühiseks logimisviisiks. Idee oli lihtne: programm saadab teksti, syslogi deemon kirjutab selle faili või saadab teise masinasse UDP kaudu. Päritolu ja tõsidus pärinevad juba sellest ajast.
 
 **syslog-ng** (1998) ja **rsyslog** (2004) on syslogi edasiarendused. Need lisasid paindlikud filtrid, TCP, krüpteerimise, järjekorrad (et logid ei kaoks, kui võrk on maas) ja moodulid, millega saab logisid saata andmebaasi või otsingusüsteemi. rsyslog on tänapäeval Red Hati, AlmaLinuxi, Debiani ja Ubuntu vaikevalik.
 
 **systemd-journald** (2011) tuli koos systemd-ga. See kogub kõik kirjed ühte kohta, hoiab neid kahendvormingus koos väljadega (mis teenus, mis protsess, mis kasutaja) ja laseb nende järgi kiiresti otsida. Puudus on see, et journal on ühe masina asi: kahendfaili ei saa lihtsalt `grep`-ida ega teise masinasse saata nii, nagu syslogi.
 
 Seepärast kasutab AlmaLinux mõlemat: journald kogub, rsyslog jagab failidesse ja saadab võrku. Kohtumistel 8-9 näed järgmist sammu: Loki ja OpenSearch, kus paljude masinate logidest saab otsida nagu andmebaasist.
-
----
 
 ## 4. Kust logid tulevad: tuum ja programmid
 
@@ -120,7 +102,7 @@ Linuxis on kaks maailma. **Tuum** (kernel space) haldab riistvara, mälu ja prot
   <figcaption>Joonis 1.4. Kaks logi allikat. Programmid kirjutavad pessa `/dev/log` või teenusena oma väljundisse, tuum kirjutab ringpuhvrisse. journald loeb mõlemat.</figcaption>
 </figure>
 
-**Tuuma sõnumid** lähevad kõigepealt **ringpuhvrisse** (ring buffer): kindla suurusega mälualasse, kus uus sõnum kirjutab vanima üle. Sealt loeb neid käsk `dmesg`. Ringpuhvris on näiteks sõnumid, et ketas andis lugemisvea, võrgukaabel ühendati lahti või mälu sai otsa ja tuum sulges protsessi (nagu Kati poes). Kuna puhver on väike ja elab mälus, loeb journald sõnumid sealt kohe välja ja salvestab need.
+**Tuuma sõnumid** lähevad kõigepealt **ringpuhvrisse** (ring buffer): kindla suurusega mälualasse, kus uus sõnum kirjutab vanima üle. Sealt loeb neid käsk `dmesg`. Ringpuhvris on näiteks sõnumid, et ketas andis lugemisvea, võrgukaabel ühendati lahti või mälu sai otsa ja tuum sulges protsessi (nagu peatüki 1 näites). Kuna puhver on väike ja asub mälus, loeb journald sõnumid sealt kohe välja ja salvestab need.
 
 **Programmid** saavad logida kolmel viisil:
 
@@ -130,13 +112,11 @@ Linuxis on kaks maailma. **Tuum** (kernel space) haldab riistvara, mälu ja prot
 
 Praktiline järeldus: kui otsid teenuse viga, vaata kõigepealt `journalctl -u teenus`. Kui seal pole midagi, vaata, kas rakendusel on oma logifail.
 
----
-
 ## 5. journald: kõik kirjed ühes kohas
 
-journald võtab vastu kõik kirjed: tuumast, teenustest ja `/dev/log` kaudu. Iga kirje juurde paneb ta hulga **välju**: millise teenuse (`_SYSTEMD_UNIT`), millise protsessi (`_PID`), millise kasutaja (`_UID`) ja millise alglaadimise (`_BOOT_ID`) juurde see kuulub. Just väljade pärast on journalist otsimine kiire ja täpne.
+journald kogub kirjed tuumast, systemd teenustest ja `/dev/log` kaudu. Iga kirje juurde paneb ta hulga **välju**: millise teenuse (`_SYSTEMD_UNIT`), millise protsessi (`_PID`), millise kasutaja (`_UID`) ja millise alglaadimise (`_BOOT_ID`) juurde see kuulub. Just väljade pärast on journalist otsimine kiire ja täpne.
 
-### Kus journal elab
+### Kus journal asub
 
 journald saab hoida journalit kahes kohas:
 
@@ -149,7 +129,7 @@ journald saab hoida journalit kahes kohas:
 
 Seadistus on failis `/etc/systemd/journald.conf`, rida `Storage=`. Vaikimisi on `Storage=auto`: kui kaust `/var/log/journal` on olemas, kirjutab journald kettale, kui ei ole, siis mällu. AlmaLinuxis seda kausta vaikimisi pole, nii et journal kaob iga taaskäivitusega.
 
-Kui server jookseb kokku ja käivitub uuesti, on just see logi, mis ütleks miks, kadunud. Seepärast teed laboris journali püsivaks. Kettale kirjutatud journal ei kasva lõputult: journald hoiab vaikimisi kuni 10% failisüsteemi mahust ja kustutab ise vanimad osad. Kui palju ruumi journal võtab, näitab `journalctl --disk-usage`.
+Kui server ootamatult taaskäivitub, on just see logi, mis ütleks miks, kadunud. Seepärast teed laboris journali püsivaks. Kettale kirjutatud journal ei kasva lõputult: journald hoiab vaikimisi kuni 10% failisüsteemi mahust ja kustutab ise vanimad osad. Kui palju ruumi journal võtab, näitab `journalctl --disk-usage`.
 
 ### journalctl: küsi, ära keri
 
@@ -158,7 +138,7 @@ Journal võib sisaldada miljoneid ridu. Neid ei loeta ülevalt alla, neilt küsi
 | Küsimus | Käsk |
 |---|---|
 | Ühe teenuse kirjed | `journalctl -u sshd` |
-| Ainult vead ja hullem | `journalctl -p err` |
+| Vead ja tõsisemad | `journalctl -p err` |
 | Viimase tunni kirjed | `journalctl --since "1 hour ago"` |
 | Kindel ajavahemik | `journalctl --since "03:00" --until "03:30"` |
 | Jooksvalt, nagu `tail -f` | `journalctl -f` |
@@ -170,21 +150,19 @@ Journal võib sisaldada miljoneid ridu. Neid ei loeta ülevalt alla, neilt küsi
 
 *Tabel 1.2. journalctl sagedasemad küsimused*
 
-Valikuid saab kombineerida. Kati küsimus "mis juhtus veebipoega öösel kell kolm?" on üks käsk:
+Valikuid saab kombineerida. Küsimus "mis juhtus veebipoega öösel kell kolm?" on üks käsk:
 
 ```bash
 journalctl -u php-fpm --since "03:00" --until "03:45" -p warning
 ```
 
-`-p warning` tähendab "hoiatus ja hullem", ehk tasemed 0 kuni 4. Tõsiduse tasemetest räägib peatükk 7.
+`-p warning` tähendab "hoiatus ja tõsisemad", ehk tasemed 0 kuni 4. Tõsiduse tasemetest räägib peatükk 7.
 
 `journalctl -b -1` on eriti kasulik pärast seda, kui server käivitus ise uuesti: see näitab eelmise alglaadimise viimaseid ridu. Aga ainult siis, kui journal on püsiv.
 
----
-
 ## 6. rsyslog: reeglid, failid ja võrk
 
-rsyslog loeb journaldist kõik kirjed (moodul `imjournal`) ja otsustab **reeglite** järgi, mis faili iga kirje läheb ja kas see saadetakse ka võrku.
+rsyslog loeb journaldist kõik kirjed (moodul `imjournal`) ja otsustab **reeglite** järgi, millisesse faili iga kirje kirjutatakse ja kas see saadetakse ka võrku.
 
 <figure markdown="span">
   ![Programmid kirjutavad journaldisse, rsyslog loeb sealt ja jagab failidesse ning saadab keskserverisse](../images/n01_logi_tee.svg)
@@ -205,9 +183,9 @@ rsyslog on üles ehitatud moodulitest. Mooduli nime algus ütleb, mis tööd see
 
 Laboris kasutad `imjournal`, `omfile`, `imtcp` ja `omfwd`.
 
-### Kus konf on
+### Kus konfiguratsioon asub
 
-Peafail on `/etc/rsyslog.conf`. Oma reeglid pannakse eraldi faili kausta `/etc/rsyslog.d/`, nimega mis lõpeb `.conf`, näiteks `10-pood.conf`. Peafailis on rida, mis laadib selle kausta failid tähestiku järjekorras, ja see rida on **enne** peafaili enda reegleid. Seega töötavad sinu reeglid enne vaikereegleid. Järjekord on oluline: kui sinu reegel ütleb `stop`, ei jõua kirje enam vaikereegliteni.
+Peafail on `/etc/rsyslog.conf`. Oma reeglid lisa eraldi faili kaustas `/etc/rsyslog.d/`. Faili nimi lõpeb `.conf`-iga, näiteks `10-pood.conf`. Peafailis on rida, mis laadib selle kausta failid tähestiku järjekorras, ja see rida on **enne** peafaili enda reegleid. Seega töötavad sinu reeglid enne vaikereegleid. Järjekord on oluline: kui sinu reegel ütleb `stop`, ei jõua kirje enam vaikereegliteni.
 
 Pärast iga muudatust kontrolli süntaksit ja alles siis taaskäivita:
 
@@ -233,8 +211,6 @@ authpriv.* action(type="omfile" file="/var/log/secure")
 ```
 
 Mõlemad teevad lihtsal juhul sama. AlmaLinux 9 kasutab vaikekonfis uut kuju, vanemates süsteemides ja paljudes internetiõpetustes näed vana. Võrku saatmise, järjekordade ja mallide jaoks on vaja uut süntaksit. Laboris kasutad mõlemat ja dokumentatsioonis[^rsyslog] on näited uues süntaksis.
-
----
 
 ## 7. Päritolu ja tõsidus
 
@@ -305,8 +281,6 @@ local0.*    action(type="omfile" file="/var/log/pood.log")
 
 `&` tähendab "sama filtriga ka järgmine tegevus". Pane tähele: `stop` peatab kirje ka kõigi järgmiste reeglite jaoks, ka nende jaoks, mis saadavad logisid keskserverisse. Laboris näed seda oma silmaga.
 
----
-
 ## 8. Logifailid AlmaLinuxis ja kes neid loeb
 
 Logifailid asuvad kaustas `/var/log/`. Tähtsamad failid AlmaLinuxis:
@@ -335,15 +309,13 @@ Logides on IP-aadressid, kasutajanimed, failiteed ja vahel ka asju, mida seal ol
 
 AlmaLinuxis on tekstilogide õigused `600`: lugeda ja kirjutada saab ainult root. Journalit saavad lugeda root ja grupid `systemd-journal`, `wheel` ja `adm`. Tavakasutaja näeb `journalctl`-iga ainult enda protsesside kirjeid.
 
-Kui kolleeg vajab veaotsinguks logisid, lisa ta gruppi `systemd-journal`. Nii saab ta lugeda journalit, aga ei saa `sudo`-ga masinas midagi muuta. See on vähimate õiguste põhimõte: anna ainult see, mida töö jaoks vaja on.
-
----
+Kui kasutaja vajab veaotsinguks logisid, lisa ta gruppi `systemd-journal`. Nii saab ta lugeda journalit, aga ei saa `sudo`-ga masinas midagi muuta. See on vähimate õiguste põhimõte: anna ainult see, mida töö jaoks vaja on.
 
 ## 9. auditd: kes seda tegi?
 
 journald ja rsyslog salvestavad seda, mida programmid ise ütlevad. Kui keegi tühjendab `sudo truncate -s 0 /var/log/secure`-iga turvalogi, kirjutab `sudo` küll rea "mari käivitas truncate", aga see rida oli just selles failis, mis tühjendati. Faili tühjendamist ennast ei pane kirja ükski programm.
 
-**auditd** töötab teisel tasemel. See on tuuma auditisüsteemi teenus, mis salvestab, mida **tuum nägi**: kes avas faili kirjutamiseks, kes muutis õigusi, kes käivitas käsu. Programm ei saa seda vältida, sest tuum näeb iga süsteemikutset.
+**auditd** töötab teisel tasemel. See on tuuma auditisüsteemi teenus, mis salvestab, mida **tuum nägi**: kes avas faili kirjutamiseks, kes muutis õigusi, kes käivitas käsu. Kui reegel on seadistatud, salvestab tuum sündmuse ka siis, kui programm ise midagi ei logi.
 
 <figure markdown="span">
   ![Sama sündmus: journald ütleb "fail muutus", audit ütleb "mari tühjendas 03:15"](../images/n01_audit.svg)
@@ -386,11 +358,9 @@ sudo aureport --summary                # kokkuvõte: sisselogimised, käsud, fai
 
 Mida jälgida? Alusta failidest, mille muutmine on alati kahtlane või oluline: logikonf (`/etc/rsyslog.d/`), turvalogi, ajastatud tööd (`/etc/cron.d/`), kasutajad (`/etc/passwd`), SSH seaded (`/etc/ssh/sshd_config`). Ära jälgi kõike, muidu kasvab auditi logi kiiremini kui jõuad lugeda.
 
----
-
 ## 10. Logi ei tohi kasvada lõputult
 
-Mati koolis on veebiserver, mis kirjutab iga päringu kohta rea. Päevas on see 200 MB, aastas 70 GB. Ühel päeval on ketas täis ja server lõpetab vastamise. Andmebaas ei saa kirjutada, veebiserver ei saa sessioone salvestada, isegi sisselogimine jääb toppama. Põhjus on logi, mida keegi ei lugenud.
+Veebiserver kirjutab iga päringu kohta rea. Päevas on see 200 MB, aastas 70 GB. Ühel päeval on ketas täis ja server lõpetab vastamise. Andmebaas ei saa kirjutada, veebiserver ei saa sessioone salvestada, isegi sisselogimine jääb toppama. Põhjus on logi, mida keegi ei lugenud.
 
 Lahendus on **logrotate**. See käib logifailid regulaarselt üle ja **pöörab** need: praegune fail saab nimeks `.1`, vana `.1` saab `.2`, vanad pakitakse kokku ja kõige vanem kustutatakse.
 
@@ -403,7 +373,7 @@ Lahendus on **logrotate**. See käib logifailid regulaarselt üle ja **pöörab*
 
 logrotate ei ole teenus, mis töötab kogu aeg. AlmaLinuxis käivitab selle kord ööpäevas systemd taimer `logrotate.timer`. Millal see järgmine kord käivitub, näitab `systemctl list-timers logrotate.timer`. logrotate jätab meelde, millal ta iga faili viimati pööras (`/var/lib/logrotate/logrotate.status`), nii et `daily` reegel ei pööra faili kaks korda päevas, isegi kui käivitad selle käsitsi.
 
-### Konf
+### Konfiguratsioon
 
 Üldseaded on failis `/etc/logrotate.conf`, iga logi reeglid eraldi failis kaustas `/etc/logrotate.d/`. Näiteks e-poe logi:
 
@@ -451,7 +421,7 @@ sudo logrotate -d /etc/logrotate.d/pood    # kuivkäivitus: näitab, mida teeks,
 sudo logrotate -f /etc/logrotate.d/pood    # sunnib pöörama kohe
 ```
 
-Alati enne `-d`, siis `-f`.
+Käivita enne `-f`-i proovikäik `-d` ja loe selle väljund läbi.
 
 ### Kui kaua logisid hoida
 
@@ -466,8 +436,6 @@ Kui kaua logi alles hoida, sõltub sellest, milleks seda vaja on:
 *Tabel 1.9. Logide säilitamise tasemed*
 
 Sisselogimiste ja auditi logisid hoitakse kauem kui veaotsingu logisid, sest turvaintsident avastatakse sageli alles nädalaid hiljem. Masina enda kettal hoitakse ainult kuuma osa, ülejäänu on keskserveris või arhiivis.
-
----
 
 ## 11. Logid ühte kohta: keskne logiserver
 
@@ -494,13 +462,13 @@ Siin saadab klient ise (push): iga uus kirje läheb kohe võrku. Sama mudelit n�
 |---|---|---|---|
 | Võrdlus | tavaline kiri postkasti | tähitud kiri | tähitud kiri, kus iga ümbriku kättesaamine kinnitatakse eraldi |
 | Kinnitus | ei ole | ühendus on, aga katkestusel võib paar kirjet kaduda | iga kirje kinnitatakse |
-| Kui server on maas | kirjed kaovad | klient hoiab järjekorras ja saadab hiljem | klient hoiab järjekorras ja saadab hiljem |
+| Kui server on maas | kirjed kaovad | klient hoiab järjekorras, kuni järjekord täis saab | klient hoiab järjekorras, kuni järjekord täis saab |
 | Port | 514/udp | 514/tcp | tavaliselt 2514/tcp |
-| Sobib | palju vähetähtsaid kirjeid | enamik juhte | kui ükski kirje ei tohi kaduda |
+| Sobib | palju vähetähtsaid kirjeid | enamik juhte | kui kirjeid ei tohi kaduda ka ühenduse katkemisel |
 
 *Tabel 1.10. Logide saatmise viisid*
 
-Laboris kasutad TCP-d ja annad kliendile **järjekorra** (queue). Kui keskserver on hetkeks maas või tulemüür blokeerib, kogub klient kirjed järjekorda ja saadab need, kui ühendus taastub. Ilma järjekorrata läheksid need kaduma.
+Laboris kasutad TCP-d ja annad kliendile **järjekorra** (queue). Kui keskserver on hetkeks maas või tulemüür blokeerib, kogub klient kirjed järjekorda ja saadab need, kui ühendus taastub. Ilma järjekorrata läheksid need kaduma. Laboris mahub järjekorda 10 000 kirjet ja see asub mälus: kui järjekord saab täis või rsyslog kliendis taaskäivitub, võivad kirjed siiski kaduda.
 
 Port 514 saadab logid avatud tekstina: kes võrgus pealt kuulab, näeb kõike. Töökohas kasutatakse TLS-i (port 6514), sellest lähemalt peatüki lõpus.
 
@@ -515,8 +483,6 @@ Keskserver peab tegema kolme asja:
 ### Kellad peavad käima ühte jalga
 
 Kolme masina logisid saab ajajärjekorda panna ainult siis, kui masinate kellad on sünkroonis. Kui `proxmox2` kell käib kaks minutit ees, näib, et viga juhtus enne põhjust. Automatiseerimise kursusel seadistasid chrony. Nüüd näed, miks: ajasünkroonimine on seire eeldus.
-
----
 
 ## 12. Suurest logist vastuse leidmine
 
@@ -550,8 +516,6 @@ Kui rida on kujul `nimi=väärtus` (`staatus=500 ip=10.0.1.36`), on filtreerimin
 
 Journalis on väljad juba olemas, seal pole `grep`-i tihti vajagi: `journalctl -u sshd -p warning --since today` on filter, mis on juba valmis.
 
----
-
 ## Taust ja edasijõudnutele
 
 See osa ei ole laboriks vajalik. Loe, kui tahad teada, kuidas seda tööd töökohas tehakse.
@@ -566,8 +530,6 @@ See osa ei ole laboriks vajalik. Loe, kui tahad teada, kuidas seda tööd töök
 
 **Edasi.** Failid keskserveris on esimene samm. Kohtumisel 8 saadad samad logid Lokisse, kus saad neid sildi järgi otsida, ja kohtumisel 9 OpenSearchi, kus saad otsida iga sõna järgi. Kohtumisel 12 näed, kuidas turvasüsteem (SIEM) loeb sedasama `secure` faili ja annab ise häire, kui keegi proovib parooli ära arvata.
 
----
-
 ## Kokkuvõte
 
 - **Logid vastavad küsimusele "mis juhtus?"**, audit küsimusele "kes tegi?". Kasutaja ei tohi olla see, kes rikke esimesena avastab.
@@ -581,30 +543,22 @@ See osa ei ole laboriks vajalik. Loe, kui tahad teada, kuidas seda tööd töök
 - **Keskserver:** masin kadunud, jäljed kustutatud, mitu masinat. TCP + järjekord, mall masina ja programmi kaupa, tulemüür, kellad sünkroonis.
 - **Suur logi:** filtreeri, loenda, vaata.
 
----
-
 ## Küsimused enda kontrolliks
 
 Vasta vihikusse. Laboris kasutad samu teadmisi.
 
-1. Miks ei piisa Katil sellest, et pood hommikul jälle töötab? Mida ütleb talle 29-minutiline vahe kahe rea vahel?
+1. Miks ei piisa sellest, et pood hommikul jälle töötab? Mida ütleb 29-minutiline vahe kahe rea vahel?
 2. Nimeta logirea kuus osa. Millised kaks pole tekstireal näha ja milleks neid vaja on?
-3. Kati käivitab `logger "tere"`. Kus kahes kohas see rida nüüd on ja kes ta sinna viis?
-4. Server käivitus öösel ise uuesti. Millise käsuga näed viimaseid ridu enne kokkujooksmist ja mis peab selleks olema eelnevalt tehtud?
+3. Käivitad `logger "tere"`. Kus kahes kohas see rida nüüd on ja mis selle sinna kirjutas?
+4. Server käivitus öösel ise uuesti. Millise käsuga näed viimaseid ridu enne taaskäivitust ja mis peab selleks olema eelnevalt tehtud?
 5. Rakendus kirjutab `local0.err`. Kas see jõuab reegli `local0.warning` faili? Kas see jõuab ka faili `/var/log/messages`? Miks?
-6. Kolleeg vajab veaotsinguks journalit. Mida teed ja miks mitte anda talle `sudo`?
+6. Kasutaja vajab veaotsinguks journalit. Mida teed ja miks mitte anda talle `sudo`?
 7. Keegi tühjendas `sudo`-ga turvalogi. Millise auditi välja järgi leiad, kes see oli, ja miks `uid` sind ei aita?
 8. Reegel on `daily` ja `rotate 7`. Mitu päeva vana logi leiad kettalt kõige rohkem? Miks peab rsyslog pärast pööramist saama `HUP`-signaali?
 9. Nimeta kolm olukorda, kus masina enda logist ei ole abi, aga keskserverist on.
 10. Selgita sõbrale UDP ja TCP vahet logide saatmisel kirja ja tähitud kirja abil. Mis on järjekorra (queue) roll?
 11. Sul on 2 miljonit rida logi ja küsimus "milliselt IP-lt tuli kõige rohkem ebaõnnestunud sisselogimisi?". Kirjelda filtreeri-loenda-vaata samme.
 
----
-
 [^rfc3164]: RFC 3164, The BSD syslog Protocol. <https://datatracker.ietf.org/doc/html/rfc3164>
 [^rfc5424]: RFC 5424, The Syslog Protocol. <https://datatracker.ietf.org/doc/html/rfc5424>
 [^rsyslog]: rsyslogi dokumentatsioon. <https://docs.rsyslog.com/doc/>
-
----
-
-*Järgmine: laboris on sinu öövahetus. Kõigepealt õpid tundma üht masinat: kus logid elavad, kes neid loeb, kuidas kirjutada oma reegel, pöörata logi ja jälgida auditiga. Siis teed `proxmox1`-st keskserveri ja saadad sinna `proxmox2` ja `proxmox3` logid.*

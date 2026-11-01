@@ -16,9 +16,9 @@ Kasutad samu kolme Proxmoxi sõlme, mis automatiseerimise kursusel. Uut masinat 
 
 *Tabel 1. Kes mida teeb*
 
-## Kontrolli, et kõik töötab
+## Kontrolli SSH-ühendust ja Ansible'i
 
-Sinu arvutis:
+Kodust töötades ühenda enne VPN. Seejärel käivita oma arvutis:
 
 ```bash
 for h in proxmox1 proxmox2 proxmox3; do
@@ -26,32 +26,32 @@ for h in proxmox1 proxmox2 proxmox3; do
 done
 ```
 
-Kolm nime, parooli ei küsita. Kui ei tööta, tee läbi automatiseerimise kursuse [nädal 1 labor](https://hkhk-automation.github.io/devops/week01/lab/) (SSH-võti ja `~/.ssh/config`).
+Iga käsk väljastab masina hostinime ja parooli ei küsita, sest ühendus kasutab SSH-võtit. Kui mõni ühendus ei õnnestu, tee läbi automatiseerimise kursuse [1. nädala praktikum](https://hkhk-automation.github.io/devops/week01/lab/) (SSH-võti ja `~/.ssh/config`).
 
 ```bash
 ansible all -i proxmox1,proxmox2,proxmox3, -m ping
 ```
 
-Kolm `pong`-i. Lõpu koma `-i` järel on vajalik.
+Väljundis on kolm `pong`-i. Koma loendi lõpus näitab Ansible'ile, et `-i` järel on masinate loend, mitte inventarifaili nimi.
 
 ## Pordid
 
-Alates N2-st avad brauseris teenuseid sõlmes `proxmox1`. Kasuta sõlme IP-d, mille said automatiseerimise kursusel.
+Monitooringusüsteemid töötavad sõlmes `proxmox1`, agendid ja exporter'id jälgitavates masinates. Veebiliidese avad brauseris aadressil `http://<proxmox1-IP>:<port>`. Kasuta IP-aadressi, mille said automatiseerimise kursusel.
 
-| Teenus | Port | Alates |
-|---|---|---|
-| rsyslog (logide vastuvõtt) | 514/tcp | N1 |
-| Zabbix veebiliides | 8080 | N2 |
-| Zabbix agent | 10050 | N4 |
-| Prometheus | 9090 | N5 |
-| node_exporter | 9100 | N5 |
-| Grafana | 3000 | N6 |
-| Alertmanager | 9093 | N6 |
-| InfluxDB | 8086 | N7 |
-| Loki | 3100 | N8 |
-| OpenSearch Dashboards | 5601 | N9 |
-| Jaeger | 16686 | N10 |
-| Uptime Kuma | 3001 | N11 |
+| Teenus | Port | Masin | Brauseris | Alates |
+|---|---|---|---|---|
+| rsyslog (logide vastuvõtt) | 514/tcp | `proxmox1` | ei | N1 |
+| Zabbix veebiliides | 8080/tcp | `proxmox1` | jah | N2 |
+| Zabbix agent | 10050/tcp | `proxmox2`, `proxmox3` | ei | N4 |
+| Prometheus | 9090/tcp | `proxmox1` | jah | N5 |
+| node_exporter | 9100/tcp | `proxmox2`, `proxmox3` | ei | N5 |
+| Grafana | 3000/tcp | `proxmox1` | jah | N6 |
+| Alertmanager | 9093/tcp | `proxmox1` | jah | N6 |
+| InfluxDB | 8086/tcp | `proxmox1` | ei | N7 |
+| Loki | 3100/tcp | `proxmox1` | ei | N8 |
+| OpenSearch Dashboards | 5601/tcp | `proxmox1` | jah | N9 |
+| Jaeger | 16686/tcp | `proxmox1` | jah | N10 |
+| Uptime Kuma | 3001/tcp | `proxmox1` | jah | N11 |
 
 *Tabel 2. Teenused ja pordid*
 
