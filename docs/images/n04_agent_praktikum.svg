@@ -1,0 +1,48 @@
+<svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="a4o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker>
+    <marker id="a4g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00796b"/></marker>
+    <marker id="a4b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker>
+  </defs>
+  <rect width="900" height="400" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Agent räägib serverile: kes avab ühenduse</text>
+
+  <!-- proxmox1 -->
+  <rect x="20" y="60" width="330" height="200" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="40" y="84" font-size="14" font-weight="700" fill="#e65100">proxmox1 · Docker Compose</text>
+  <rect x="45" y="100" width="280" height="70" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="185" y="128" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Zabbix server</text>
+  <text x="185" y="150" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">võtab vastu port 10051</text>
+  <rect x="45" y="185" width="280" height="55" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="185" y="208" text-anchor="middle" font-size="14" font-weight="700" fill="#e65100">veebiliides</text>
+  <text x="185" y="227" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">port 8080 · template, trigger</text>
+
+  <!-- proxmox2 passive -->
+  <rect x="560" y="60" width="320" height="95" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="720" y="86" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox2 · passiivne</text>
+  <text x="720" y="108" text-anchor="middle" font-size="12" fill="#263238">Zabbix agent 2 ootab, port 10050 lahti</text>
+  <text x="720" y="128" text-anchor="middle" font-size="11" fill="#263238">template Linux by Zabbix agent</text>
+  <text x="720" y="145" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">Server = proxmox1 IP</text>
+
+  <!-- proxmox3 active -->
+  <rect x="560" y="185" width="320" height="95" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="720" y="211" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox3 · aktiivne</text>
+  <text x="720" y="233" text-anchor="middle" font-size="12" fill="#263238">Zabbix agent 2 saadab ise</text>
+  <text x="720" y="253" text-anchor="middle" font-size="11" fill="#263238">template Linux by Zabbix agent active</text>
+  <text x="720" y="270" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">ServerActive = proxmox1 IP · Hostname</text>
+
+  <!-- server asks proxmox2 -->
+  <line x1="325" y1="118" x2="555" y2="100" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#a4o)"/>
+  <text x="440" y="96" text-anchor="middle" font-size="12" fill="#e65100">server küsib agendi porti 10050</text>
+  <!-- proxmox3 sends to server -->
+  <line x1="555" y1="225" x2="330" y2="150" stroke="#00796b" stroke-width="2.5" marker-end="url(#a4g)"/>
+  <text x="455" y="150" text-anchor="middle" font-size="12" fill="#004d40">agent saadab serveri porti 10051</text>
+
+  <!-- your computer -->
+  <rect x="20" y="310" width="330" height="70" rx="10" fill="#eceff1" stroke="#546e7a" stroke-width="2"/>
+  <text x="185" y="338" text-anchor="middle" font-size="15" font-weight="700" fill="#37474f">sinu arvuti</text>
+  <text x="185" y="360" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">ansible-playbook konf/agent.yml</text>
+  <line x1="350" y1="335" x2="555" y2="150" stroke="#546e7a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a4b)"/>
+  <line x1="350" y1="345" x2="555" y2="275" stroke="#546e7a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a4b)"/>
+  <text x="560" y="330" font-size="12" fill="#546e7a">SSH: paigaldab agendi ja seaded</text>
+</svg>

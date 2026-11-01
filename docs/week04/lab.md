@@ -20,6 +20,11 @@ Täna paigaldad Zabbix agent 2 kõigepealt käsitsi `proxmox2`-sse ja seejärel 
     4. luua item'i ja trigger'i, mis teeb probleemi, kui vaba kettaruumi on alla 20%;
     5. tekitada probleemi ja näidata andmebaasist, et see tekkis ja lahenes.
 
+<figure markdown="span">
+  ![proxmox1-s Zabbix server ja veebiliides; server küsib proxmox2 agendilt porti 10050, proxmox3 agent saadab ise serveri porti 10051; sinu arvuti paigaldab agendid Ansible'iga](../images/n04_agent_praktikum.svg)
+  <figcaption>Joonis 4.2. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
+</figure>
+
 Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Vastus on kokkuvolditud plokis.
 
 ## Osa 1 · Agent käsitsi proxmox2-s
