@@ -37,12 +37,12 @@ ls
 ??? success "Oodatav tulemus"
 
     ```text
-    README.md  konf  logid
+    README.md  konf  logid  zabbix
     ```
 
-    `README.md`-sse kirjutad vastused, pealkirjad on juba olemas. Playbook läheb kausta `konf/`, tõendid kausta `logid/`.
+    `README.md`-sse kirjutad vastused, pealkirjad on juba olemas. Playbook läheb kausta `konf/`, tõendid kausta `logid/`. Kaustas `zabbix/` on Zabbixi Compose'i fail neile, kellel Zabbix veel puudub.
 
-Zabbix peab `proxmox1`-s töötama. Kui peatasid selle N2 lõpus käsuga `docker compose stop`, käivita see uuesti. Kontrolli ka, et `proxmox2` ja `proxmox3` tulemüür on sees, sest selle osa katse sõltub sellest:
+Agent saadab andmed Zabbixi serverile. Seepärast peab Zabbix `proxmox1`-s töötama ja seal peavad olema hostid `proxmox2` ja `proxmox3`. Kontrolli seda ja jälgitavate masinate tulemüüri, sest osa 1 katse sõltub sellest:
 
 ```bash
 ssh proxmox1 "cd ~/zabbix && docker compose start && docker compose ps"
@@ -53,7 +53,23 @@ ssh proxmox3 "sudo firewall-cmd --state"
 
 ??? success "Oodatav tulemus"
 
-    Kolm konteinerit olekus `Up`, siis `proxmox1` IP (näiteks `192.168.35.11`) ja kaks korda `running`. IP läheb agendi seadetesse. Veebiliides on aadressil `http://<proxmox1-IP>:8080` ja seal on hostid `proxmox2` ja `proxmox3` template'iga *ICMP Ping*.
+    Kolm konteinerit olekus `Up`, siis `proxmox1` IP-aadress (näiteks `192.168.35.11`) ja kaks korda `running`. IP-aadress läheb agendi seadetesse. Veebiliides on aadressil `http://<proxmox1-IP>:8080` ja seal on hostid `proxmox2` ja `proxmox3` template'iga *ICMP Ping*.
+
+??? warning "Kui näed `No such file or directory` või `no configuration file provided`"
+    Sul ei ole `proxmox1`-s Zabbixit. Käivita see starteri failiga oma arvutist, repositooriumi kaustas:
+
+    ```bash
+    ssh proxmox1 "mkdir -p ~/zabbix"
+    scp zabbix/compose.yaml proxmox1:zabbix/
+    ssh proxmox1 'cd ~/zabbix && echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env && docker compose up -d'
+    ```
+
+    Esimesel käivitusel loob server andmebaasi tabelid, see võtab 1–3 minutit. Oota, kuni `ssh proxmox1 "cd ~/zabbix && docker compose logs zabbix-server" | grep "server #0 started"` annab rea. Seejärel ava `http://<proxmox1-IP>:8080`, kasutaja on **Admin** ja parool **zabbix**.
+
+    Lisa kaks hosti: **Data collection → Hosts → Create host**, **Host name** `proxmox2`, **Templates** **ICMP Ping**, **Host groups** **Linux servers**, **Interfaces → Add → Agent** ja masina IP-aadress (`ssh proxmox2 "hostname -I"`). Vajuta **Add** ja tee sama `proxmox3` jaoks. Täpsemalt on see kirjas [praktikumis 2](../week02/lab.md).
+
+??? warning "Kui konteiner `zabbix-web` on olekus `Created` või `Exited`"
+    Port 8080 on tõenäoliselt kasutusel. Vaata `ssh proxmox1 "docker ps"`, milline konteiner porti hoiab, ja peata see oma kaustas käsuga `docker compose stop`.
 
 ??? warning "Kui näed `FirewallD is not running`"
     Masinas pole tulemüür sees. Käivita see: `sudo systemctl enable --now firewalld`. SSH on vaikimisi lubatud.
