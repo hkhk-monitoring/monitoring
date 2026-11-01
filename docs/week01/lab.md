@@ -530,8 +530,8 @@ Iga ülesanne ütleb, mis peab olema tehtud ja kuidas kontrollida. Kasuta loengu
 - kõik kirjed (`*.*`) TCP kaudu `proxmox1`-le;
 - kui keskserver ei vasta, ootavad kirjed järjekorras ja klient ei loobu kunagi.
 
-!!! warning "Tähelepanu: kausta nimi on masina päris nimi"
-    `%HOSTNAME%` on masina enda nimi, mitte sinu SSH alias. `proxmox1-3` on ainult sinu `~/.ssh/config`-is, keskserver neid ei tea. Vaata päris nimed järele ja kasuta neid edaspidi `<proxmox2-nimi>` ja `<proxmox3-nimi>` asemel:
+!!! warning "Tähelepanu: kausta nimi on masina tegelik nimi"
+    `%HOSTNAME%` on masina enda nimi, mitte sinu SSH alias. `proxmox1-3` on ainult sinu `~/.ssh/config`-is, keskserver neid ei tea. Vaata tegelikud nimed järele ja kasuta neid edaspidi `<proxmox2-nimi>` ja `<proxmox3-nimi>` asemel:
 
     ```bash
     ssh proxmox2 hostname

@@ -13,7 +13,7 @@ tags:
 
 See leht on mõeldud iseseisvaks lugemiseks. Klassis käime põhiliini kiiremini üle, aga siit leiad kõik lahti seletatuna, koos näidetega, ja saad selle laboris spikrina lahti hoida.
 
-**Labor vajab peatükke 1-11.** Peatükk 12 (vastuse leidmine suurest logist) on vajalik labori teises pooles. Lõpus olev osa "Taust ja edasijõudnutele" on lugemismaterjal neile, kes tahavad teada, kuidas seda tööd päriselt tehakse.
+**Labor vajab peatükke 1-11.** Peatükk 12 (vastuse leidmine suurest logist) on vajalik labori teises pooles. Lõpus olev osa "Taust ja edasijõudnutele" on lugemismaterjal neile, kes tahavad teada, kuidas seda tööd töökohas tehakse.
 
 ---
 
@@ -502,7 +502,7 @@ Siin saadab klient ise (push): iga uus kirje läheb kohe võrku. Sama mudelit n�
 
 Laboris kasutad TCP-d ja annad kliendile **järjekorra** (queue). Kui keskserver on hetkeks maas või tulemüür blokeerib, kogub klient kirjed järjekorda ja saadab need, kui ühendus taastub. Ilma järjekorrata läheksid need kaduma.
 
-Port 514 saadab logid avatud tekstina: kes võrgus pealt kuulab, näeb kõike. Päriselus kasutatakse TLS-i (port 6514), sellest lähemalt peatüki lõpus.
+Port 514 saadab logid avatud tekstina: kes võrgus pealt kuulab, näeb kõike. Töökohas kasutatakse TLS-i (port 6514), sellest lähemalt peatüki lõpus.
 
 ### Keskserveri pool
 
@@ -554,11 +554,11 @@ Journalis on väljad juba olemas, seal pole `grep`-i tihti vajagi: `journalctl -
 
 ## Taust ja edasijõudnutele
 
-See osa ei ole laboriks vajalik. Loe, kui tahad teada, kuidas seda tööd päriselt tehakse.
+See osa ei ole laboriks vajalik. Loe, kui tahad teada, kuidas seda tööd töökohas tehakse.
 
 **Peidetud number PRI.** Syslogi kirje algab võrgus kujul `<132>Oct 13 ...`. Number nurksulgudes on päritolu ja tõsidus koos: päritolu × 8 + tõsidus. `local0` on päritolu 16 ja `warning` on tõsidus 4, seega 16 × 8 + 4 = 132. Kui näed keskserveris või võrguliikluses sellist numbrit, saad sealt välja lugeda, kust ja kui tõsine kirje oli.
 
-**Krüpteerimine.** Port 514 saadab logid avatud tekstina. Päriselus kasutatakse TLS-i (port 6514): klient ja server vahetavad sertifikaadid ja keegi ei saa logisid pealt kuulata ega võltsida. rsyslogi dokumentatsioonis on selle jaoks eraldi juhend[^rsyslog].
+**Krüpteerimine.** Port 514 saadab logid avatud tekstina. Töökohas kasutatakse TLS-i (port 6514): klient ja server vahetavad sertifikaadid ja keegi ei saa logisid pealt kuulata ega võltsida. rsyslogi dokumentatsioonis on selle jaoks eraldi juhend[^rsyslog].
 
 **Logide terviklikkus.** Ründaja, kes pääseb keskserverisse, saab ka seal logisid muuta. Selle vastu arvutatakse pööratud logidest räsi (`sha256sum`) ja hoitakse räsisid kolmandas kohas. Kui fail hiljem muutub, ei klapi räsi. Suuremates süsteemides saadetakse logid kohe kirjutuskaitstud arhiivi.
 

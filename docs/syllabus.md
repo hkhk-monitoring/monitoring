@@ -54,7 +54,7 @@ Kursuse lõpuks õppija:
 
 *Tabel 0.2. Kohtumised (1 tund = 45 min). Iga kohtumine lõpeb 10-15-minutilise kokkuvõttega. *
 
-Neljatunnise kohtumise labor on kahes osas: **A** on juhendatud, pärast pausi tuleb **B**, kus kasutad sama oskust muudetud olukorras. Kuuetunnisel kohtumisel on osad A, B ja C. Iga labori lõpus on lisaülesanded neile, kes saavad varem valmis, kergest päris raskeni.
+Neljatunnise kohtumise labor on kahes osas: **A** on juhendatud, pärast pausi tuleb **B**, kus kasutad sama oskust muudetud olukorras. Kuuetunnisel kohtumisel on osad A, B ja C. Iga labori lõpus on lisaülesanded neile, kes saavad varem valmis, kergest raskeni.
 
 Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose down`), sest `proxmox1` mälu on piiratud.
 
