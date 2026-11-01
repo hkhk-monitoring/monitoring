@@ -44,12 +44,8 @@ Tähtaja näed Classroom 50-s.
 
 ## AI praktikumides
 
-- **Võib:** küsida AI-lt, mida mingi käsk või veateade tähendab, nagu küsiksid kaaslaselt.
-- **Ei või:** kopeerida AI-lt lahendusi järjest terminali, ilma et saaksid aru, mida need teevad.
-- **Keelatud:** AI-agendid, mis käivitavad käske sinu masinas (Copilot agent mode, Codex, Claude Code jms).
+| Võib | Ei või | Keelatud |
+|---|---|---|
+| küsida AI-lt, mida käsk või veateade tähendab | kopeerida AI lahendusi terminali, ilma et saaksid aru, mida need teevad | AI-agendid, mis käivitavad käske sinu masinas (Copilot agent mode, Codex, Claude Code jms) |
 
-Iga käsu kohta, mille käivitad, pead oskama öelda, mida see teeb.
-
-Laboritahvel loeb masinate logisid. Kui seal on agendi jäljed või palju kleebitud teksti, saad oma praktikumi repositooriumis issue'i. Siis näitad 7 päeva jooksul oma tööd suuliselt (2 minutit, tunnis või videokõnes): mida tegid ja miks. Kui sa seda näidata ei saa, teed praktikumi uuesti tunnis järelevalvega.
-
-Kehtib alates N3-st.
+Iga käivitatud käsu kohta pead oskama öelda, mida see teeb. Kui laboritahvel näeb agendi jälgi või palju kleebitud teksti, saad repositooriumis issue'i ja näitad 7 päeva jooksul oma tööd suuliselt (2 minutit). Kui seda ei saa, teed praktikumi uuesti tunnis. Kehtib alates N3-st.
