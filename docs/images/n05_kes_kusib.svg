@@ -1,0 +1,30 @@
+<svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="b1o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker>
+    <marker id="b1g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00796b"/></marker>
+  </defs>
+  <rect width="900" height="330" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Kes küsib ja kes vastab</text>
+  <rect x="20" y="70" width="300" height="190" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="40" y="94" font-size="14" font-weight="700" fill="#e65100">proxmox1</text>
+  <rect x="45" y="115" width="250" height="110" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="170" y="148" text-anchor="middle" font-size="16" font-weight="700" fill="#e65100">Prometheus</text>
+  <text x="170" y="172" text-anchor="middle" font-size="12" fill="#5d4037">teab target'ite aadresse,</text>
+  <text x="170" y="190" text-anchor="middle" font-size="12" fill="#5d4037">salvestab aegread</text>
+  <text x="170" y="212" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">veebiliides port 9090</text>
+  <rect x="580" y="60" width="300" height="90" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="730" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">proxmox2</text>
+  <text x="730" y="112" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">node_exporter</text>
+  <text x="730" y="134" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">vastab pordil 9100</text>
+  <rect x="580" y="180" width="300" height="90" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="730" y="208" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">proxmox3</text>
+  <text x="730" y="232" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">node_exporter</text>
+  <text x="730" y="254" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">vastab pordil 9100</text>
+  <line x1="295" y1="135" x2="575" y2="92" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#b1o)"/>
+  <text x="445" y="100" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#e65100">1. GET /metrics</text>
+  <line x1="575" y1="122" x2="300" y2="160" stroke="#00796b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#b1g)"/>
+  <text x="445" y="158" text-anchor="middle" font-size="12" fill="#004d40">2. mõõteväärtused</text>
+  <line x1="295" y1="190" x2="575" y2="212" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#b1o)"/>
+  <line x1="575" y1="240" x2="300" y2="212" stroke="#00796b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#b1g)"/>
+  <text x="450" y="305" text-anchor="middle" font-size="13" fill="#546e7a">Ühenduse avab Prometheus, iga kogumisintervalli järel uuesti. Exporter ainult vastab.</text>
+</svg>
