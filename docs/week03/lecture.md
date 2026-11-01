@@ -16,7 +16,7 @@ N2-s seadistasid Zabbixi, mis pingib masinaid ja annab teada, kui mõni ei vasta
     - eristada mõõdikut (number ajas) ja sündmust (kirje sellest, mis juhtus);
     - selgitada, mis on aegrida ja proovivõtu intervall;
     - eristada gauge'i ja counterit ning tuua mõlemast näite;
-    - rakendada USE-meetodit protsessori, mälu ja ketta kohta;
+    - kasutada USE-meetodit uurimisküsimuste koostamiseks ja nimetada mõõtmiste piirid;
     - tõlgendada koormust (load average) tuumade arvu järgi ja mälu veeru `available` järgi;
     - selgitada, miks Zabbix näeb N2 seadistusega ainult seda, kas masin vastab, ja miks on vaja agenti.
 
@@ -144,7 +144,8 @@ Brendan Gregg sõnastas sama mõtte **USE-meetodina**. Iga ressursi kohta küsid
     |---|---|---|---|
     | Protsessor | `top`: `us` + `sy` (või 100 - `id`) | koormus suurem kui tuumade arv | harva, vaata `dmesg` |
     | Mälu | `free -h`: `used` võrreldes `total`-iga | `available` nulli lähedal, swap kasutusel | OOM killer logis (`journalctl -k`) |
-    | Ketas | `df -h`: `Use%` | `top`: `wa` kõrge, koormus kõrge, kuigi protsessor puhkab | `I/O error` logis |
+    | Ketta maht | `df -h`: `Use%` | failisüsteem täis, programmid ei saa kirjutada | `No space left on device` logis |
+    | Ketta sisend-väljund | `iostat -x`: `%util` | `iostat -x`: järjekord `aqu-sz`, ooteaeg `r_await`; `top`: `wa` | `I/O error` logis |
 
 Pane tähele viimast veergu: vead leiad sageli **logidest**, mitte mõõdikutest. Siin saavad N1 ja N2 kokku. Lähemalt loe [Greggi lehelt](https://www.brendangregg.com/usemethod.html).
 
