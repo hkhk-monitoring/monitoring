@@ -103,11 +103,6 @@ nav:
     - Praktikum: week04/lab.md
     - Kodutöö: week04/homework.md
 
-  - N5 · Server küsib ise:
-    - Loeng: week05/lecture.md
-    - Praktikum: week05/lab.md
-    - Kodutöö: week05/homework.md
-
 - Info:
   - Litsents: litsents.md
 
@@ -158,7 +153,6 @@ markdown_extensions:
 - pymdownx.tasklist:
     custom_checkbox: true
 - pymdownx.tilde
-
 
 extra_css:
   - stylesheets/extra.css
