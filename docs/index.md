@@ -20,7 +20,7 @@ Server ei oska kurta. Ta kirjutab logi, näitab numbreid ja jätab jälgi. Selle
 
 ---
 
-## Programm
+## Teemad nädalate kaupa
 
 | Kohtumine | Mõisteplokk |
 |---|---|
