@@ -7,157 +7,131 @@ tags:
 
 # Loeng: keskne jälgimissüsteem
 
-**Maht:** ~20 min klassis, ~30 min iseseisvalt lugedes
-**Tase:** K1 on tehtud: tead, kus logid on ja kuidas need keskserverisse jõuavad. Docker Compose on tuttav automatiseerimise kursuse N6-st.
+N1-s kogusid masinate logid keskserverisse ja leidsid neist, mis öösel juhtus. Täna vaatad, kuidas monitooringusüsteem kontrollib masinaid pidevalt ja teatab probleemist enne, kui kasutaja seda märkab.
 
-Selle loengu järel tead, mida teeb monitooringusüsteem ja millest Zabbix koosneb. Laboris paned Zabbixi `proxmox1`-s tööle ja lisad sinna esimesed masinad.
-
----
-
-!!! abstract "Õpiväljundid"
-    Pärast seda materjali oskad:
+??? abstract "Õpiväljundid"
+    Pärast loengut ja praktikumi oskad:
 
     - selgitada, mille poolest monitooring logidest erineb
-    - nimetada monitooringusüsteemi neli tööd: kogub, hoiab, näitab, teavitab
-    - kirjeldada Zabbixi osi (server, andmebaas, veebiliides, agent, proxy) ja seda, kes kellega räägib
-    - selgitada mõisteid host, item, trigger ja template ühe näite peal
-    - kirjeldada probleemi elutsüklit: tekib, on näha, laheneb
+    - nimetada monitooringusüsteemi neli ülesannet: kogumine, hoidmine, näitamine ja teavitamine
+    - kirjeldada Zabbixi osi (server, andmebaas, veebiliides, agent, proxy) ja nendevahelisi ühendusi
+    - selgitada ühe näite põhjal mõisteid host, item, trigger ja template
+    - kirjeldada probleemi elutsüklit: probleem tekib, on veebiliideses näha ja laheneb
 
----
+## 1. Logid ja monitooring
 
-## 1. Logid räägivad tagantjärele
+N1 näites uuriti e-poe öist riket logidest. Logid vastasid küsimusele **„mis juhtus?“**. Logi avati aga alles hommikul, kui klient oli juba teatanud, et pood ei avane.
 
-K1-s uuris Kati öösel juhtunut logidest. Logid vastasid küsimusele **„mis juhtus?“**. Aga keegi pidi need lahti tegema, ja ta tegi seda alles hommikul, kui klient helistas, et e-pood ei avane.
+**Monitooring** (seire) vastab teisele küsimusele: **„kas praegu on kõik korras ja kui palju?“** Monitooringusüsteem kontrollib näiteks iga minut, kas masin vastab, kui täis on ketas ja kui kiiresti leht avaneb. Kui väärtus ületab seatud piiri, teavitab süsteem inimest kohe.
 
-E-pood oli maas 40 minutit. Logides oli kõik kirjas, aga keegi ei vaadanud.
+??? note "Tabel 2.1. Logid ja monitooring"
+    | | Logid (N1) | Monitooring (N2–N7) |
+    |---|---|---|
+    | Küsimus | Mis juhtus? | Kas praegu on korras? Kui palju? |
+    | Andmed | tekstiread sündmustest | numbrid ajas: 1 või 0, 73 %, 120 ms |
+    | Millal vaatad | pärast, uurimiseks | pidevalt, süsteem kontrollib ise |
+    | Kes märkab | inimene, kes logi loeb | süsteem, mis teavitab inimest |
 
-**Monitooring** (seire) küsib teist küsimust: **„kas praegu on kõik korras ja kui palju?“** Süsteem kontrollib ise iga minut, kas masin vastab, kui täis on ketas ja kui kiiresti leht avaneb. Kui midagi läheb valesti, ütleb ta seda kohe, enne kui klient helistab.
+??? question "Kontrolli ennast"
+    E-poe serveri ketas sai öösel täis ja andmebaas peatus. Mida oleksid näinud logides ja mida monitooringus? Kumb oleks hoiatanud enne, kui ketas täis sai?
 
-| | Logid (K1) | Monitooring (K2–K7) |
-|---|---|---|
-| Küsimus | Mis juhtus? | Kas praegu on korras? Kui palju? |
-| Andmed | tekstiread sündmustest | numbrid ajas: 1 või 0, 73 %, 120 ms |
-| Millal vaatad | pärast, uurimiseks | kogu aeg, süsteem vaatab sinu eest |
-| Kes märkab | inimene, kes logi loeb | süsteem ise, ja teavitab inimest |
+## 2. Monitooringusüsteemi neli ülesannet
 
-*Tabel 2.1. Logid ja monitooring vastavad eri küsimustele. Head tööd teevad mõlemad koos.*
+Zabbix, Prometheus ja teised monitooringusüsteemid teevad nelja tööd:
 
-??? question "Kordamisküsimus"
-    Kati ketas sai öösel täis ja andmebaas jäi seisma. Mida oleks näinud logides ja mida monitooringus? Kumb oleks hoiatanud **enne**, kui ketas täis sai?
+1. **Kogumine:** süsteem küsib masinatelt numbreid või võtab vastu need, mida masinad ise saadavad.
+2. **Hoidmine:** iga number salvestatakse koos kellaajaga andmebaasi. Hiljem saad vaadata, mis oli eile kell 3.
+3. **Näitamine:** numbritest tehakse tabelid ja graafikud.
+4. **Teavitamine:** kui number ületab piiri, tekib probleem ja süsteem teavitab inimest.
 
----
-
-## 2. Monitooringusüsteemi neli tööd
-
-Iga monitooringusüsteem, olgu see Zabbix, Prometheus või midagi muud, teeb sama nelja asja:
-
-1. **Kogub:** küsib masinatelt numbreid või võtab vastu need, mis masinad ise saadavad.
-2. **Hoiab:** salvestab iga numbri koos kellaajaga andmebaasi. Nii saad hiljem vaadata, mis oli eile kell 3.
-3. **Näitab:** teeb numbritest tabelid ja graafikud.
-4. **Teavitab:** kui number ületab piiri, tekib probleem ja süsteem annab inimesele teada.
-
-Neist neljast on kõige olulisem neljas. Monitooring, mis kõike kogub, aga kellelegi midagi ei ütle, on lihtsalt kallis logi.
-
----
+Ilma teavituseta peab inimene graafikuid ise jälgima. Teavitused seadistad N6-s.
 
 ## 3. Zabbix: kes kellega räägib
 
-Zabbixi kirjutas 1998. aastal Riias Alexei Vladišev, esimene avalik versioon ilmus 2001 ([Zabbixi ajalugu](https://www.zabbix.com/about)). Praegu on see üks levinumaid vabavaralisi monitooringusüsteeme. Seda kasutatakse eriti seal, kus on palju erinevaid seadmeid: serverid, võrguseadmed, printerid, UPS-id. Kasutame versiooni **7.0 LTS** (pikaajalise toega), vt [Zabbixi kirjeldus](https://www.zabbix.com/documentation/7.0/en/manual/introduction/about).
+Kursusel kasutad Zabbixi versiooni **7.0 LTS** (pikaajalise toega). Zabbix sobib eriti kohtadesse, kus on palju eri tüüpi seadmeid: serverid, võrguseadmed, printerid ja UPS-id ([Zabbixi kirjeldus](https://www.zabbix.com/documentation/7.0/en/manual/introduction/about)).
+
+??? info "Zabbixi taust"
+    Zabbixi kirjutas 1998. aastal Riias Alexei Vladišev, esimene avalik versioon ilmus 2001 ([Zabbixi ajalugu](https://www.zabbix.com/about)). Praegu on see üks levinumaid vabavaralisi monitooringusüsteeme.
 
 <figure markdown="span">
   ![Zabbixi osad: veebiliides ja server kasutavad sama PostgreSQL andmebaasi proxmox1-s, server küsib andmeid proxmox2-lt ja proxmox3-lt, proxy kaugkontoris](../images/n02_zabbix_osad.svg)
-  <figcaption>Joonis 2.1. Zabbixi osad. Server kogub ja otsustab, andmebaas hoiab, veebiliides näitab.</figcaption>
+  <figcaption>Joonis 2.1. Zabbixi osad. Server kogub andmed ja hindab trigger'eid, andmebaas hoiab andmeid, veebiliides näitab neid (Talvik, 2026).</figcaption>
 </figure>
 
-| Osa | Mida teeb | Laboris |
-|---|---|---|
-| [**Server**](https://www.zabbix.com/documentation/7.0/en/manual/concepts/server) | küsib andmed, kirjutab need andmebaasi, kontrollib piire ja tekitab probleemid | konteiner `zabbix-server` |
-| **Andmebaas** | hoiab seadistust (mis masinad, mida küsida) ja kõiki mõõdetud numbreid | konteiner `postgres` |
-| **Veebiliides** | näitab andmeid ja laseb seadistada; ise midagi ei kogu | konteiner `zabbix-web`, port 8080 |
-| [**Agent**](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent) | väike programm jälgitavas masinas, annab CPU, mälu ja ketta numbrid | K4 |
-| [**Proxy**](https://www.zabbix.com/documentation/7.0/en/manual/concepts/proxy) | kogub kaugkontoris andmed kokku ja saadab serverile ühe ühendusega | kursusel ei tee |
+??? note "Tabel 2.2. Zabbixi osad"
+    | Osa | Mida teeb | Praktikumis |
+    |---|---|---|
+    | [**Server**](https://www.zabbix.com/documentation/7.0/en/manual/concepts/server) | küsib andmed, kirjutab need andmebaasi, kontrollib piire ja tekitab probleemid | konteiner `zabbix-server` |
+    | **Andmebaas** | hoiab seadistust (mis masinad, mida küsida) ja mõõdetud väärtusi | konteiner `postgres` |
+    | **Veebiliides** | näitab andmeid ja võimaldab seadistada, ise andmeid ei kogu | konteiner `zabbix-web`, port 8080 |
+    | [**Agent**](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent) | väike programm jälgitavas masinas, annab protsessori, mälu ja ketta väärtused | N4 |
+    | [**Proxy**](https://www.zabbix.com/documentation/7.0/en/manual/concepts/proxy) | kogub kaugkontoris andmed kokku ja saadab serverile ühe ühendusega | kursusel ei kasutata |
 
-*Tabel 2.2. Zabbixi osad.*
+Veebiliides ja server kasutavad sama andmebaasi. Kui andmebaas ei tööta, ei tööta kumbki. Kui server ei tööta, näitab veebiliides vanu andmeid, uusi andmeid ei tule ja teavitusi ei saadeta. Veebiliidese allservas on siis teade *Zabbix server is not running: the information displayed may not be current*.
 
-Pane tähele: veebiliides ja server räägivad mõlemad sama andmebaasiga. Kui andmebaas ei tööta, ei tööta kumbki. Kui server ei tööta, näitab veebiliides küll vanu andmeid, aga uusi ei tule ja teavitusi ei saadeta. Zabbix ütleb selle kohta veebiliidese allservas: *Zabbix server is not running: the information displayed may not be current*. Laboris näed, mis siis juhtub.
+Andmeid saab koguda ka **ilma agendita**. Kõige lihtsam kontroll on ping: server saadab masinale ICMP-paketi ja ootab vastust. Samamoodi küsib Zabbix võrguseadmetelt andmeid **SNMP**-ga ja veebilehelt **HTTP**-ga, seadmesse midagi paigaldamata. Masina sisemised väärtused (protsessor, mälu, ketas) tulevad agendiga N4-s.
 
-Andmeid saab koguda ka **ilma agendita**. Kõige lihtsam on ping: server saadab masinale ICMP-paketi ja vaatab, kas vastus tuleb. Seda teeme täna. Samamoodi küsib Zabbix võrguseadmetelt (ruuterid, switchid) andmeid **SNMP**-ga ja veebilehelt **HTTP**-ga, seadmesse midagi paigaldamata. Agent tuleb K4-s, siis saame ka masina sisemised numbrid: CPU, mälu, ketas.
+**Proxy** on vaja siis, kui server ei saa kõiki masinaid otse küsida:
 
-**Proxy** on vaja siis, kui server ei saa kõiki masinaid ise otse küsida:
-
-- **kaugkontor:** 50 seadet teises linnas, proxy kogub need kohapeal kokku ja saadab serverile ühe ühendusega;
+- **kaugkontor:** 50 seadet teises linnas, proxy kogub nende andmed kohapeal ja saadab serverile ühe ühendusega;
 - **eraldatud võrk (DMZ):** tulemüüris on vaja ühte reeglit (proxy → server), mitte 50;
-- **ühendus katkeb:** proxy hoiab andmeid enda juures ja saadab need edasi, kui ühendus on tagasi. Andmetesse auke ei jää.
+- **ühendus katkeb:** proxy hoiab andmeid enda juures ja saadab need edasi, kui ühendus taastub.
 
-Proxy kogub ja edastab, aga trigger'eid hindab alati server.
+Proxy kogub ja edastab andmeid, trigger'eid hindab server.
 
-??? question "Kordamisküsimus"
-    Andmebaasi konteiner jookseb kokku. Mis juhtub veebiliidesega ja mis serveriga? Kas sa saad sel ajal teavituse, et miski on katki?
+??? question "Kontrolli ennast"
+    Andmebaasi konteiner peatub ootamatult. Mis juhtub veebiliidesega ja mis serveriga? Kas saad sel ajal teavituse, et midagi on katki?
 
----
+## 4. Host, item, trigger ja template
 
-## 4. Neli mõistet: host, item, trigger, template
+Zabbixi seadistus põhineb neljal mõistel ([Zabbixi mõisted](https://www.zabbix.com/documentation/7.0/en/manual/definitions)). Näites tahad teada, kas `proxmox2` vastab.
 
-Zabbixis on neli sõna, ilma milleta ei saa midagi teha ([Zabbixi mõisted](https://www.zabbix.com/documentation/7.0/en/manual/definitions)). Vaatame neid ühe näite peal: tahame teada, kas `proxmox2` vastab.
-
-| Mõiste | Mis see on | Näide |
-|---|---|---|
-| **Host** | masin või seade, mida jälgid | `proxmox2`, IP `192.168.x.x` |
-| **Item** | üks number, mida hostilt küsid, koos võtmega (key) ja intervalliga | `icmpping`: kas vastab (1 või 0), iga minut |
-| **Trigger** | tingimus, mille täitumisel tekib probleem | „kolm viimast pingi on 0“ → *Unavailable by ICMP ping* |
-| **Template** | valmis komplekt item'eid ja trigger'eid, mille saad hostile külge panna | *ICMP Ping*: kolm item'it ja kolm trigger'it |
-
-*Tabel 2.3. Zabbixi põhimõisted.*
+??? note "Tabel 2.3. Zabbixi põhimõisted"
+    | Mõiste | Mis see on | Näide |
+    |---|---|---|
+    | **Host** | masin või seade, mida jälgid | `proxmox2`, IP `192.168.x.x` |
+    | **Item** | üks väärtus, mida hostilt küsid, koos võtmega (key) ja intervalliga | `icmpping`: kas vastab (1 või 0), iga minut |
+    | **Trigger** | tingimus, mille täitumisel tekib probleem | „kolm viimast pingi on 0“ → *Unavailable by ICMP ping* |
+    | **Template** | valmis komplekt item'eid ja trigger'eid, mille seod hostiga | *ICMP Ping*: kolm item'it ja kolm trigger'it |
 
 <figure markdown="span">
   ![Host proxmox2, millele on külge pandud template ICMP Ping: kolm item'it (icmpping, icmppingsec, icmppingloss) ja trigger, mis teeb probleemi, kui kolm viimast pingi on 0](../images/n02_moisted.svg)
-  <figcaption>Joonis 2.2. Host saab template'ist item'id ja trigger'id. Item küsib numbri, trigger otsustab, kas see on probleem.</figcaption>
+  <figcaption>Joonis 2.2. Host saab template'ist item'id ja trigger'id. Item küsib väärtuse, trigger otsustab, kas see on probleem (Talvik, 2026).</figcaption>
 </figure>
 
-Viies mõiste on **action**: mis juhtub, kui probleem tekib. Saada e-kiri, sõnum või käivita skript. Täna vaatame probleeme ainult veebiliideses, teavitused seadistame K6-s. Kogu ahel on: **host → item → trigger → action**, ehk mida jälgid → mida mõõdad → millal on halb → kes saab teada.
+Viies mõiste on **action**: mis juhtub, kui probleem tekib. Action saadab e-kirja, sõnumi või käivitab skripti. Täna vaatad probleeme ainult veebiliideses, teavitused seadistad N6-s.
 
-[Template'i](https://www.zabbix.com/documentation/7.0/en/manual/config/templates) mõte: sa ei loo igale masinale käsitsi item'eid. Paned template'i külge ja kõik vajalik tuleb kaasa. Kui sul on 200 serverit ja template'is muudad ühe piiri, muutub see kõigil 200-l. Sama mõte nagu Ansible rollis.
+[Template](https://www.zabbix.com/documentation/7.0/en/manual/config/templates) säästab käsitsi tööd: item'eid ei pea igale masinale eraldi looma. Kui muudad template'is piiri, muutub see kõigil hostidel, millega template on seotud. Sama mõte on Ansible'i rollil.
 
-Item'i **võti** (key) ütleb, mida täpselt küsitakse. `icmpping` küsib, kas host vastab pingile. `icmppingsec` küsib vastuse aega sekundites. Võtmete nimekiri on [Zabbixi dokumentatsioonis](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/simple_checks).
+Item'i **võti** (key) määrab, mida küsitakse. `icmpping` küsib, kas host vastab pingile, ja `icmppingsec` küsib vastuse aega sekundites. Võtmete loend on [Zabbixi dokumentatsioonis](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/simple_checks).
 
-??? question "Kordamisküsimus"
-    Sul on 30 veebiserverit ja tahad igaühelt teada, kas port 443 vastab. Mitu template'it teed ja mitu korda pead trigger'it kirjutama?
-
----
+??? question "Kontrolli ennast"
+    Sul on 30 veebiserverit ja tahad igaühelt teada, kas port 443 vastab. Mitu template'it teed ja mitu korda kirjutad trigger'i?
 
 ## 5. Probleemi elutsükkel
 
-[Trigger'il](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers) on kaks olekut: **OK** ja **PROBLEM**. Kui tingimus täitub, läheb trigger olekusse PROBLEM ja tekib **probleem** (*problem*), mida näed veebiliideses menüüs **Monitoring → Problems**.
+[Trigger'il](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers) on kaks olekut: **OK** ja **PROBLEM**. Kui tingimus täitub, läheb trigger olekusse PROBLEM ja tekib **probleem** (problem). Probleemi näed veebiliideses menüüs **Monitoring → Problems**.
 
 <figure markdown="span">
   ![Pingid 1, 1, siis viis korda 0: kolmanda järel läheb trigger OK-st PROBLEM-i, kui vastus tuleb tagasi, saab probleem märke RESOLVED](../images/n02_probleem.svg)
-  <figcaption>Joonis 2.3. Probleem tekib, on näha ja laheneb ise, kui põhjus kaob.</figcaption>
+  <figcaption>Joonis 2.3. Probleem tekib, on näha ja laheneb, kui põhjus kaob (Talvik, 2026).</figcaption>
 </figure>
 
-Miks **kolm** pingi, mitte üks? Üks kadunud pakett võib olla juhus. Kui trigger reageeriks igale üksikule nurjumisele, saaksid öösel kümme valehäiret ja hakkaksid teavitusi ignoreerima. See on monitooringu kõige levinum viga: liiga palju häireid, mida keegi enam ei loe. Sellest räägime täpsemalt K6-s.
+Template *ICMP Ping* ootab kolme järjestikust nurjunud pingi. Üks kadunud pakett võib olla juhuslik. Kui trigger reageeriks igale nurjumisele, tuleks palju valehäireid ja teavitusi hakataks eirama. Häirete hulgast räägib N6.
 
-Kui masin hakkab jälle vastama, läheb trigger tagasi olekusse OK ja probleem saab märke **RESOLVED**. Ajalukku jääb, millal see algas ja kaua kestis. Selle järgi saad hiljem öelda, et e-pood oli maas 40 minutit, mitte „kuskil öösel“.
+Kui masin hakkab uuesti vastama, läheb trigger tagasi olekusse OK ja probleem saab märke **RESOLVED**. Ajalukku jääb probleemi algus ja kestus. Nende järgi saad hiljem öelda, et e-pood oli maas 40 minutit.
 
----
+??? question "Kontrolli ennast"
+    1. Mis vahe on Zabbixi serveril ja veebiliidesel? Kumb peab töötama, et teavitus tuleks?
+    2. Pane järjekorda: template, host, trigger, item. Mis millest koosneb?
+    3. Miks ei tekita template'i *ICMP Ping* trigger probleemi esimese kadunud pingi järel?
+    4. Probleem on olekus RESOLVED. Mida saad sellest veel teada?
 
-## Kokkuvõte
-
-- **Logid** vastavad küsimusele „mis juhtus“, **monitooring** küsimusele „kas praegu on korras“.
-- Monitooringusüsteem **kogub, hoiab, näitab ja teavitab**. Teavitus on neist kõige tähtsam.
-- Zabbix = **server** (kogub ja otsustab) + **andmebaas** (hoiab) + **veebiliides** (näitab). Agent ja proxy tulevad juurde, kui vaja.
-- **Host** on masin, **item** üks number, **trigger** tingimus, **template** valmis komplekt.
-- Probleem **tekib**, **on näha** ja **laheneb**. Trigger ootab mitu nurjumist järjest, et vältida valehäireid.
-
----
-
-## Küsimused enda kontrolliks
-
-1. Kati e-pood oli 40 minutit maas ja keegi ei teadnud. Milline monitooringusüsteemi neljast tööst puudus?
-2. Mis vahe on Zabbixi serveril ja veebiliidesel? Kumb neist peab töötama, et saaksid teavituse?
-3. Pane ritta: template, host, trigger, item. Mis millest koosneb?
-4. Miks ei tekita *ICMP Ping* template'i trigger probleemi kohe esimese kadunud pingi peale?
-5. Probleem on olekus RESOLVED. Mis infot sellest veel saad?
-
----
-
-*Järgmine: laboris paned Zabbixi `proxmox1`-s Docker Compose'iga tööle, logid sisse, lisad `proxmox2` ja `proxmox3` ning tekitad esimese probleemi.*
+??? abstract "Kokkuvõte"
+    | Mõiste | Lühidalt |
+    |---|---|
+    | Logid ja monitooring | logid vastavad küsimusele „mis juhtus“, monitooring küsimusele „kas praegu on korras“ |
+    | Neli ülesannet | kogumine, hoidmine, näitamine ja teavitamine |
+    | Zabbix | server kogub ja hindab, andmebaas hoiab, veebiliides näitab; agent ja proxy lisanduvad vajaduse korral |
+    | Host, item, trigger, template | masin, üks väärtus, tingimus, valmis komplekt |
+    | Probleemi elutsükkel | tekib, on näha, laheneb; trigger ootab mitut nurjumist, et vältida valehäireid |

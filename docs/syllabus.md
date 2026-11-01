@@ -54,7 +54,7 @@ Kursuse lõpuks oskad:
 
 Iga kohtumine lõpeb 10–15-minutilise kokkuvõttega.
 
-Neljatunnise kohtumise praktikum on kahes osas: osa A on juhendatud, pärast pausi tuleb osa B, kus kasutad sama oskust muudetud olukorras. Kuuetunnisel kohtumisel on osad A, B ja C. Iga praktikumi lõpus on lisaülesanded, kergest raskeni.
+Praktikum koosneb osadest. Esimestes osades on sammud ette antud, viimastes kasutad sama oskust muudetud olukorras iseseisvalt. Iga praktikumi lõpus on lisaülesanded, kergest raskeni.
 
 Sõlme `proxmox1` mälu on piiratud. Iga praktikumi alguses on kirjas, millised varasemad süsteemid peavad töötama ja millised peatada. Peatamiseks kasuta käsku `docker compose stop`, siis jäävad andmed alles.
 

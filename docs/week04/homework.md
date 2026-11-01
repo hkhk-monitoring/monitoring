@@ -7,14 +7,11 @@ tags:
 
 # Kodutöö: kas varundus töötas?
 
-!!! abstract "Eesmärk"
-    Praktikumis kasutasid agendi valmis võtmeid. Agendile saab lisada ka oma võtme: käsu, mille väljundi agent annab serverile. Kodutöös teed `proxmox3`-s võtme, mis näitab, mitu sekundit tagasi viimane varundus tehti, lisad selle playbook'iga ja paned Zabbixi probleemi tegema, kui varundus jääb vahele.
+Praktikumis kasutasid agendi valmis võtmeid. Agendile saab lisada ka oma võtme: käsu, mille väljundi agent annab serverile. Kodutöös teed `proxmox3`-s võtme, mis näitab, mitu sekundit tagasi viimane varundus tehti, lisad selle playbook'iga ja seadistad Zabbixi tegema probleemi, kui varundus jääb vahele. Kodutöö on boonus.
 
-    Kodutöö annab lisapunkte (BOONUS) ja labori 100 punkti see ei muuda. Maht umbes 1 tund. Eeldus: praktikumi osad A2 ja A3 on tehtud, `proxmox3`-s töötab aktiivne agent.
+Eeldus on praktikumi osad 2 ja 3: `proxmox3`-s töötab aktiivne agent. Tähtaja näed Classroom 50-s.
 
----
-
-## 1. Varunduse asemel üks fail
+## Osa 1 · Varunduse asemel üks fail
 
 Varundusskript kirjutab tavaliselt lõpus faili, et töö sai tehtud. Siin teeb seda iga 5 minuti järel `cron`, mis uuendab faili `/var/tmp/varundus.ok` aega. Pärast iga õnnestunud varundust on faili muutmise aeg uus.
 
@@ -26,7 +23,7 @@ UserParameter=varundus.vanus,echo $(( $(date +%s) - $(stat -c %Y /var/tmp/varund
 
 Käsk lahutab praegusest ajast faili muutmise aja. Tulemus on varunduse vanus sekundites. Kui faili pole, on vanus väga suur.
 
-## 2. Playbook
+## Osa 2 · Playbook
 
 Agendi konfiguratsioonifaili lõpus on rida `Include=/etc/zabbix/zabbix_agent2.d/*.conf`. Kõik selle kausta `.conf` failid loetakse agendi seadete hulka. Kontrolli seda:
 
@@ -50,7 +47,7 @@ ssh proxmox3 "sudo touch /var/tmp/varundus.ok; sudo zabbix_agent2 -t varundus.va
 
 Väljundis on võti ja väike arv sekundeid. Kui väljundis on `ZBX_NOTSUPPORTED`, vaata, kas fail jõudis kausta `/etc/zabbix/zabbix_agent2.d/` ja kas agent taaskäivitus.
 
-## 3. Item ja trigger
+## Osa 3 · Item ja trigger
 
 `proxmox3` agent on aktiivne, seega peab ka uus item olema aktiivne. **Data collection → Hosts → proxmox3 → Items → Create item**:
 
@@ -63,9 +60,9 @@ Väljundis on võti ja väike arv sekundeid. Kui väljundis on `ZBX_NOTSUPPORTED
 
 Seejärel trigger nimega `Varundus on vanem kui 10 minutit`, raskusaste **High**. Avaldise kirjuta ise loengu [§5](lecture.md#5-trigger-avaldis-ja-raskusaste) järgi.
 
-## 4. Jäta varundus vahele
+## Osa 4 · Jäta varundus vahele
 
-Lülita cron'i kirje välja. Tee seda playbook'iga: lisa `cron` ülesandele `disabled: true` ja käivita playbook ainult `proxmox3`-s (`-i proxmox3,`). Oota 10-15 minutit ja vaata **Monitoring → Problems**. Kui probleem on olemas, kustuta `disabled: true`, käivita playbook uuesti ja oota, kuni probleem laheneb.
+Lülita cron'i kirje välja. Tee seda playbook'iga: lisa `cron` ülesandele `disabled: true` ja käivita playbook ainult `proxmox3`-s (`-i proxmox3,`). Oota 10–15 minutit ja vaata **Monitoring → Problems**. Kui probleem on olemas, kustuta `disabled: true`, käivita playbook uuesti ja oota, kuni probleem laheneb.
 
 Salvesta tõend oma arvutis repositooriumi kaustas:
 
@@ -73,7 +70,7 @@ Salvesta tõend oma arvutis repositooriumi kaustas:
 ssh proxmox3 "sudo zabbix_agent2 -t varundus.vanus; sudo crontab -l | grep -A1 varundus" > logid/kodutoo-varundus.txt
 ```
 
-## 5. Vasta
+## Osa 5 · Vasta küsimustele
 
 Vastused lähevad README osasse **Kodutöö** iga `_kodutöö_` asemele:
 
@@ -82,14 +79,15 @@ Vastused lähevad README osasse **Kodutöö** iga `_kodutöö_` asemele:
 3. Mis juhtub, kui keegi kustutab faili `/var/tmp/varundus.ok`? Kas see on hea või halb?
 4. Miks sobib see kontroll paremini aktiivsele agendile? Mõtle, kus varundusserverid tavaliselt asuvad.
 
-## Esitamine
+## Töö esitamine
 
-Kodutöö läheb samasse repositooriumi, kus on labor 4. Kõik muudatused (`konf/varundus.conf`, `konf/agent.yml`, `logid/kodutoo-varundus.txt`, README) on commit'itud ja GitHubi saadetud:
+Repositooriumis on `konf/varundus.conf`, täiendatud `konf/agent.yml`, `logid/kodutoo-varundus.txt` ja README vastused. Oma arvutis repositooriumi kaustas:
 
 ```bash
+git status
 git add konf logid README.md
 git commit -m "Kodutöö 4: varunduse vanus"
 git push
 ```
 
-Automaatkontroll näitab kodutöö kontrolle nimega **BOONUS**. Labori kontrollid peavad pärast kodutööd ikka läbima, sest playbook jääb samaks, ainult kaks ülesannet tuleb juurde.
+Tulemuse näed Classroom 50-s. Praktikumi kontrollid peavad pärast kodutööd endiselt õnnestuma, sest playbook'i lisandub ainult kaks ülesannet.
