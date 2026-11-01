@@ -70,9 +70,19 @@ df -h /
 ```
 
 ??? success "Oodatav tulemus"
-    `nproc` annab loogiliste protsessorite arvu, näiteks `2`. `uptime` lõpus on kolm koormuse keskmist (load average) viimase 1, 5 ja 15 minuti kohta. `top` real `%Cpu(s)` on `id` (idle) tavaolekus üle 90. `free -h` veerus `available` on mälu, mida programmid saavad kohe kasutada. `df -h /` veerus `Use%` on juurfailisüsteemi täituvus.
+    `nproc` annab loogiliste protsessorite arvu, näiteks `2`. `uptime` lõpus on kolm koormuse keskmist (load average) viimase 1, 5 ja 15 minuti kohta. `top` real `%Cpu(s)` on `id` (idle) tavaolekus üle 90. `free -h` real `Mem:` on mitu veergu, nende hulgas `free` ja `available`. `df -h /` veerus `Use%` on juurfailisüsteemi täituvus.
 
-Protsessori kasutus ja koormuse keskmine ei ole sama asi. Protsessori kasutus näitab, kui suure osa ajast protsessor töötas. Koormuse keskmine loeb protsesse, mis töötavad või ootavad protsessorit, ja Linuxis ka protsesse, mis ootavad ketast. Seepärast ei tõenda kõrge koormus üksi, et protsessorist jääb puudu.
+Protsessori kasutus ja koormuse keskmine on erinevad näidud. Mida koormuse keskmine täpselt loeb, on kirjas dokumentatsioonis.
+
+**Leia dokumentatsioonist:** ava [proc_loadavg(5)](https://man7.org/linux/man-pages/man5/proc_loadavg.5.html). Milliseid protsesse koormuse keskmine loeb? Kas kõrge koormus tähendab alati, et protsessorist jääb puudu?
+
+??? success "Vastus"
+    Koormuse keskmine loeb protsesse, mis töötavad või ootavad protsessorit (olek R), ja protsesse, mis ootavad ketast (olek D). Seepärast võib koormus olla kõrge ka siis, kui protsessor on peaaegu tühi ja masin ootab ketast.
+
+**Leia dokumentatsioonist:** ava [free(1)](https://man7.org/linux/man-pages/man1/free.1.html). Mille poolest erineb veerg `available` veerust `free`? Kumba vaatad, kui tahad teada, kas uus programm mahub mällu?
+
+??? success "Vastus"
+    `free` on mälu, mida ei kasuta keegi. `available` on hinnang mälule, mille saab uus programm kätte ilma swap'ita, sest sinna kuulub ka vahemälu, mille tuum saab vabastada. Programmi mahtumise kohta vaata `available`.
 
 Vali igast väljundist (`uptime`, `top`, `free`, `df`) üks näit. Kirjuta README tabelisse **Osa 2** selle nimi, väärtus, ühik ja küsimus, millele see näit vastab.
 
@@ -119,6 +129,13 @@ ssh proxmox2 'stress-ng --cpu $(nproc) --timeout 60s'
 
     Koormuse ajal on `cpu_%` 100 lähedal. `load1` tõuseb aeglaselt ja langeb aeglaselt, sest see on keskmine.
 
+Skript võtab protsessori kasutuse käsu `vmstat` väljundist ja arvutab selle kujul 100 − `id`.
+
+**Leia dokumentatsioonist:** ava [vmstat(8)](https://man7.org/linux/man-pages/man8/vmstat.8.html), jaotis **CPU**. Mida tähendab veerg `id` ja miks ei ole 100 − `id` sama mis veerg `us`?
+
+??? success "Vastus"
+    `id` on aeg, mil protsessor ei teinud midagi. 100 − `id` sisaldab kõike muud: kasutaja programme (`us`), tuuma (`sy`) ja ketta ootamist (`wa`). `us` on ainult kasutaja programmide aeg.
+
 Täida README jaotises **Osa 4** tabel: vali failist üks rida enne koormust, üks koormuse ajal ja üks pärast. Seejärel vasta:
 
 1. Milline näit kinnitab, et koormuskatse mõjutas masinat?
@@ -140,7 +157,14 @@ Kirjuta README jaotisse **Osa 5**, mis kell algas ja lõppes koormus täieliku r
 
 ## Osa 6 · Gauge ja counter
 
-`load1` ja `available_MiB` on **gauge**'id: need näitavad hetkeolekut ja käivad üles-alla. **Counter** ainult kasvab. Näiteks `/proc/stat` real `ctxt` on kontekstivahetuste arv alates masina käivitusest. Counteri väärtus üksi ei ütle palju, huvitav on, kui kiiresti see kasvab. Loe counterit kaks korda kümnesekundilise vahega:
+`load1` ja `available_MiB` on **gauge**'id: need näitavad hetkeolekut ja käivad üles-alla. **Counter** ainult kasvab. Counteri väärtus üksi ei ütle palju, huvitav on, kui kiiresti see kasvab. Failis `/proc/stat` on üks counter real `ctxt`.
+
+**Leia dokumentatsioonist:** ava [proc_stat(5)](https://man7.org/linux/man-pages/man5/proc_stat.5.html) ja otsi `ctxt`. Mida see arv loeb ja millest alates?
+
+??? success "Vastus"
+    Kontekstivahetuste arvu ehk seda, mitu korda on tuum protsessoril ühe töö teise vastu vahetanud. Arv loetakse alates masina käivitusest.
+
+Loe counterit kaks korda kümnesekundilise vahega:
 
 ```bash
 ssh proxmox2 'grep ctxt /proc/stat; sleep 10; grep ctxt /proc/stat' | tee logid/n3-loendur.txt
@@ -160,8 +184,12 @@ USE-meetodi järgi küsitakse iga ressursi kohta kolme asja: kasutus (utilizatio
 
 Täida README jaotises **Osa 7** tabel protsessori, mälu ja ketta kohta. Kirjuta lahtrisse näit, mille sa mõõtsid, või „ei mõõtnud“. „Ei mõõtnud“ on parem vastus kui põhjendamata „korras“.
 
-??? tip "Vihje: ketas"
-    `df -h` näitab, kui palju failisüsteemi mahust on kasutusel. Ketta sisend-väljundtöö kohta see midagi ei ütle. Ketta küllastust näeb järjekorrast ja ooteajast, näiteks käsuga `iostat -x` (pakett `sysstat`) veergudest `aqu-sz` ja `r_await`. Kui sa seda ei mõõtnud, kirjuta „ei mõõtnud“.
+`df -h` näitab, kui palju failisüsteemi mahust on kasutusel. Ketta sisend-väljundtöö kohta see midagi ei ütle.
+
+**Leia dokumentatsioonist:** ava [iostat(1)](https://man7.org/linux/man-pages/man1/iostat.1.html). Millised võtmega `-x` kuvatavad veerud näitavad, et kettale tekib järjekord ja päringud peavad ootama?
+
+??? success "Vastus"
+    `aqu-sz` on keskmine järjekorra pikkus, `r_await` ja `w_await` on lugemise ja kirjutamise keskmine aeg koos järjekorras ootamisega. `iostat` on paketis `sysstat`. Kui sa seda ei mõõtnud, kirjuta USE-tabelisse „ei mõõtnud“.
 
 Lõpuks vasta README jaotises **Osa 7** viimasele küsimusele: milliseid kolme näitu peaks agent N4-s automaatselt koguma ja miks just neid?
 
