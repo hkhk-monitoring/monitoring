@@ -271,7 +271,7 @@ Masina enda logist on vähe kasu kolmes olukorras:
 2. **Jäljed on kustutatud.** Ründaja pääses masinasse ja tühjendas `/var/log/secure`.
 3. **Masinaid on mitu.** Viga tekkis veebiserveris, põhjus oli andmebaasis. Logisid on vaja näha kõrvuti ja ajajärjekorras.
 
-Kõigi kolme lahendus on, et iga masin saadab oma logid kohe ka **keskserverisse** (central log server). Laboris on keskserver `proxmox1`.
+Kõigi kolme lahendus on, et iga masin saadab oma logid kohe ka **keskserverisse** (central log server). Praktikumis on keskserver `proxmox1`.
 
 <figure markdown="span">
   ![proxmox2 ja proxmox3 saadavad logid TCP kaudu proxmox1-le, mis kirjutab need masina ja programmi kaupa kaustadesse](../images/n01_keskserver.svg)

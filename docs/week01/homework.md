@@ -69,7 +69,7 @@ Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skr
 
 **5. samm:** iga masina viis viimast veateadet. Keskserveri failides ei ole tõsidus reas kirjas (loeng, joonis 1.2), seega ei saa seda `grep`-iga otsida. Kasuta sõnu: otsi ridu, kus on `error`, `fail` või `ebaõnnestus` (tõstutundetult, `grep -i -E`). Read on eri failides, seega järjesta need enne viie viimase valimist aja järgi: `sort -k1,1M -k2,2n -k3,3`.
 
-**Mõtle:** Miks on sõnade järgi otsimine halvem kui tõsiduse järgi? Mis rea võid nii kahe silma vahele jätta? (Labori lisaülesanne 6 lahendab selle.)
+**Mõtle:** Miks on sõnade järgi otsimine halvem kui tõsiduse järgi? Mis rea võid nii kahe silma vahele jätta? (Praktikumi lisaülesanne 6 lahendab selle.)
 
 ## 3. Vasta
 

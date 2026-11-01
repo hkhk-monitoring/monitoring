@@ -34,7 +34,7 @@ Pärast seda osa on `proxmox1`-s Compose'i fail, mille image'id ja seaded leidsi
 
 ### 1.1 Repositoorium ja IP-aadressid
 
-Ava Classroom 50 link ([Lab 02 - Zabbix valvab](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium. Käivita käsud oma arvutis:
+Ava Classroom 50 link ([Praktikum 2 - Zabbix valvab](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium. Käivita käsud oma arvutis:
 
 ```bash
 git clone <sinu-repo-url>

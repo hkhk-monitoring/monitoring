@@ -88,19 +88,19 @@ nav:
 - Nädalad:
   - N1 · Masina logid ja keskne logiserver:
     - Loeng: week01/lecture.md
-    - Labor: week01/lab.md
+    - Praktikum: week01/lab.md
     - Kodutöö: week01/homework.md
 
   - N2 · Keskne jälgimissüsteem:
     - Loeng: week02/lecture.md
-    - Labor: week02/lab.md
+    - Praktikum: week02/lab.md
 
   - N3 · Mõõdik, aegrida, agent (veebiõpe):
     - Loeng: week03/lecture.md
 
   - N4 · Agent räägib serverile:
     - Loeng: week04/lecture.md
-    - Labor: week04/lab.md
+    - Praktikum: week04/lab.md
     - Kodutöö: week04/homework.md
 
 - Info:

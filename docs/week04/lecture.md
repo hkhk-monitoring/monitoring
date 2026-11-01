@@ -159,7 +159,7 @@ Praktikumis teed paigalduse kõigepealt käsitsi `proxmox2`-s, et näha iga samm
 ??? question "Kontrolli ennast"
     1. Mida näeb agent, mida ping ei näe? Too kaks näidet.
     2. Passiivse agendi item'id ei tööta, aktiivse omad töötavad. Mida kontrollid kõigepealt?
-    3. Miks on agendi seades `Server` selles laboris `proxmox1` IP, kuigi server töötab konteineris?
+    3. Miks on agendi seades `Server` selles praktikumis `proxmox1` IP, kuigi server töötab konteineris?
     4. Kirjuta avaldis, mis teeb probleemi, kui `proxmox3` 1 minuti koormus on üle 4.
     5. Mis vahe on raskusastmetel Warning ja High? Too kummastki näide.
 

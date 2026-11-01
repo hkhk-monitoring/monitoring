@@ -108,7 +108,7 @@ kell 10:00:10   8 425 163 210 baiti
 vahe 10 sekundiga: 12 500 000 baiti → 1,25 MB sekundis
 ```
 
-Seda arvutust nimetatakse **kiiruseks** (rate). Täpselt nii töötab ka `top`: protsessori protsendi arvutab ta, lugedes protsessori aja counterit kaks korda ja võrreldes vahet. Laboris teed seda ise.
+Seda arvutust nimetatakse **kiiruseks** (rate). Täpselt nii töötab ka `top`: protsessori protsendi arvutab ta, lugedes protsessori aja counterit kaks korda ja võrreldes vahet. Praktikumis teed seda ise.
 
 Counteril on üks lõks: kui masin taaskäivitub, algab loendur nullist. Hea monitooringusüsteem tunneb selle ära ega joonista graafikule tohutut negatiivset hüpet.
 

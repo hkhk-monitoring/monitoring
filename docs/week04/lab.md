@@ -26,7 +26,7 @@ Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Vastus on 
 
 ### 1.1 Repositoorium ja Zabbix
 
-Ava Classroom 50 link ([Lab 04 - Agent räägib serverile](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium:
+Ava Classroom 50 link ([Praktikum 4 - Agent räägib serverile](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium:
 
 ```bash
 git clone <sinu-repo-url>
