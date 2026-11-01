@@ -57,4 +57,4 @@ Monitooringusüsteemid töötavad sõlmes `proxmox1`, agendid ja exporter'id jä
 
 ## Mälu
 
-Iga seiresüsteem vajab `proxmox1`-l 0,5–2 GB mälu. Iga praktikumi alguses on kirjas, millised süsteemid peavad töötama. Ülejäänud peata nende kaustas käsuga `docker compose stop`, siis jäävad andmed alles. Kontrolli `ssh proxmox1 free -h`, veerg `available`. Kui see on alla 3 GB, anna õpetajale teada.
+Iga seiresüsteem vajab `proxmox1`-l 0,5–2 GB mälu. Iga praktikumi alguses on kirjas, millised süsteemid peavad töötama. Ülejäänud peata nende Compose'i projekti kaustas käsuga `docker compose stop`. See peatab konteinerid, kuid ei eemalda neid ega nende andmeköiteid, nii et `docker compose start` käivitab need samas olekus uuesti. Kontrolli `ssh proxmox1 free -h`, veerg `available`. Kui see on alla 3 GB, anna õpetajale teada.

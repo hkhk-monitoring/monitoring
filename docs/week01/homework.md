@@ -101,4 +101,4 @@ Tulemuse näed Classroom 50-s.
 
 **B. Ainult eilne ja tänane päev.** Praegu loeb skript kõiki ridu. Muuda nii, et raportis on ainult eilse ja tänase päeva read. Vihje: logirea algus on kuupäev; `date -d yesterday '+%b %e'` annab eilse kuupäeva samas vormingus.
 
-**C. Raport Ansiblega.** Kirjuta playbook, mis paigaldab skripti ja timeri `proxmox1`-le, et seda saaks korrata ka uuele keskserverile.
+**C. Raport Ansible'iga.** Kirjuta playbook, mis paigaldab skripti ja taimeri `proxmox1`-le, et seda saaks korrata ka uuele keskserverile.
