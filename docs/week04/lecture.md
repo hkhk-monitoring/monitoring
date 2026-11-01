@@ -12,11 +12,10 @@ N2-s käivitasid Zabbixi ja see kontrollis pingiga, kas `proxmox2` ja `proxmox3`
 ??? abstract "Õpiväljundid"
     Pärast loengut ja praktikumi oskad:
 
-    - selgitada, mida teeb Zabbixi agent ja milliseid seadeid vajavad passiivne ja aktiivne kontroll;
-    - eristada passiivset ja aktiivset agenti selle järgi, kes avab ühenduse ja milline port peab olema lahti;
-    - valida hostile sobiva template'i ja kontrollida item'i väärtust masina seest;
-    - kirjutada trigger'i avaldise ja valida sellele raskusastme;
-    - põhjendada, miks agent paigaldatakse Ansible'iga.
+    - paigaldada ja seadistada Zabbix agent 2 Ansible'i playbook'iga mitmes masinas;
+    - eristada passiivseid ja aktiivseid kontrolle ühenduse algataja järgi;
+    - siduda hostid sobivate template'itega ja kontrollida mõõteväärtuste uuenemist;
+    - luua oma trigger'i ning tõendada probleemi tekkimist ja lahenemist.
 
 ## 1. Ping ei näe masina sisse
 
@@ -44,6 +43,11 @@ Agendi seaded on failis `/etc/zabbix/zabbix_agent2.conf`. Fail on pikk, kuid ena
     | `ServerActive` | `127.0.0.1` | server, kuhu agent ise andmeid saadab (aktiivne agent) | `proxmox1` IP |
     | `Hostname` | `Zabbix server` | nimi, millega agent end serverile tutvustab | `proxmox2` või `proxmox3` |
 
+<figure markdown="span">
+  ![Agendi konfiguratsioonifaili read Server, ServerActive ja Hostname: Server lubab passiivse päringu, ServerActive on server, kuhu agent ise saadab, Hostname peab võrduma veebiliidese Host name väljaga](../images/n04_seaded.svg)
+  <figcaption>Joonis 4.1. Agendi kolm seadet ja mida igaüks mõjutab (Talvik, 2026).</figcaption>
+</figure>
+
 `Hostname` peab olema täpselt sama mis veebiliideses hosti väli **Host name**, ka suur- ja väiketähed peavad klappima. Kui need erinevad, ei leia server õiget hosti ja aktiivse agendi andmed jäävad vastu võtmata. N2-s panid hostide nimeks `proxmox2` ja `proxmox3`, need lähevad ka agendi seadesse.
 
 Konfiguratsioonifaili õigused on `640` ja see kuulub grupile `zabbix`. Tavakasutaja faili lugeda ei saa, sest seal võivad olla paroolid, näiteks andmebaasi pluginate jaoks. Faili vaatamiseks kasuta `sudo`.
@@ -56,23 +60,8 @@ Konfiguratsioonifaili õigused on `640` ja see kuulub grupile `zabbix`. Tavakasu
 Agent saab andmed serverile anda kahel viisil. Vahe on selles, kes alustab andmevahetust ehk avab ühenduse.
 
 <figure markdown="span">
-```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e0f2f1','primaryBorderColor':'#00796b','primaryTextColor':'#212121','lineColor':'#26a69a'}}}%%
-graph LR
-    subgraph P1["proxmox1"]
-        S["Zabbix server<br/>port 10051"]
-    end
-    subgraph P2["proxmox2: passiivne"]
-        A2["agent 2<br/>port 10050"]
-    end
-    subgraph P3["proxmox3: aktiivne"]
-        A3["agent 2"]
-    end
-    S -- "1. küsib: system.cpu.load?" --> A2
-    A2 -. "2. vastab: 0.15" .-> S
-    A3 -- "1. küsib: mida mõõta?<br/>2. saadab väärtused" --> S
-```
-  <figcaption>Joonis 4.1. Passiivse agendi puhul avab ühenduse server jälgitava masina porti 10050. Aktiivne agent avab ühenduse ise serveri porti 10051 (Talvik, 2026).</figcaption>
+  ![Zabbix server proxmox1-s küsib proxmox2 passiivselt agendilt item'i väärtust pordil 10050; proxmox3 aktiivne agent avab ise ühenduse serveri porti 10051 ja saadab väärtused](../images/n04_passiivne_aktiivne.svg)
+  <figcaption>Joonis 4.2. Passiivse kontrolli puhul avab ühenduse server jälgitava masina porti 10050. Aktiivse kontrolli puhul avab ühenduse agent serveri porti 10051 (Talvik, 2026).</figcaption>
 </figure>
 
 **Passiivne agent** (passive check) ootab pordil 10050. Server küsib iga item'i kohta eraldi ja agent vastab. Agent vastab ainult aadressidele, mis on seades `Server`. Jälgitava masina tulemüüris peab port 10050 olema lahti.
@@ -133,6 +122,11 @@ last(/proxmox2/vfs.fs.size[/,pfree])<20
 
 `last()` võtab viimase väärtuse. Avaldis on tõene, kui `proxmox2` juurfailisüsteemis on vaba ruumi alla 20%. Siis läheb trigger olekusse PROBLEM ja tekib probleem. Kui väärtus on jälle 20 või rohkem, läheb trigger olekusse OK ja probleem saab märke RESOLVED, nagu nägid N2-s pingiga.
 
+<figure markdown="span">
+  ![Agent loeb vaba kettaruumi, item toob väärtuse iga 30 sekundi järel, trigger võrdleb seda piiriga 20 ja probleem tekib ning laheneb](../images/n04_item_trigger.svg)
+  <figcaption>Joonis 4.3. Agent annab väärtuse, item salvestab selle, trigger võrdleb seda piiriga ja probleem tekib või laheneb. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+</figure>
+
 Igal trigger'il on [raskusaste](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/severity) (severity). See näitab, kui kiiresti peab inimene reageerima. N6-s valitakse selle järgi, kes teavituse saab.
 
 ??? note "Tabel 4.4. Zabbixi raskusastmed"
@@ -156,7 +150,7 @@ Agendi paigaldus on igas masinas sama: võti, hoidla, pakett, kolm seadet, tulem
 
 Playbook kirjeldab soovitud olekut ja Ansible rakendab vajalikud muudatused. `Hostname` tuleb inventarifailist muutujaga `inventory_hostname`, seega sobib sama playbook igale masinale. Teine käivitus annab `changed=0`, kui masinad on juba soovitud olekus. Uue masina lisamiseks paned selle inventarifaili ja käivitad playbook'i uuesti.
 
-Praktikumis teed paigalduse kõigepealt käsitsi `proxmox2`-s, et näha iga sammu tulemust. Seejärel kirjutad samad sammud playbook'iks ja käivitad selle mõlemas masinas.
+Praktikumis on playbook pooleli: ülesanded on olemas ja sina täidad seaded, pordi ja handler'i. Siis käivitad selle mõlemas masinas.
 
 ??? question "Kontrolli ennast"
     1. Mida näeb agent, mida ping ei näe? Too kaks näidet.

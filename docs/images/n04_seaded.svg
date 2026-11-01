@@ -1,0 +1,29 @@
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="c1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker></defs>
+  <rect width="900" height="340" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Agendi kolm seadet ja mida igaüks mõjutab</text>
+  <rect x="30" y="60" width="340" height="250" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="50" y="86" font-size="13" font-weight="700" fill="#004d40">proxmox2</text>
+  <text x="50" y="106" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#004d40">/etc/zabbix/zabbix_agent2.conf</text>
+  <g font-size="15" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">
+    <rect x="50" y="125" width="300" height="44" rx="6" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+    <text x="64" y="153">Server=<tspan fill="#e65100">192.168.35.11</tspan></text>
+    <rect x="50" y="185" width="300" height="44" rx="6" fill="#ffffff" stroke="#00796b" stroke-width="2"/>
+    <text x="64" y="213">ServerActive=<tspan fill="#00796b">192.168.35.11</tspan></text>
+    <rect x="50" y="245" width="300" height="44" rx="6" fill="#ffffff" stroke="#1565c0" stroke-width="2"/>
+    <text x="64" y="273">Hostname=<tspan fill="#1565c0">proxmox2</tspan></text>
+  </g>
+  <g stroke="#546e7a" stroke-width="2"><line x1="352" y1="147" x2="440" y2="117" marker-end="url(#c1)"/><line x1="352" y1="207" x2="440" y2="207" marker-end="url(#c1)"/><line x1="352" y1="267" x2="440" y2="290" marker-end="url(#c1)"/></g>
+  <rect x="445" y="80" width="430" height="70" rx="8" fill="#fff8e1" stroke="#ff8f00"/>
+  <text x="460" y="105" font-size="14" font-weight="700" fill="#e65100">Passiivne kontroll</text>
+  <text x="460" y="127" font-size="12" fill="#263238">Ainult sellelt aadressilt tulevale päringule</text>
+  <text x="460" y="143" font-size="12" fill="#263238">vastab agent pordil 10050.</text>
+  <rect x="445" y="170" width="430" height="70" rx="8" fill="#e0f2f1" stroke="#00796b"/>
+  <text x="460" y="195" font-size="14" font-weight="700" fill="#004d40">Aktiivne kontroll</text>
+  <text x="460" y="217" font-size="12" fill="#263238">Sellele serverile avab agent ise ühenduse,</text>
+  <text x="460" y="233" font-size="12" fill="#263238">port 10051.</text>
+  <rect x="445" y="260" width="430" height="70" rx="8" fill="#e3f2fd" stroke="#1565c0"/>
+  <text x="460" y="285" font-size="14" font-weight="700" fill="#0d47a1">Nimi aktiivsetes kontrollides</text>
+  <text x="460" y="307" font-size="12" fill="#263238">Peab olema täpselt sama mis veebiliideses <tspan font-weight="700">Host name</tspan>,</text>
+  <text x="460" y="323" font-size="12" fill="#263238">ka suur- ja väiketähed.</text>
+</svg>
