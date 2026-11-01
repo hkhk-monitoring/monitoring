@@ -11,14 +11,14 @@ Server ei oska kurta. Ta kirjutab logi, näitab numbreid ja jätab jälgi. Selle
 
 ## Mida sa õpid
 
-1. Koguda kõigi masinate logid ühte kohta, et need säiliksid ka siis, kui masin kaob
-2. Jälgida kõiki masinaid ühest kohast ja saada teada, kui midagi läheb valesti
-3. Küsida andmetelt küsimusi ja teha neist töölaud, millest on kasu
-4. Otsida logidest nii sildi kui ka iga sõna järgi ja teada, mida kumbki maksab
-5. Leida ühe päringu teekond läbi mitme teenuse
-6. Uurida turvaintsidenti ja kirjutada sellest raport
+Kursuse lõpuks oskad:
 
----
+1. koguda laborimasinate logid ühte kohta, et need säiliksid ka siis, kui masin kaob;
+2. jälgida masinate olekut ühest kohast ja saada teavitus, kui midagi läheb valesti;
+3. koostada kogutud andmete põhjal päringuid ja teha neist töölaua, mille järgi saab otsustada;
+4. otsida logidest nii sildi kui ka iga sõna järgi ning võrrelda nende ressursikulu ja otsinguvõimalusi;
+5. leida ühe päringu teekond läbi mitme teenuse;
+6. uurida turvaintsidenti ja kirjutada sellest raport.
 
 ## Teemad nädalate kaupa
 
@@ -38,15 +38,13 @@ Server ei oska kurta. Ta kirjutab logi, näitab numbreid ja jätab jälgi. Selle
 | N12 | Turvamonitooring ja intsident |
 | N13 | Lõputöö ja kaitsmine |
 
-Tunnid, tööriistad ja hindamine: [Kursuse ülesehitus](syllabus.md).
-
----
+Tundide jaotus ja tööriistad on lehel [Kursuse ülesehitus](syllabus.md).
 
 ## Enne esimest tundi
 
-Sul on kõik juba olemas automatiseerimise kursusest:
+Töökeskkond on sama, mis automatiseerimise kursusel. Enne esimest tundi kontrolli, et:
 
-- `ssh proxmox1`, `ssh proxmox2`, `ssh proxmox3` töötavad ilma paroolita;
-- Ansible ja VS Code on sinu arvutis.
+- `ssh proxmox1`, `ssh proxmox2` ja `ssh proxmox3` töötavad SSH-võtmega ega küsi parooli;
+- arvutis on Ansible ja VS Code.
 
-Kui midagi neist ei tööta, vaata [Töökeskkond](kodulabor.md).
+Kui mõni neist ei tööta, järgi lehte [Töökeskkond](kodulabor.md).

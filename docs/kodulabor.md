@@ -57,4 +57,4 @@ Alates N2-st avad brauseris teenuseid sõlmes `proxmox1`. Kasuta sõlme IP-d, mi
 
 ## Mälu
 
-Iga seiresüsteem vajab `proxmox1`-l 0,5-2 GB mälu. Korraga jookseb ainult üks: enne uue käivitamist peata eelmine (`docker compose down`). Kontrolli `ssh proxmox1 free -h`, veerg `available`. Kui see on alla 3 GB, anna õpetajale teada.
+Iga seiresüsteem vajab `proxmox1`-l 0,5–2 GB mälu. Iga praktikumi alguses on kirjas, millised süsteemid peavad töötama. Ülejäänud peata nende kaustas käsuga `docker compose stop`, siis jäävad andmed alles. Kontrolli `ssh proxmox1 free -h`, veerg `available`. Kui see on alla 3 GB, anna õpetajale teada.

@@ -4,61 +4,59 @@ tags:
   - Monitooring
 ---
 
-# Monitooring - kursuse ülevaade
+# Kursuse ülevaade
 
-**Maht:** 50 akadeemilist tundi kontaktõpet + 15 tundi iseseisvat tööd · 13 kohtumist
-**Eeldused:** Linuxi käsurida, SSH, Docker Compose, Ansible alused
-**Laborikeskkond:** samad Proxmoxi sõlmed, mis automatiseerimise kursusel: `proxmox1` kannab monitooringusüsteeme, `proxmox2` ja `proxmox3` on jälgitavad masinad. Ansible ja Git jooksevad sinu arvutis. Vt [Töökeskkond](kodulabor.md).
+Kursusel on 13 kohtumist, 50 akadeemilist tundi kontaktõpet ja 15 tundi iseseisvat tööd. Eeldused on Linuxi käsurida, SSH, Docker Compose ja Ansible'i alused.
+
+Kasutad samu Proxmoxi sõlmi nagu automatiseerimise kursusel. Sõlmes `proxmox1` töötavad monitooringusüsteemid, `proxmox2` ja `proxmox3` on jälgitavad masinad. Ansible'i ja Giti käivitad oma arvutis. Täpsemalt on see kirjas lehel [Töökeskkond](kodulabor.md).
 
 ## Kursuse õpiväljundid
 
-Kursuse lõpuks õppija:
+Kursuse lõpuks oskad:
 
-1. selgitab, mis vahe on logimisel, monitooringul ja jälgimisel (tracing) ning kuidas need kolm koos annavad süsteemist tervikpildi (observability);
-2. kogub, hoiab ja otsib logisid nii ühes masinas kui ka keskses süsteemis;
-3. kogub masinate ja teenuste mõõdikuid nii agendi- kui ka pull-mudeliga ning teeb neist töölaua;
-4. seadistab alarmid, mis jõuavad inimeseni ja millest on tegelikult kasu;
-5. jälgib päringu teekonda läbi mitme teenuse ja seob jälje logi ning mõõdikuga;
-6. leiab oma monitooringust rikke ja turvasündmuse ning kirjeldab seda intsidendiraportis;
-7. valib olukorrale sobiva tööriista ja põhjendab valikut.
+1. selgitada logimise, monitooringu ja jälgimise (tracing) erinevust ning seda, kuidas need koos annavad süsteemist tervikpildi (observability);
+2. koguda, hoida ja otsida logisid nii ühes masinas kui ka keskses süsteemis;
+3. koguda masinate ja teenuste mõõdikuid nii pull- kui ka push-mudeliga ning teha neist töölaua;
+4. seadistada alarme, mis jõuavad inimeseni ja mille järgi saab tegutseda;
+5. jälgida päringu teekonda läbi mitme teenuse ning siduda jälje logi ja mõõdikuga;
+6. leida oma monitooringust rikke ja turvasündmuse ning kirjeldada neid intsidendiraportis;
+7. valida olukorrale sobiva tööriista ja põhjendada valikut.
 
 ## Kursuse neli osa
 
-| Osa | Mida küsib | Kohtumised | Tunnid |
-|---|---|---|---:|
-| **Logging** | Mis juhtus? | 1, 8, 9 | 12 |
-| **Monitoring** | Kui palju ja kui kaua? | 2-7 | 18 |
-| **Tracing** | Kus päring aega kulutas? | 10 | 4 |
-| **Observability** | Miks see juhtus? (kõik koos) | 11, 12, 13 | 16 |
-
-*Tabel 0.1. Kursuse osad*
+??? note "Tabel 0.1. Kursuse osad"
+    | Osa | Mida küsib | Kohtumised | Tunnid |
+    |---|---|---|---:|
+    | Logging | Mis juhtus? | 1, 8, 9 | 12 |
+    | Monitoring | Kui palju ja kui kaua? | 2–7 | 18 |
+    | Tracing | Kus päring aega kulutas? | 10 | 4 |
+    | Observability | Miks see juhtus? (kõik koos) | 11, 12, 13 | 16 |
 
 ## Kohtumised ühe pilguga
 
-| Nr | h | Osa | Mõisteplokk | Tööriistad | Loeng / labor (min) |
-|---:|---:|---|---|---|---|
-| 1 | 4 | Logging | Masina logid ja keskne logiserver | journald, rsyslog, logrotate | 35 / 125 |
-| 2 | 2 | Monitoring | Keskne jälgimissüsteem | Zabbix server | 20 / 60 |
-| 3 | 2 | Monitoring | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, stress-ng, Zabbix | 20 / 60 |
-| 4 | 2 | Monitoring | Agent räägib serverile | Zabbix agent 2, Ansible | 20 / 60 |
-| 5 | 4 | Monitoring | Server küsib ise | Prometheus, node_exporter, PromQL | 35 / 125 |
-| 6 | 4 | Monitoring | Numbrid pildiks ja alarm | Grafana, Alertmanager | 35 / 125 |
-| 7 | 4 | Monitoring | Aegrea andmebaas teisiti | Telegraf, InfluxDB 3 | 35 / 125 |
-| 8 | 2 | Logging | Logid sildi järgi | Loki, Grafana Alloy | 20 / 60 |
-| 9 | 6 | Logging | Logid täisotsinguga | Elasticsearch/OpenSearch, Kibana/Dashboards | 45 / 200 |
-| 10 | 4 | Tracing | Päringu teekond | OpenTelemetry, Jaeger/Tempo | 35 / 125 |
-| 11 | 4 | Observability | Kolm sammast koos ja kas üldse töötab | Blackbox exporter, Uptime Kuma | 35 / 125 |
-| 12 | 4 | Observability | Turvamonitooring ja intsident | Wazuh | 35 / 125 |
-| 13 | 8 | Observability | Lõputöö ja kaitsmine | oma valik | 15 / 240 + 90 kaitsmisi |
-| | **50** | | | | |
+??? note "Tabel 0.2. Kohtumised (1 tund = 45 min)"
+    | Nr | h | Osa | Mõisteplokk | Tööriistad | Loeng / praktikum (min) |
+    |---:|---:|---|---|---|---|
+    | 1 | 4 | Logging | Masina logid ja keskne logiserver | journald, rsyslog, logrotate | 35 / 125 |
+    | 2 | 2 | Monitoring | Keskne jälgimissüsteem | Zabbix server | 20 / 60 |
+    | 3 | 2 | Monitoring | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, stress-ng, Zabbix | 20 / 60 |
+    | 4 | 2 | Monitoring | Agent räägib serverile | Zabbix agent 2, Ansible | 20 / 60 |
+    | 5 | 4 | Monitoring | Server küsib ise | Prometheus, node_exporter, PromQL | 35 / 125 |
+    | 6 | 4 | Monitoring | Numbrid pildiks ja alarm | Grafana, Alertmanager | 35 / 125 |
+    | 7 | 4 | Monitoring | Aegrea andmebaas teisiti | Telegraf, InfluxDB 3 | 35 / 125 |
+    | 8 | 2 | Logging | Logid sildi järgi | Loki, Grafana Alloy | 20 / 60 |
+    | 9 | 6 | Logging | Logid täisotsinguga | Elasticsearch/OpenSearch, Kibana/Dashboards | 45 / 200 |
+    | 10 | 4 | Tracing | Päringu teekond | OpenTelemetry, Jaeger/Tempo | 35 / 125 |
+    | 11 | 4 | Observability | Kolm sammast koos ja kas üldse töötab | Blackbox exporter, Uptime Kuma | 35 / 125 |
+    | 12 | 4 | Observability | Turvamonitooring ja intsident | Wazuh | 35 / 125 |
+    | 13 | 8 | Observability | Lõputöö ja kaitsmine | oma valik | 15 / 240 + 90 kaitsmisi |
+    | | **50** | | | | |
 
-*Tabel 0.2. Kohtumised (1 tund = 45 min). Iga kohtumine lõpeb 10-15-minutilise kokkuvõttega. *
+Iga kohtumine lõpeb 10–15-minutilise kokkuvõttega.
 
-Neljatunnise kohtumise labor on kahes osas: **A** on juhendatud, pärast pausi tuleb **B**, kus kasutad sama oskust muudetud olukorras. Kuuetunnisel kohtumisel on osad A, B ja C. Iga labori lõpus on lisaülesanded neile, kes saavad varem valmis, kergest raskeni.
+Neljatunnise kohtumise praktikum on kahes osas: osa A on juhendatud, pärast pausi tuleb osa B, kus kasutad sama oskust muudetud olukorras. Kuuetunnisel kohtumisel on osad A, B ja C. Iga praktikumi lõpus on lisaülesanded, kergest raskeni.
 
-Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose down`), sest `proxmox1` mälu on piiratud.
-
----
+Sõlme `proxmox1` mälu on piiratud. Iga praktikumi alguses on kirjas, millised varasemad süsteemid peavad töötama ja millised peatada. Peatamiseks kasuta käsku `docker compose stop`, siis jäävad andmed alles.
 
 ## 1. Masina logid ja keskne logiserver
 
@@ -66,7 +64,7 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 
 **Mida õpime**
 
-- Miks monitoorida: kasutaja ei tohi olla see, kes rikke esimesena avastab.
+- Miks monitoorida: rike tuleks avastada enne, kui kasutaja sellest teatab.
 - Logide liigid: süsteemi-, autentimis-, kerneli- ja rakenduse logid. Kus need asuvad (`/var/log`, journald).
 - `journalctl` monitooringu vaatest: filtrid teenuse, raskusastme ja ajavahemiku järgi, `-f`.
 - Syslogi raskusastmed (severity) ja allikad (facility).
@@ -74,17 +72,15 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - logrotate: miks logid kasvavad üle pea, konfiguratsioon (`daily`, `rotate`, `compress`, `postrotate`), kontroll `-d`-ga.
 - Keskne logiserver: rsyslog võtab vastu (TCP/UDP 514), kliendid saadavad.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- leiab `journalctl` abil konkreetse teenuse vead etteantud ajavahemikus;
-- seadistab rsyslogi reegli, mis suunab valitud logid eraldi faili;
-- koostab teenusele logrotate konfiguratsiooni ja kontrollib seda;
-- seadistab `proxmox1` keskseks logiserveriks ja suunab `proxmox2` ning `proxmox3` logid sinna;
-- põhjendab, miks keskne logimine on vajalik juba kolme masina puhul.
+- leida `journalctl` abil konkreetse teenuse vead etteantud ajavahemikus;
+- seadistada rsyslogi reegli, mis suunab valitud logid eraldi faili;
+- koostada teenusele logrotate'i konfiguratsiooni ja seda kontrollida;
+- seadistada `proxmox1` keskseks logiserveriks ning suunata `proxmox2` ja `proxmox3` logid sinna;
+- põhjendada, miks keskne logimine on vajalik juba kolme masina puhul.
 
 **Tööriistad:** journald/journalctl, rsyslog, logrotate, logger
-
----
 
 ## 2. Keskne jälgimissüsteem
 
@@ -97,15 +93,13 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - Põhimõisted: host, item, trigger, template.
 - Zabbixi käivitamine Docker Compose'iga.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- kirjeldab Zabbixi komponente ja nende omavahelist suhtlust;
-- käivitab Zabbixi serveri koos andmebaasi ja veebiliidesega;
-- lisab esimese hosti ja leiab selle viimased andmed veebiliidesest.
+- kirjeldada Zabbixi komponente ja nende omavahelist suhtlust;
+- käivitada Zabbixi serveri koos andmebaasi ja veebiliidesega;
+- lisada esimese hosti ja leida selle viimased andmed veebiliidesest.
 
 **Tööriistad:** Zabbix 7.0 LTS (server, veebiliides, PostgreSQL), Docker Compose
-
----
 
 ## 3. Mõõdik, aegrida, agent
 
@@ -120,16 +114,14 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - Agendiga ja agendita kogumine.
 - Masina numbrite lugemine käsitsi: tavaolek vs koormus.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- eristab gauge'i ja counterit ning toob mõlemast näite;
-- rakendab USE-meetodit protsessori, mälu ja ketta kohta;
-- mõõdab käsitsi masina tavaoleku ja koormusega oleku ning võrdleb neid;
-- loeb Zabbixi graafikult, millal koormus algas ja lõppes.
+- eristada gauge'i ja counterit ning tuua mõlemast näite;
+- rakendada USE-meetodit protsessori, mälu ja ketta kohta;
+- mõõta käsitsi masina tavaolekut ja koormusega olekut ning neid võrrelda;
+- lugeda Zabbixi graafikult, millal koormus algas ja lõppes.
 
 **Tööriistad:** top/htop, free, df, stress-ng, Zabbixi veebiliides
-
----
 
 ## 4. Agent räägib serverile
 
@@ -142,15 +134,13 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - Valmis template'i kasutamine.
 - Triggerid ja raskusastmed, probleemi tekkimine ja lahenemine.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- paigaldab agendi Ansible playbookiga mitmesse masinasse korraga;
-- seob hostid template'iga ja kontrollib, et andmed tulevad;
-- loob oma triggeri (nt vaba kettaruum alla 20%) ja näitab, et see läheb probleemi olekusse ja tagasi.
+- paigaldada agendi Ansible'i playbook'iga mitmesse masinasse korraga;
+- siduda hostid template'iga ja kontrollida, et andmed tulevad;
+- luua oma triggeri (näiteks vaba kettaruum alla 20%) ja näidata, et see läheb probleemi olekusse ja tagasi.
 
 **Tööriistad:** Zabbix agent 2, Ansible, Zabbixi template'id
-
----
 
 ## 5. Server küsib ise
 
@@ -164,16 +154,14 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - PromQL: valik, labelifilter, `rate()`, `sum by`, `avg`, võrdlus.
 - Zabbix vs Prometheus: millal kumb.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- selgitab agendi- ja pull-mudeli erinevust;
-- seadistab scrape target'id ja kontrollib Targets-lehelt, et kõik on UP;
-- kirjutab PromQL päringud protsessori koormuse, mälu kasutuse ja vaba kettaruumi kohta;
-- põhjendab, millises olukorras valiks Zabbixi ja millises Prometheuse.
+- selgitada, kes alustab andmevahetust Zabbixi passiivse ja aktiivse agendi ning Prometheuse puhul;
+- seadistada scrape target'id ja kontrollida **Targets**-lehelt, et need on olekus UP;
+- kirjutada PromQL-i päringud protsessori koormuse, mälu kasutuse ja vaba kettaruumi kohta;
+- põhjendada, millises olukorras valiksid Zabbixi ja millises Prometheuse.
 
 **Tööriistad:** Prometheus, node_exporter, PromQL, Ansible
-
----
 
 ## 6. Numbrid pildiks ja alarm
 
@@ -187,16 +175,14 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - Alertmanager: marsruutimine, grupeerimine, vaigistamine.
 - Contact point ja hea alarmisõnum (milline masin, mis mõõdik, kui hull, mis ajast).
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- ehitab masinate tervise töölaua, kus hosti saab valida muutujaga;
-- eemaldab töölaualt paneeli, mis otsust ei toeta, ja põhjendab;
-- loob alarmireegli ja näitab oleku muutumist;
-- seadistab teavituse, mis jõuab kohale, ja hindab, kas sõnumist saab öösel aru.
+- ehitada masinate tervise töölaua, kus hosti saab valida muutujaga;
+- eemaldada töölaualt paneeli, mis otsust ei toeta, ja seda põhjendada;
+- luua alarmireegli ja näidata oleku muutumist;
+- seadistada teavituse, mis jõuab kohale, ja hinnata, kas sõnumist saab öösel aru.
 
 **Tööriistad:** Grafana, Alertmanager
-
----
 
 ## 7. Aegrea andmebaas teisiti
 
@@ -210,15 +196,13 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - InfluxDB Grafana andmeallikana.
 - Prometheus vs InfluxDB: pull vs push, millal kumb.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- seadistab Telegrafi saatma masina mõõdikuid InfluxDB-sse;
-- teeb InfluxDB-s päringu ja kuvab tulemuse Grafanas;
-- võrdleb push- ja pull-mudelit ning toob kummagi kohta sobiva olukorra.
+- seadistada Telegrafi saatma masina mõõdikuid InfluxDB-sse;
+- teha InfluxDB-s päringu ja kuvada tulemuse Grafanas;
+- võrrelda push- ja pull-mudelit ning tuua kummagi kohta sobiva olukorra.
 
 **Tööriistad:** Telegraf, InfluxDB 3 Core, Grafana
-
----
 
 ## 8. Logid sildi järgi
 
@@ -231,15 +215,13 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - journaldi ja rsyslogi logid Lokisse.
 - LogQL: sildifilter, tekstifilter, logiridade arv ajas.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- seadistab Alloy saatma `proxmox2` ja `proxmox3` logid Lokisse;
-- kirjutab LogQL päringu, mis leiab kindla teenuse vead;
-- selgitab, miks Loki on odavam kui täisindeksiga logisüsteem.
+- seadistada Alloy saatma `proxmox2` ja `proxmox3` logid Lokisse;
+- kirjutada LogQL-i päringu, mis leiab kindla teenuse vead;
+- selgitada, kuidas indekseerimise viis mõjutab logisüsteemi ressursikulu ja otsinguvõimalusi.
 
 **Tööriistad:** Loki, Grafana Alloy, Grafana
-
----
 
 ## 9. Logid täisotsinguga
 
@@ -253,16 +235,14 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - Loki vs Elastic: kulu, kiirus, otsinguvõimalused.
 - Logid ja mõõdikud ühel töölaual: logirida mõõdiku hüppe all.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- käivitab ühesõlmelise klastri ja saadab sinna logid;
-- otsib logidest päringukeelega ja ehitab visualiseeringu;
-- põhjendab, millal valida Loki ja millal Elasticsearch/OpenSearch;
-- leiab logirea, mis selgitab mõõdikus nähtud hüpet.
+- käivitada ühesõlmelise klastri ja saata sinna logid;
+- otsida logidest päringukeelega ja ehitada visualiseeringu;
+- põhjendada, millal valida Loki ja millal Elasticsearch või OpenSearch;
+- leida logirea, mis selgitab mõõdikus nähtud hüpet.
 
 **Tööriistad:** Elasticsearch või OpenSearch, Kibana või OpenSearch Dashboards, logisaatja, Grafana
-
----
 
 ## 10. Päringu teekond
 
@@ -275,15 +255,13 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - OpenTelemetry: SDK, kollektor, OTLP.
 - Valmis näidisrakenduse jälgede vaatamine Jaegeris või Tempos.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- selgitab trace'i ja spani mõistet joonise abil;
-- käivitab OpenTelemetry kollektori ja jälgede taustasüsteemi;
-- leiab aeglase päringu ja spani, mis aja ära kulutas.
+- selgitada joonise abil trace'i ja spani mõistet;
+- käivitada OpenTelemetry kollektori ja jälgede taustasüsteemi;
+- leida aeglase päringu ja spani, mis aja ära kulutas.
 
 **Tööriistad:** OpenTelemetry Collector, Jaeger 2 või Tempo 3, näidisrakendus
-
----
 
 ## 11. Kolm sammast koos ja kas üldse töötab
 
@@ -296,15 +274,13 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - Blackbox exporter (HTTP, ICMP) ja Uptime Kuma.
 - Lihtne teenuse kättesaadavuse näitaja: mitu protsenti päringuid õnnestus.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- jälgib ühe vea läbi kõigi kolme samba: mõõdiku hüpe → jälg → logirida;
-- seadistab kättesaadavuse kontrolli ja alarmi teenuse kadumise kohta;
-- selgitab, mida blackbox-kontroll näeb, mida protsessori mõõdik kunagi ei näe.
+- jälgida üht viga läbi kõigi kolme samba: mõõdiku hüppest jäljeni ja jäljest logireani;
+- seadistada kättesaadavuse kontrolli ja alarmi teenuse kadumise kohta;
+- selgitada, mida näeb blackbox-kontroll, kuid ei näe protsessori mõõdik.
 
 **Tööriistad:** Grafana, Loki, Jaeger/Tempo, Blackbox exporter, Uptime Kuma
-
----
 
 ## 12. Turvamonitooring ja intsident
 
@@ -318,22 +294,20 @@ Igal kohtumisel peatad enne uue süsteemi käivitamist eelmise (`docker compose 
 - Intsidendiharjutus: õpetaja tekitab rikkeid, õppijad leiavad need oma monitooringust.
 - Intsidendiraport: mis juhtus, millal, kuidas avastati, põhjus, parandus.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- selgitab, mille poolest SIEM erineb tavalisest logisüsteemist;
-- paigaldab Wazuh agendi oma masinatesse ja leiab ühisest serverist brute force'i hoiatuse;
-- leiab etteantud rikked oma monitooringust ja nimetab põhjuse;
-- kirjutab lühikese intsidendiraporti.
+- selgitada, mille poolest SIEM erineb tavalisest logisüsteemist;
+- paigaldada Wazuhi agendi oma masinatesse ja leida ühisest serverist brute force'i hoiatuse;
+- leida etteantud rikked oma monitooringust ja nimetada põhjuse;
+- kirjutada lühikese intsidendiraporti.
 
 **Tööriistad:** Wazuh ja kõik varem kasutatud süsteemid
-
----
 
 ## 13. Lõputöö ja kaitsmine
 
 **8 h · Observability**
 
-Rühmad 2-3 inimest. Iga rühm saab süsteemi ja ehitab sellele tervikliku jälgimise.
+Rühmas on 2–3 inimest. Iga rühm saab süsteemi ja ehitab sellele tervikliku jälgimise.
 
 **Nõuded**
 
@@ -344,18 +318,16 @@ Rühmad 2-3 inimest. Iga rühm saab süsteemi ja ehitab sellele tervikliku jälg
 - vähemalt üks jälg või kättesaadavuse kontroll;
 - üks intsident läbi mängitud: hüpe töölaual → alarm → logirida → põhjus.
 
-**Eesmärgid** - õppija:
+**Pärast kohtumist oskad:**
 
-- kavandab ja ehitab etteantud süsteemile jälgimise;
-- põhjendab iga tööriista valikut;
-- demonstreerib töötavat süsteemi ja vastab küsimustele.
+- kavandada ja ehitada etteantud süsteemile jälgimise;
+- põhjendada iga tööriista valikut;
+- näidata töötavat süsteemi ja vastata küsimustele.
 
 **Kaitsmine:** 8 minutit demo + 2 minutit küsimusi rühma kohta.
 
----
-
 ## Iseseisev töö
 
-Igal kohtumisel on kodutöö umbes 1 tunni jagu. Kohtumise 13 eel on lisaks umbes 3 tundi lõputöö ettevalmistust. Igal laboril on lisaülesanded neile, kes tahavad edasi minna.
+Kohtumiste 1–12 järel on kodutöö, igaüks umbes ühe tunni jagu. Enne kohtumist 13 on lõputöö ettevalmistus, umbes kolm tundi. Kokku on iseseisvat tööd 15 tundi.
 
-Kohtumine 3 on veebiõppe nädal. Õpetajat pole kõrval, seega on loeng ja labor kirjutatud täiesti iseseisvaks läbitöötamiseks: selgitust on rohkem ja iga sammu järel on kontrollpunkt.
+Kohtumine 3 on veebiõpe. Õpetajat kõrval pole, seetõttu on selle nädala materjalis selgitust rohkem ja iga sammu järel on kontrollpunkt.
