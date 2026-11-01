@@ -2,8 +2,6 @@
 <div class="hero-content" markdown>
 # Süsteemide monitooring
 
-Server ei oska kurta. Ta kirjutab logi, näitab numbreid ja jätab jälgi. Sellel kursusel õpid neid lugema, ühte kohta koguma, pildiks tegema ja nende peale reageerima, et saaksid probleemist teada enne kasutajat.
-
 [Alusta kursusega](week01/lecture.md){ .btn-primary }
 [Kursuse ülesehitus](syllabus.md){ .btn-secondary }
 </div>
