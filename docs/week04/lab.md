@@ -21,7 +21,7 @@ Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse m
 
 <figure markdown="span">
   ![proxmox1-s Zabbix server ja veebiliides; server küsib proxmox2 agendilt porti 10050, proxmox3 agent saadab ise serveri porti 10051; sinu arvuti paigaldab agendid Ansible'iga](../images/n04_agent_praktikum.svg)
-  <figcaption>Joonis 4.4. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.8. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
 </figure>
 
 Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Vastus on kokkuvolditud plokis.

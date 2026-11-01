@@ -40,7 +40,7 @@ Rikke avastas esimesena klient. Kursuse eesmärk on, et rike avastatakse enne ka
   <figcaption>Joonis 1.1. Kursuse neli osa: logid, mõõdikud ja jäljed on kolm sammast, observability seob need kokku. Täna on teemaks vasakpoolne sammas (Talvik, 2026).</figcaption>
 </figure>
 
-**Logid** vastavad küsimusele „mis juhtus?“: iga rida on üks sündmus koos ajaga. **Mõõdikud** (kohtumised 2–7) vastavad küsimusele „kui palju ja kui kaua?“, näiteks protsessori koormus või vaba mälu. **Jäljed** (kohtumine 10) näitavad, kuidas üks päring liikus läbi mitme teenuse. Kui need kolm on omavahel seotud, saab küsida ka „miks see juhtus?“. Seda nimetatakse jälgitavuseks (observability).
+**Logid** vastavad küsimusele „mis juhtus?“: iga rida on üks sündmus koos ajaga. **Mõõdikud** (kohtumised 2–7) vastavad küsimusele „kui palju ja kui kaua?“, näiteks protsessori koormus või vaba mälu. **Jäljed** (kohtumine 10) näitavad, kuidas üks päring liikus läbi mitme teenuse. Kui need kolm on omavahel seotud, saab küsida ka „miks see juhtus?“. Seda nimetatakse jälgitavuseks (observability). Monitooring näitab, et midagi on valesti, jälgitavus aitab leida, miks ([monitooringu ja jälgitavuse erinevus, AWS](https://aws.amazon.com/compare/the-difference-between-monitoring-and-observability/)).
 
 Rikke uurimist alustatakse tavaliselt logidest. Süsteemiteenused kirjutavad logisid juba vaikeseadistuses, nende jaoks ei pea midagi paigaldama.
 

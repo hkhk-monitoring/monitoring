@@ -21,6 +21,13 @@ N2-s käivitasid Zabbixi ja see kontrollis pingiga, kas `proxmox2` ja `proxmox3`
 
 Ping näitab ainult seda, kas masin vastab. Ketas võib olla täis, kuigi masin vastab pingile ja Zabbix näitab rohelist. Ketta täituvust loed jälgitava masina sees, nagu N3-s käsuga `df -h`. Pidevaks mõõtmiseks on vaja programmi, mis töötab jälgitavas masinas, loeb numbrid ja annab need serverile. Seda programmi nimetatakse **agendiks** (agent).
 
+Need on kaks vaadet: **blackbox**- ja **whitebox**-monitooring ([Application monitoring: black box vs white box](https://dev.to/rafaeljcamara/application-monitoring-black-box-vs-white-box-32ij)). Blackbox-kontroll vaatab süsteemi väljast, nagu kasutaja: kas masin vastab pingile, kas veebileht avaneb. See ei näe masina sisse, aga näitab, kas kasutaja saab teenust kasutada. Whitebox-kontroll mõõdab süsteemi seest: protsessorit, mälu, ketast ja teenuste olekut. See näitab probleemi sageli enne, kui kasutaja seda märkab, näiteks ketas täitub. N2 ping oli blackbox, tänane agent on whitebox. Vaja on mõlemat, N11-s lisandub veebiteenuse blackbox-kontroll.
+
+<figure markdown="span">
+  ![Zabbix server pingib proxmox2 väljast ja saab vastuse jah; proxmox2 sees loeb Zabbix agent 2 protsessorit, mälu ja ketast ning teatab, et ketas on peaaegu täis](../images/n04_ping_agent.svg)
+  <figcaption>Joonis 4.1. Ping näeb masinat väljast (blackbox), agent loeb masina seest (whitebox) (Talvik, 2026).</figcaption>
+</figure>
+
 Zabbixil on kaks agenti. Vanem [Zabbix agent](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent) on kirjutatud C-s. Uuem [Zabbix agent 2](https://www.zabbix.com/documentation/7.0/en/manual/concepts/agent2) on kirjutatud Go-s ja oskab pluginate kaudu jälgida ka näiteks Dockerit, PostgreSQL-i ja MySQL-i. Põhilised item'id (protsessor, mälu, ketas, võrk) on mõlemal samad. Kursusel kasutad Zabbix agent 2 programmi, sest uued pluginad tulevad ainult sinna.
 
 Zabbixis on kolm mõistet, mida praktikumis kasutad. **Item** on ühe kogutava väärtuse seadistus: mida mõõta, millise võtmega ja kui tihti. **Trigger** on avaldis, mis otsustab kogutud väärtuste põhjal, kas on probleem. **Template** on korduskasutatav mall, mis annab hostile korraga palju item'eid ja trigger'eid.
@@ -45,7 +52,7 @@ Agendi seaded on failis `/etc/zabbix/zabbix_agent2.conf`. Fail on pikk, kuid ena
 
 <figure markdown="span">
   ![Agendi konfiguratsioonifaili read Server, ServerActive ja Hostname: Server lubab passiivse päringu, ServerActive on server, kuhu agent ise saadab, Hostname peab võrduma veebiliidese Host name väljaga](../images/n04_seaded.svg)
-  <figcaption>Joonis 4.1. Agendi kolm seadet ja mida igaüks mõjutab (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.2. Agendi kolm seadet ja mida igaüks mõjutab (Talvik, 2026).</figcaption>
 </figure>
 
 `Hostname` peab olema täpselt sama mis veebiliideses hosti väli **Host name**, ka suur- ja väiketähed peavad klappima. Kui need erinevad, ei leia server õiget hosti ja aktiivse agendi andmed jäävad vastu võtmata. N2-s panid hostide nimeks `proxmox2` ja `proxmox3`, need lähevad ka agendi seadesse.
@@ -61,7 +68,7 @@ Agent saab andmed serverile anda kahel viisil. Vahe on selles, kes alustab andme
 
 <figure markdown="span">
   ![Zabbix server proxmox1-s küsib proxmox2 passiivselt agendilt item'i väärtust pordil 10050; proxmox3 aktiivne agent avab ise ühenduse serveri porti 10051 ja saadab väärtused](../images/n04_passiivne_aktiivne.svg)
-  <figcaption>Joonis 4.2. Passiivse kontrolli puhul avab ühenduse server jälgitava masina porti 10050. Aktiivse kontrolli puhul avab ühenduse agent serveri porti 10051 (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.3. Passiivse kontrolli puhul avab ühenduse server jälgitava masina porti 10050. Aktiivse kontrolli puhul avab ühenduse agent serveri porti 10051 (Talvik, 2026).</figcaption>
 </figure>
 
 **Passiivne agent** (passive check) ootab pordil 10050. Server küsib iga item'i kohta eraldi ja agent vastab. Agent vastab ainult aadressidele, mis on seades `Server`. Jälgitava masina tulemüüris peab port 10050 olema lahti.
@@ -88,6 +95,11 @@ Selle kursuse Zabbix server töötab Dockeri konteineris. Dockeri vaikimisi võr
 ## 4. Template ja item'i võti
 
 N2-s panid hostidele template'i *ICMP Ping*, millel on kolm item'it. Template *Linux by Zabbix agent* on palju suurem: protsessor, mälu, kettad, võrguliidesed ja protsessid, kokku kümneid item'eid ja trigger'eid. Kettad ja võrguliidesed leiab template ise üles (low-level discovery), neid ei pea ükshaaval lisama ([Linuxi template'id](https://www.zabbix.com/integrations/linux)).
+
+<figure markdown="span">
+  ![Template Linux by Zabbix agent sisaldab kümneid item'eid ja trigger'eid ning on seotud hostidega proxmox2, proxmox3 ja uue serveriga](../images/n04_template.svg)
+  <figcaption>Joonis 4.4. Üks template annab item'id ja trigger'id kõigile seotud hostidele (Talvik, 2026).</figcaption>
+</figure>
 
 Iga item'i taga on võti, mis ütleb agendile, mida mõõta.
 
@@ -124,7 +136,7 @@ last(/proxmox2/vfs.fs.size[/,pfree])<20
 
 <figure markdown="span">
   ![Agent loeb vaba kettaruumi, item toob väärtuse iga 30 sekundi järel, trigger võrdleb seda piiriga 20 ja probleem tekib ning laheneb](../images/n04_item_trigger.svg)
-  <figcaption>Joonis 4.3. Agent annab väärtuse, item salvestab selle, trigger võrdleb seda piiriga ja probleem tekib või laheneb. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.5. Agent annab väärtuse, item salvestab selle, trigger võrdleb seda piiriga ja probleem tekib või laheneb. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
 </figure>
 
 Igal trigger'il on [raskusaste](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/severity) (severity). See näitab, kui kiiresti peab inimene reageerima. N6-s valitakse selle järgi, kes teavituse saab.
@@ -141,12 +153,22 @@ Igal trigger'il on [raskusaste](https://www.zabbix.com/documentation/7.0/en/manu
 
 Kui väärtus kõigub piiri ümber (19, 21, 19, 21), tekib ja laheneb probleem iga minut. Selle vastu aitab [taastumise avaldis](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/expression#hysteresis) (recovery expression). Probleem tekib alla 20% juures, kuid laheneb alles siis, kui vaba ruumi on üle 25%. Seda nimetatakse **hüstereesiks**. Probleem laheneb siis, kui probleemi avaldis ei ole enam tõene ja taastumise avaldis on tõene. Veebiliideses vali trigger'i juures **OK event generation: Recovery expression**, muidu teist avaldist ei kasutata.
 
+<figure markdown="span">
+  ![Vasakul ainult 20% piir, väärtus kõigub 19 ja 21 vahel ning probleem tekib ja laheneb mitu korda; paremal laheneb probleem alles üle 25%](../images/n04_hysterees.svg)
+  <figcaption>Joonis 4.6. Ilma taastumise avaldiseta tekib ja laheneb probleem iga kõikumisega. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+</figure>
+
 ??? question "Kontrolli ennast"
     Template'is on ketta trigger juba olemas (kasutusel üle 80%). Miks võib olla vaja oma trigger'it teise piiri või teise raskusastmega?
 
 ## 6. Miks agent paigaldatakse Ansible'iga
 
 Agendi paigaldus on igas masinas sama: võti, hoidla, pakett, kolm seadet, tulemüür ja teenus. Erinev on ainult `Hostname`. Kahes masinas saab seda teha käsitsi, kuid 50 masinas jääb mõni samm kergesti vahele. Hiljem ei ole ka teada, millised seaded igas masinas on.
+
+<figure markdown="span">
+  ![Playbook konf/agent.yml paigaldab agendi proxmox2 ja proxmox3 masinasse; kõik seaded on samad, Hostname tuleb muutujast inventory_hostname](../images/n04_ansible.svg)
+  <figcaption>Joonis 4.7. Sama playbook kahes masinas, erineb ainult masina nimi (Talvik, 2026).</figcaption>
+</figure>
 
 Playbook kirjeldab soovitud olekut ja Ansible rakendab vajalikud muudatused. `Hostname` tuleb inventarifailist muutujaga `inventory_hostname`, seega sobib sama playbook igale masinale. Teine käivitus annab `changed=0`, kui masinad on juba soovitud olekus. Uue masina lisamiseks paned selle inventarifaili ja käivitad playbook'i uuesti.
 

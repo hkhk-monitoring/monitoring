@@ -1,0 +1,27 @@
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="360" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Väärtus kõigub piiri ümber</text>
+  <text x="225" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#c62828">ainult piir 20%</text>
+  <text x="675" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#00796b">probleem alla 20%, laheneb üle 25%</text>
+  <g font-size="11" fill="#546e7a"><text x="30" y="130">25%</text><text x="30" y="170">20%</text><text x="480" y="130">25%</text><text x="480" y="170">20%</text></g>
+  <line x1="60" y1="166" x2="420" y2="166" stroke="#c62828" stroke-dasharray="5 4"/>
+  <line x1="510" y1="166" x2="870" y2="166" stroke="#c62828" stroke-dasharray="5 4"/>
+  <line x1="510" y1="126" x2="870" y2="126" stroke="#00796b" stroke-dasharray="5 4"/>
+  <polyline points="70,150 110,180 150,150 190,180 230,150 270,180 310,150 350,120 400,110" fill="none" stroke="#37474f" stroke-width="2.5"/>
+  <polyline points="520,150 560,180 600,150 640,180 680,150 720,180 760,150 800,120 850,110" fill="none" stroke="#37474f" stroke-width="2.5"/>
+  <g font-size="10" font-weight="700">
+    <rect x="98" y="200" width="24" height="18" fill="#ffebee"/><text x="110" y="213" text-anchor="middle" fill="#c62828">P</text>
+    <rect x="138" y="200" width="24" height="18" fill="#e0f2f1"/><text x="150" y="213" text-anchor="middle" fill="#00796b">R</text>
+    <rect x="178" y="200" width="24" height="18" fill="#ffebee"/><text x="190" y="213" text-anchor="middle" fill="#c62828">P</text>
+    <rect x="218" y="200" width="24" height="18" fill="#e0f2f1"/><text x="230" y="213" text-anchor="middle" fill="#00796b">R</text>
+    <rect x="258" y="200" width="24" height="18" fill="#ffebee"/><text x="270" y="213" text-anchor="middle" fill="#c62828">P</text>
+    <rect x="298" y="200" width="24" height="18" fill="#e0f2f1"/><text x="310" y="213" text-anchor="middle" fill="#00796b">R</text>
+    <rect x="548" y="200" width="24" height="18" fill="#ffebee"/><text x="560" y="213" text-anchor="middle" fill="#c62828">P</text>
+    <rect x="575" y="200" width="200" height="18" fill="#ffebee" fill-opacity="0.5"/><text x="675" y="213" text-anchor="middle" fill="#c62828">probleem püsib</text>
+    <rect x="788" y="200" width="24" height="18" fill="#e0f2f1"/><text x="800" y="213" text-anchor="middle" fill="#00796b">R</text>
+  </g>
+  <text x="225" y="250" text-anchor="middle" font-size="13" fill="#263238">3 probleemi ja 3 lahenemist 6 minutiga</text>
+  <text x="675" y="250" text-anchor="middle" font-size="13" fill="#263238">1 probleem, laheneb, kui vaba ruumi on üle 25%</text>
+  <text x="450" y="300" text-anchor="middle" font-size="12" fill="#546e7a">P = PROBLEM, R = RESOLVED. Mõõtmine iga minut, väärtused on illustratiivsed.</text>
+  <text x="450" y="325" text-anchor="middle" font-size="12" fill="#546e7a">Taastumise avaldis: Recovery expression, trigger'i väljal OK event generation.</text>
+</svg>
