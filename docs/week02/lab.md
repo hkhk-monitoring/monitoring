@@ -192,7 +192,7 @@ docker compose ps -a
 
     `docker compose ps -a`: `postgres` ja `zabbix-server` on `Up`, aga `zabbix-web` on olekus `Created`. Konteiner on loodud, aga käivitada ei saanud.
 
-??? question "Diagnoosi"
+??? question "Leia põhjus"
     Kes hoiab porti 8080? Leia see kahel viisil: `docker ps` (konteinerite pordid) ja `sudo ss -ltnp | grep 8080` (kõik, mis masinas kuulab). Miks tasub osata mõlemat?
 
 Paranda: peata see, kes porti hoiab, ja käivita uuesti. Kui sul käib N6 stack, peata see kaustas `~/lab06` käsuga `docker compose down`.
@@ -233,7 +233,7 @@ Ava brauseris `http://<proxmox1-IP>:8080`. Kasutaja **Admin**, parool **zabbix**
 
 Ava **Data collection → Hosts** ([Hosts](https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/data_collection/hosts)). Seal on juba üks host: **Zabbix server**. Veerus **Availability** on punane **ZBX**.
 
-??? question "Diagnoosi"
+??? question "Leia põhjus"
     Hõljuta hiirt punase ZBX kohal. Zabbix proovib ühendust võtta agendiga aadressil `127.0.0.1:10050`. Miks see ei õnnestu? (Vihje: mitu konteinerit sul on ja kas mõni neist on agent? Vaata [loengu §3](lecture.md#3-zabbix-kes-kellega-raagib).)
 
 Ava **Monitoring → Latest data** ja vali host **Zabbix server**. Osal item'itel on väärtus olemas, näiteks `Zabbix server: Utilization of configuration syncer internal processes`.
