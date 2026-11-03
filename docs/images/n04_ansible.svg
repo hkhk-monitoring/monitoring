@@ -1,7 +1,7 @@
 <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
   <defs><marker id="d4" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker></defs>
   <rect width="900" height="340" fill="#ffffff"/>
-  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Üks playbook, erinev ainult masina nimi</text>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Üks playbook: agendi seadetes erineb ainult masina nimi</text>
   <rect x="20" y="60" width="340" height="230" rx="10" fill="#eceff1" stroke="#546e7a" stroke-width="2"/>
   <text x="40" y="86" font-size="14" font-weight="700" fill="#37474f">konf/agent.yml</text>
   <g font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">
@@ -16,11 +16,11 @@
   <rect x="560" y="60" width="320" height="95" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
   <text x="720" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox2</text>
   <text x="720" y="114" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">Hostname=<tspan fill="#1565c0" font-weight="700">proxmox2</tspan></text>
-  <text x="720" y="138" text-anchor="middle" font-size="12" fill="#263238">kõik muu sama</text>
+  <text x="720" y="138" text-anchor="middle" font-size="12" fill="#263238">Zabbixis template: passiivne</text>
   <rect x="560" y="185" width="320" height="95" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
   <text x="720" y="213" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox3</text>
   <text x="720" y="239" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">Hostname=<tspan fill="#1565c0" font-weight="700">proxmox3</tspan></text>
-  <text x="720" y="263" text-anchor="middle" font-size="12" fill="#263238">kõik muu sama</text>
+  <text x="720" y="263" text-anchor="middle" font-size="12" fill="#263238">Zabbixis template: aktiivne</text>
   <g stroke="#546e7a" stroke-width="2"><line x1="360" y1="150" x2="556" y2="108" marker-end="url(#d4)"/><line x1="360" y1="190" x2="556" y2="232" marker-end="url(#d4)"/></g>
   <text x="458" y="320" text-anchor="middle" font-size="12" fill="#546e7a">Teine käivitus: changed=0, sest masinad on juba soovitud olekus.</text>
 </svg>

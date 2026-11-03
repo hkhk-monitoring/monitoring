@@ -1,29 +1,26 @@
-<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
   <defs><marker id="d2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker></defs>
-  <rect width="900" height="340" fill="#ffffff"/>
-  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Üks template, palju hoste</text>
-  <rect x="30" y="60" width="330" height="230" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
-  <text x="195" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Template Linux by Zabbix agent</text>
-  <text x="50" y="118" font-size="13" font-weight="700" fill="#5d4037">item'id (kümneid)</text>
-  <g font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">
-    <text x="60" y="140">system.cpu.load[all,avg1]</text>
-    <text x="60" y="158">vm.memory.size[available]</text>
-    <text x="60" y="176">vfs.fs.size[/,pfree]  …</text>
-  </g>
-  <text x="50" y="206" font-size="13" font-weight="700" fill="#5d4037">trigger'id</text>
-  <g font-size="11" fill="#5d4037">
-    <text x="60" y="228">kettaruum hakkab otsa saama</text>
-    <text x="60" y="246">mälu on vähe</text>
-    <text x="60" y="264">agent ei vasta  …</text>
-  </g>
-  <g>
-    <rect x="560" y="60" width="300" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
-    <text x="710" y="93" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">proxmox2</text>
-    <rect x="560" y="132" width="300" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
-    <text x="710" y="165" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">proxmox3</text>
-    <rect x="560" y="204" width="300" height="56" rx="8" fill="#fafafa" stroke="#90a4ae" stroke-dasharray="5 4"/>
-    <text x="710" y="237" text-anchor="middle" font-size="13" fill="#546e7a">uus server: seo sama template</text>
-  </g>
-  <g stroke="#546e7a" stroke-width="2"><line x1="360" y1="150" x2="556" y2="88" marker-end="url(#d2)"/><line x1="360" y1="170" x2="556" y2="160" marker-end="url(#d2)"/><line x1="360" y1="190" x2="556" y2="232" marker-end="url(#d2)" stroke-dasharray="5 4"/></g>
-  <text x="460" y="320" text-anchor="middle" font-size="12" fill="#546e7a">Muudad template'is ühe trigger'i, muutus kehtib kõigil seotud hostidel.</text>
+  <rect width="900" height="360" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Template annab hostile item'id ja trigger'id</text>
+  <rect x="30" y="55" width="360" height="120" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="50" y="80" font-size="14" font-weight="700" fill="#e65100">Linux by Zabbix agent</text>
+  <text x="50" y="100" font-size="12" fill="#5d4037">passiivne kontroll: server küsib</text>
+  <text x="50" y="124" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">kümned item'id: protsessor, mälu,</text>
+  <text x="50" y="142" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">kettad, võrk …</text>
+  <text x="50" y="162" font-size="11" fill="#5d4037">trigger'id: mälu vähe, ketas täis, agent ei vasta …</text>
+  <rect x="30" y="195" width="360" height="120" rx="12" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="50" y="220" font-size="14" font-weight="700" fill="#004d40">Linux by Zabbix agent active</text>
+  <text x="50" y="240" font-size="12" fill="#263238">aktiivne kontroll: agent saadab</text>
+  <text x="50" y="264" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">samad item'id, tüüp</text>
+  <text x="50" y="282" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">Zabbix agent (active)</text>
+  <text x="50" y="302" font-size="11" fill="#263238">samad trigger'id</text>
+  <rect x="580" y="70" width="290" height="56" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="725" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#e65100">proxmox2</text>
+  <rect x="580" y="210" width="290" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="725" y="243" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">proxmox3</text>
+  <rect x="580" y="140" width="290" height="56" rx="8" fill="#fafafa" stroke="#90a4ae" stroke-dasharray="5 4"/>
+  <text x="725" y="166" text-anchor="middle" font-size="12" fill="#546e7a">uus server: seo üks</text>
+  <text x="725" y="184" text-anchor="middle" font-size="12" fill="#546e7a">neist kahest template'ist</text>
+  <g stroke="#546e7a" stroke-width="2"><line x1="390" y1="110" x2="576" y2="98" marker-end="url(#d2)"/><line x1="390" y1="250" x2="576" y2="238" marker-end="url(#d2)"/><line x1="390" y1="130" x2="576" y2="160" marker-end="url(#d2)" stroke-dasharray="5 4"/></g>
+  <text x="450" y="345" text-anchor="middle" font-size="12" fill="#546e7a">Muudad template'is ühe trigger'i, muutus kehtib kõigil sellega seotud hostidel.</text>
 </svg>

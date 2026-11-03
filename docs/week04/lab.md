@@ -364,7 +364,7 @@ Kodutöö: [Kas varundus töötas?](homework.md)
 ## Lisaülesanded
 
 ??? example "1 · Hüsterees"
-    Kui vaba ruum kõigub 20% ümber, tekib ja laheneb probleem iga 30 sekundi järel. Ava oma trigger, vali **OK event generation: Recovery expression** ja kirjuta `last(/proxmox2/vfs.fs.size[/,pfree])>25` ([hüsterees](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/expression#hysteresis)). Täida ketas nii, et vaba jääb 15%. Siis kustuta fail ja loo uus, mis jätab vabaks 22% (osa 5.3 arvutuses `15` asemel `22`). Mis olekus on probleem ja miks?
+    Kui vaba ruum kõigub 20% ümber, võib probleem iga uue väärtusega kord tekkida ja kord laheneda. Ava oma trigger, vali **OK event generation: Recovery expression** ja kirjuta `last(/proxmox2/vfs.fs.size[/,pfree])>25` ([hüsterees](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/expression#hysteresis)). Täida ketas nii, et vaba jääb 15%. Siis kustuta fail ja loo uus, mis jätab vabaks 22% (osa 5.3 arvutuses `15` asemel `22`). Mis olekus on probleem ja miks?
 
 ??? example "2 · Template'i piir hosti makroga"
     Template'i ketta trigger kasutab makrot `{$VFS.FS.PUSED.MAX.WARN}` (vaikimisi 80). Ava **Data collection → Hosts → proxmox3 → Macros → Inherited and host macros** ja muuda see `proxmox3` jaoks 50 peale. Kas `proxmox3` juures tekib probleem? Miks on makro parem kui template'i muutmine?

@@ -127,7 +127,7 @@ Jagamine paneb kokku read, millel on samad labelid, seega saad iga masina kohta 
 
 **Millises masinas on juurfailisüsteemis kõige vähem vaba ruumi?** Masinas on mitu failisüsteemi ja `node_filesystem_avail_bytes` annab rea igaühe kohta. Õige failisüsteemi valid labeliga `mountpoint="/"`. Vaba ruumi osakaal tuleb samamoodi nagu mälu puhul, jagades suurusega `node_filesystem_size_bytes`.
 
-**Kuidas muutub protsessori kasutus koormuskatse ajal?** `node_cpu_seconds_total` on counter. N3-s lugesid counterit kaks korda ja jagasid vahe ajaga. Funktsioon `rate()` teeb sama: see võtab ajavahemiku `[1m]` väärtused ja arvutab keskmise kasvu sekundis. Jõudeoleku (`mode="idle"`) kasv on iga protsessori kohta 0 ja 1 vahel. `avg by (instance)` paneb ühe masina protsessorid kokku ja `100 * (1 - ...)` teeb jõudeoleku osast kasutuse protsentides:
+**Kuidas muutub protsessori kasutus koormuskatse ajal?** `node_cpu_seconds_total` on counter. N3 loengus nägid, et counterist arvutatakse kiirus: loed kaks väärtust ja jagad vahe ajaga. Funktsioon `rate()` teeb sama: see võtab ajavahemiku `[1m]` väärtused ja arvutab keskmise kasvu sekundis. Jõudeoleku (`mode="idle"`) kasv on iga protsessori kohta 0 ja 1 vahel. `avg by (instance)` paneb ühe masina protsessorid kokku ja `100 * (1 - ...)` teeb jõudeoleku osast kasutuse protsentides:
 
 ```text
 node_cpu_seconds_total{mode="idle"}
@@ -167,5 +167,5 @@ Mõlemad koguvad mõõdikuid ja annavad teada probleemidest. N4-s valis Zabbixi 
     | label | nimi ja väärtus mõõdiku juures; nimi koos labelitega määrab aegrea |
     | `up` | 1, kui target vastas, 0, kui ei vastanud |
     | Targets-leht | olek, **Last scrape** ja **Error** iga target'i kohta |
-    | `rate()` | counteri keskmine kasv sekundis, nagu N3 käsitsi arvutus |
+    | `rate()` | counteri keskmine kasv sekundis, nagu N3 loengu näites |
     | `avg by (instance)` | paneb ühe masina aegread kokku |
