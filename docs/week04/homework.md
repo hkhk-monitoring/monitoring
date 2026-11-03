@@ -87,25 +87,20 @@ Salvesta agendi tõend oma arvutis repositooriumi kaustas:
 ssh proxmox3 "sudo -u zabbix zabbix_agent2 -t varundus.vanus; sudo crontab -l | grep -A1 varundus" > logid/kodutoo-varundus.txt
 ```
 
-Probleemi elutsükli tõend läheb README-sse (küsimus 5): **Monitoring → Problems**, filtris **Show: History**, rida *Varundus on vanem kui 10 minutit*. Kirjuta sealt host, algusaeg ja lahenemise aeg ning oma kellaajad cron'i keelamise ja taastamise kohta.
+Probleemi algus- ja lahenemise aja leiad **Monitoring → Problems**, filtris **Show: History**.
 
 ??? note "Lõppseis"
     Cron'i kirje on lubatud, märgistusfaili aeg uueneb iga 5 minuti järel, item kogub värskeid väärtusi ja trigger on olekus OK. Probleemi tekkimine ja lahenemine on README-s kirjas. Praktikumi agendiseadistus on alles: pärast kodutööd käivita playbook veel kord ja kontrolli, et mõlema masina väärtused uuenevad.
 
-## Osa 5 · Vasta küsimustele
-
-Vastused lähevad README osasse **Kodutöö** iga `_kodutöö_` asemele:
-
-1. Kirjuta oma trigger'i avaldis.
-2. Mitu minutit pärast cron'i keelamist tekkis probleem ja miks just siis? Arvesta faili viimast muutmisaega ja item'i intervalli.
-3. Mis juhtub, kui keegi kustutab faili `/var/tmp/varundus.ok`? Kas see on hea või halb?
-4. Varundusmasin saab avada ühenduse Zabbixi serveriga, kuid server ei pääse varundusmasinasse. Miks sobib selles võrgus aktiivne kontroll? Kas sama võtit saaks teises võrgus kasutada ka passiivse kontrollina?
-5. Probleemi ajalugu: host, algusaeg, lahenemise aeg, cron'i keelamise ja taastamise kellaaeg.
-6. Mida see kontroll tõendab ja mida peaksid veel kontrollima, et teada, kas varukoopiast saab andmed taastada?
-
 ## Töö esitamine
 
-Repositooriumis on `konf/varundus.conf`, täiendatud `konf/agent.yml`, `logid/kodutoo-varundus.txt` ja README vastused. Oma arvutis repositooriumi kaustas:
+Repositooriumis on `konf/varundus.conf`, täiendatud `konf/agent.yml` ja `logid/kodutoo-varundus.txt`. README osas **Kodutöö** kirjuta iga `_kodutöö_` asemele lühike vastus:
+
+1. sinu trigger'i avaldis;
+2. probleemi algus- ja lahenemise aeg (**Monitoring → Problems**, **Show: History**);
+3. mida see kontroll tõendab ja mida mitte.
+
+Oma arvutis repositooriumi kaustas:
 
 ```bash
 git status
