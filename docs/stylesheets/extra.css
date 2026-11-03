@@ -72,3 +72,6 @@
   .hero-content .btn-primary,
   .hero-content .btn-secondary { display: block; margin: 0.6rem auto; width: 220px; }
 }
+
+/* Avalehe kaardid: kolm ühes reas, kitsal ekraanil üksteise all */
+.md-typeset .grid.cards { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
