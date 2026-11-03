@@ -1,0 +1,25 @@
+<svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="f1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker>
+  <marker id="f1o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker></defs>
+  <rect width="900" height="330" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Playbook'i käik ja handler</text>
+  <g font-size="12" text-anchor="middle">
+    <rect x="15" y="60" width="95" height="54" rx="8" fill="#eceff1" stroke="#546e7a"/><text x="62" y="84">allkirja-</text><text x="62" y="100">võti</text>
+    <rect x="122" y="60" width="95" height="54" rx="8" fill="#eceff1" stroke="#546e7a"/><text x="169" y="84">Zabbixi</text><text x="169" y="100">hoidla</text>
+    <rect x="229" y="60" width="95" height="54" rx="8" fill="#eceff1" stroke="#546e7a"/><text x="276" y="84">EPEL ilma</text><text x="276" y="100">Zabbixita</text>
+    <rect x="336" y="60" width="95" height="54" rx="8" fill="#eceff1" stroke="#546e7a"/><text x="383" y="84">pakett</text><text x="383" y="100">zabbix-agent2</text>
+    <rect x="443" y="60" width="110" height="54" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/><text x="498" y="84" font-weight="700" fill="#e65100">kolm seadet</text><text x="498" y="100" fill="#e65100">notify</text>
+    <rect x="565" y="60" width="95" height="54" rx="8" fill="#eceff1" stroke="#546e7a"/><text x="612" y="84">port</text><text x="612" y="100">10050/tcp</text>
+    <rect x="672" y="60" width="95" height="54" rx="8" fill="#eceff1" stroke="#546e7a"/><text x="719" y="84">teenus</text><text x="719" y="100">käivitatud</text>
+    <rect x="785" y="60" width="100" height="54" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2" stroke-dasharray="5 3"/><text x="835" y="80" font-weight="700" fill="#e65100">handler</text><text x="835" y="96" fill="#e65100">taaskäivita</text><text x="835" y="109" font-size="10" fill="#e65100">play lõpus</text>
+  </g>
+  <g stroke="#546e7a" stroke-width="1.5"><line x1="110" y1="87" x2="120" y2="87" marker-end="url(#f1)"/><line x1="217" y1="87" x2="227" y2="87" marker-end="url(#f1)"/><line x1="324" y1="87" x2="334" y2="87" marker-end="url(#f1)"/><line x1="431" y1="87" x2="441" y2="87" marker-end="url(#f1)"/><line x1="553" y1="87" x2="563" y2="87" marker-end="url(#f1)"/><line x1="660" y1="87" x2="670" y2="87" marker-end="url(#f1)"/><line x1="767" y1="87" x2="783" y2="87" marker-end="url(#f1)"/></g>
+  <path d="M498,114 C498,150 835,150 835,118" fill="none" stroke="#ff8f00" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#f1o)"/>
+  <text x="665" y="160" text-anchor="middle" font-size="11" fill="#e65100">fail muutus → teavitab handler'it</text>
+  <rect x="15" y="190" width="870" height="50" rx="8" fill="#fff8e1" stroke="#ff8f00"/>
+  <text x="30" y="212" font-size="13" font-weight="700" fill="#e65100">1. käivitus</text>
+  <text x="30" y="230" font-size="12" fill="#263238">enamik ülesandeid changed, seadete fail muutus, handler taaskäivitab agendi</text>
+  <rect x="15" y="250" width="870" height="50" rx="8" fill="#e0f2f1" stroke="#00796b"/>
+  <text x="30" y="272" font-size="13" font-weight="700" fill="#004d40">2. käivitus</text>
+  <text x="30" y="290" font-size="12" fill="#263238">kõik ok, changed=0: masinad on juba soovitud olekus, handler ei käivitu</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="300" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Kettakatse ajajoon</text>
+  <line x1="40" y1="170" x2="860" y2="170" stroke="#37474f" stroke-width="2"/>
+  <rect x="200" y="150" width="400" height="40" fill="#ffebee"/>
+  <text x="400" y="175" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">vaba ruumi ~15%</text>
+  <g font-size="12" text-anchor="middle">
+    <line x1="120" y1="160" x2="120" y2="180" stroke="#37474f" stroke-width="2"/><text x="120" y="140" font-weight="700" fill="#263238">date + fallocate</text><text x="120" y="205" fill="#546e7a">sinu kellaaeg 1</text>
+    <line x1="200" y1="155" x2="200" y2="185" stroke="#00796b" stroke-width="2" stroke-dasharray="3 3"/><text x="200" y="225" fill="#00796b">item: uus väärtus</text>
+    <line x1="260" y1="120" x2="260" y2="190" stroke="#c62828" stroke-width="3"/><text x="260" y="110" font-weight="700" fill="#c62828">PROBLEM</text><text x="260" y="245" fill="#c62828">tabelis: algas</text>
+    <line x1="560" y1="160" x2="560" y2="180" stroke="#37474f" stroke-width="2"/><text x="560" y="140" font-weight="700" fill="#263238">date + rm</text><text x="560" y="205" fill="#546e7a">sinu kellaaeg 2</text>
+    <line x1="600" y1="155" x2="600" y2="185" stroke="#00796b" stroke-width="2" stroke-dasharray="3 3"/><text x="620" y="225" fill="#00796b">item: uus väärtus</text>
+    <line x1="660" y1="120" x2="660" y2="190" stroke="#00796b" stroke-width="3"/><text x="660" y="110" font-weight="700" fill="#00796b">RESOLVED</text><text x="660" y="245" fill="#00796b">tabelis: lahenes</text>
+  </g>
+  <text x="450" y="282" text-anchor="middle" font-size="12" fill="#546e7a">Viivitus tuleb item'i intervallist (30 s) ja trigger'i hindamisest. Ajad on illustratiivsed.</text>
+</svg>

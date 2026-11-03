@@ -1,0 +1,29 @@
+<svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="f2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker></defs>
+  <rect width="900" height="300" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Triiv ja selle parandamine</text>
+  <rect x="20" y="60" width="240" height="170" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="140" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">soovitud olek</text>
+  <text x="140" y="108" text-anchor="middle" font-size="11" fill="#263238">playbook kirjeldab:</text>
+  <text x="140" y="128" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">port 10050 lahti</text>
+  <text x="140" y="164" text-anchor="middle" font-size="12" fill="#263238">proxmox2: väärtused uuenevad</text>
+  <text x="140" y="184" text-anchor="middle" font-size="12" fill="#263238">proxmox3: väärtused uuenevad</text>
+  <rect x="330" y="60" width="240" height="170" rx="10" fill="#ffebee" stroke="#c62828" stroke-width="2"/>
+  <text x="450" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#c62828">tegelik olek erineb</text>
+  <text x="450" y="108" text-anchor="middle" font-size="11" fill="#263238">tulemüüris:</text>
+  <text x="450" y="128" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">port 10050 kinni</text>
+  <text x="450" y="164" text-anchor="middle" font-size="12" fill="#c62828" font-weight="700">proxmox2: ei uuene</text>
+  <text x="450" y="184" text-anchor="middle" font-size="12" fill="#263238">proxmox3: uueneb edasi</text>
+  <text x="450" y="210" text-anchor="middle" font-size="11" fill="#546e7a">aktiivne agent avab ühenduse ise</text>
+  <rect x="640" y="60" width="240" height="170" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="760" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">jälle soovitud olekus</text>
+  <text x="760" y="108" text-anchor="middle" font-size="11" fill="#263238">playbook uuesti:</text>
+  <text x="760" y="128" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">port: changed</text>
+  <text x="760" y="148" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">kõik muu: ok</text>
+  <text x="760" y="184" text-anchor="middle" font-size="12" fill="#263238">proxmox2: uueneb jälle</text>
+  <g stroke="#546e7a" stroke-width="2.5"><line x1="262" y1="145" x2="326" y2="145" marker-end="url(#f2)"/><line x1="572" y1="145" x2="636" y2="145" marker-end="url(#f2)"/></g>
+  <text x="295" y="255" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#546e7a">firewall-cmd --remove-port</text>
+  <text x="295" y="272" text-anchor="middle" font-size="11" fill="#546e7a">käsitsi muudatus = triiv</text>
+  <text x="605" y="255" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#546e7a">ansible-playbook</text>
+  <text x="605" y="272" text-anchor="middle" font-size="11" fill="#546e7a">parandab ainult erinevuse</text>
+</svg>
