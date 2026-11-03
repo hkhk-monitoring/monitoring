@@ -17,6 +17,7 @@ N2-s seadistasid Zabbixi, mis pingib masinaid ja annab teada, kui mõni ei vasta
     - selgitada, mis on aegrida ja proovivõtu intervall;
     - eristada gauge'i ja counterit ning tuua mõlemast näite;
     - kasutada USE-meetodit uurimisküsimuste koostamiseks ja nimetada mõõtmiste piirid;
+    - selgitada nelja kuldset signaali ning SLI, SLO ja SLA erinevust;
     - tõlgendada koormust (load average) tuumade arvu järgi ja mälu veeru `available` järgi;
     - selgitada, miks Zabbix näeb N2 seadistusega ainult seda, kas masin vastab, ja miks on vaja agenti.
 
@@ -153,7 +154,44 @@ Pane tähele viimast veergu: vead leiad sageli **logidest**, mitte mõõdikutest
     1. E-pood jäi seisma täis ketta tõttu. Kas see oli kasutuse, küllastuse või vea probleem?
     2. Protsessor on 100% hõivatud, aga järjekorda pole. Kas see on halb? Mis siis, kui järjekorras ootab 6 protsessi?
 
-## 5. Kust numbrid tulevad ja kes neid kogub
+## 5. Teenuse vaade: neli kuldset signaali, SLI, SLO ja SLA
+
+USE vaatab masinat. Kasutaja masinat ei näe, ta näeb teenust: kas leht avaneb ja kui kiiresti. Google'i SRE raamat soovitab teenuse kohta mõõta [nelja kuldset signaali](https://sre.google/sre-book/monitoring-distributed-systems/#xref_monitoring_golden-signals) (golden signals).
+
+??? note "Tabel 3.5. Neli kuldset signaali"
+    | Signaal | Küsimus | E-poe näide |
+    |---|---|---|
+    | **Latentsus** (latency) | kui kaua vastus võtab | 95% päringutest vastab alla 300 ms |
+    | **Liiklus** (traffic) | kui palju on nõudlust | 40 päringut sekundis |
+    | **Vead** (errors) | kui suur osa päringutest ebaõnnestub | 0,3% päringutest annab vea 500 |
+    | **Küllastus** (saturation) | kui täis teenus on | andmebaasi ühendustest on kasutusel 90% |
+
+<figure markdown="span">
+  ![Kasutaja saadab päringud e-poodi; teenuse kohta mõõdetakse latentsust, liiklust, vigu ja küllastust](../images/n03_kuldsed_signaalid.svg)
+  <figcaption>Joonis 3.3. Neli kuldset signaali kirjeldavad teenust kasutaja vaatest. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+</figure>
+
+Küllastus on sama mõte mis USE-s: kui ressurss saab täis, tekib järjekord ja latentsus kasvab. Masina mõõdikud näitavad põhjust, kuldsed signaalid näitavad, kas kasutaja seda tunneb. Latentsust ja vigu mõõdetakse päringute kohta, kursusel teed seda N11-s.
+
+Kuldsetest signaalidest saab teenuse kvaliteedi mõõdupuu ([Measurement is critical](https://manishagarwal.hashnode.dev/measurement-is-critical)):
+
+- **SLI** (service level indicator) on mõõdetud näitaja, näiteks õnnestunud päringute osakaal viimase 30 päeva jooksul.
+- **SLO** (service level objective) on meeskonna eesmärk sellele näitajale, näiteks 99,5%.
+- **SLA** (service level agreement) on leping kliendiga. Kui teenus jääb lubatud tasemest allapoole, maksab teenusepakkuja hüvitist.
+
+SLA on tavaliselt madalam kui SLO, et meeskond märkaks probleemi enne lepingu rikkumist. SLO ja 100% vahe on **veaeelarve** (error budget). SLO 99,5% tähendab, et 30 päeva jooksul võib teenus olla häiritud umbes 3,6 tundi (30 × 24 h × 0,005). Kui veaeelarve on kulunud, tegeleb meeskond töökindlusega, mitte uute funktsioonidega.
+
+<figure markdown="span">
+  ![Skaala 98 kuni 100 protsenti: SLA 99,0 protsenti, SLO 99,5 protsenti, mõõdetud SLI 99,7 protsenti; SLO ja 100 protsendi vahe on veaeelarve](../images/n03_sli_slo_sla.svg)
+  <figcaption>Joonis 3.4. SLI on mõõdetud, SLO on eesmärk, SLA on lubadus kliendile. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+</figure>
+
+??? question "Kontrolli ennast"
+    1. E-poe leht avaneb, aga vastus võtab 8 sekundit. Ping ja USE näitavad, et masinal on kõik korras. Milline kuldne signaal seda näitab ja kust selle mõõtmise saaksid?
+    2. SLO on 99,9% 30 päeva kohta. Mitu minutit võib teenus selle aja jooksul olla häiritud?
+    3. Miks ei panda SLA-sse sama numbrit kui SLO-sse?
+
+## 6. Kust numbrid tulevad ja kes neid kogub
 
 Masina kohta käivaid numbreid haldab Linuxis **tuum** (kernel): mitu protsessi ootab, kui palju mälu on kasutusel, kaua masin on üleval olnud. Tuum ei kirjuta neid numbreid kettale, vaid näitab neid kaustas **`/proc`**. See näeb välja nagu tavaline kaust failidega, kuid failide sisu koostab tuum lugemise hetkel.
 
@@ -167,10 +205,10 @@ graph LR
     P -. "N4" .-> A["Zabbix agent"]
     P -. "N5" .-> N["node_exporter"]
 ```
-  <figcaption>Joonis 3.3. Käsud `uptime`, `free` ja `top` ei mõõda midagi ise. Nad loevad tuuma numbreid kaustast `/proc`. Hiljem teevad sama Zabbix agent ja node_exporter (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 3.5. Käsud `uptime`, `free` ja `top` ei mõõda midagi ise. Nad loevad tuuma numbreid kaustast `/proc`. Hiljem teevad sama Zabbix agent ja node_exporter (Talvik, 2026).</figcaption>
 </figure>
 
-??? note "Tabel 3.5. Olulisemad failid kaustas `/proc`"
+??? note "Tabel 3.6. Olulisemad failid kaustas `/proc`"
     | Fail | Mis seal on | Tüüp | Mis käsk seda loeb |
     |---|---|---|---|
     | `/proc/uptime` | sekundid alates käivitusest | counter | `uptime` |
@@ -185,7 +223,7 @@ Neid faile saab lugeda **ainult masina seest**. N2 Zabbix töötab `proxmox1`-s 
 
 Mõõdikute kogumiseks on kaks võimalust:
 
-??? note "Tabel 3.6. Agendiga ja agendita kogumine"
+??? note "Tabel 3.7. Agendiga ja agendita kogumine"
     | | Agendita (agentless) | Agendiga |
     |---|---|---|
     | Kuidas | server mõõdab väljast: ping, kas port on lahti, kas veebileht vastab | masinas töötab väike programm (agent), mis loeb `/proc`-i ja annab numbrid serverile |
@@ -198,7 +236,7 @@ Mõõdikute kogumiseks on kaks võimalust:
     2. Tahad teada, millal e-poe ketas täis saab. Kas N2 Zabbix suudab seda öelda? Mida on vaja juurde?
     3. Too üks olukord, kus agendita kontroll on parem kui agent.
 
-## 6. Kuidas numbreid õigesti lugeda
+## 7. Kuidas numbreid õigesti lugeda
 
 ### Koormus ja poe kassad
 
@@ -232,7 +270,7 @@ graph LR
     end
     J --> C
 ```
-  <figcaption>Joonis 3.4. Koormus 6 kahe tuumaga masinas: kaks protsessi töötavad, neli ootavad. Koormus jagatud tuumade arvuga on 3: masin on kolm korda üle koormatud. See on USE-meetodi küllastus (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 3.6. Koormus 6 kahe tuumaga masinas: kaks protsessi töötavad, neli ootavad. Koormus jagatud tuumade arvuga on 3: masin on kolm korda üle koormatud. See on USE-meetodi küllastus (Talvik, 2026).</figcaption>
 </figure>
 
 **Koormus ilma tuumade arvuta ei tähenda midagi.** Tuumade arvu näitab käsk `nproc`. Rusikareegel: jaga koormus tuumade arvuga. Kuni 1 on korras, üle selle tekib järjekord.
@@ -259,7 +297,7 @@ Seepärast vaata veergu **`available`**: see on mälu, mille programm saaks kohe
     2. Mida tähendab `load average: 0.20, 1.50, 3.80`? Kas olukord läheb paremaks või halvemaks?
     3. Sõber saadab sulle `free -h` väljundi, kus `free` on 90 MiB ja `available` on 3 GiB. Mida talle vastad?
 
-## 7. Number üksi ei ütle midagi
+## 8. Number üksi ei ütle midagi
 
 Sama number võib ühes masinas tähendada tavalist olekut ja teises riket. Varukoopiaserver pakib iga öö kell 02:00 failid kokku ja protsessor on tund aega 95% hõivatud. See on tavaline öö. Kui sama 95% on keskpäeval, kui varukoopiat ei tehta, on midagi valesti.
 
@@ -276,9 +314,6 @@ Testides tekitatakse koormus meelega. Tööriist **`stress-ng`** paneb protsesso
 ??? info "Koormus ja ketas"
     Linuxi koormuse sees on ka protsessid, mis ootavad ketast. Seega võib koormus olla kõrge ka siis, kui protsessor on peaaegu tühi. Seda näed `top`-is real `%Cpu(s)` väärtusena `wa` (wait).
 
-??? info "Neli kuldset signaali"
-    Masina jaoks on USE. Teenuse (veebilehe, API) jaoks kasutatakse Google'i SRE raamatu [nelja kuldset signaali](https://sre.google/sre-book/monitoring-distributed-systems/#xref_monitoring_golden-signals): latentsus, liiklus, vead ja küllastus. N11-s mõõdad neid.
-
 ??? info "Push ja pull"
     Zabbix agent saab töötada kahel moel: server küsib (passiivne) või agent saadab ise (aktiivne). Prometheus (N5) küsib andmeid ise, Telegraf (N7) saadab need ise. Kumb on parem, sõltub võrgust: kas server pääseb masinani või ainult masin serverini.
 
@@ -294,6 +329,8 @@ Testides tekitatakse koormus meelega. Tööriist **`stress-ng`** paneb protsesso
     | **Gauge** | käib üles ja alla, hetkeseis | `cat /proc/loadavg` |
     | **Counter** | ainult kasvab, loeb kokku | `cat /proc/net/dev` |
     | **USE** | kasutus, küllastus, vead iga ressursi kohta | Tabel 3.4 |
+    | **Neli kuldset signaali** | latentsus, liiklus, vead, küllastus teenuse kohta | Tabel 3.5 |
+    | **SLI, SLO, SLA** | mõõdetud näitaja, eesmärk, leping kliendiga | Joonis 3.4 |
     | **Koormus (load average)** | mitu protsessi tahab protsessorit, 1/5/15 min | `uptime` |
     | **Agent** | programm masinas, mis loeb `/proc`-i ja annab numbrid serverile | N4 |
     | **Baasjoon (baseline)** | masina tavaline olek | ainult aegreast |
