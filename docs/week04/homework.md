@@ -90,11 +90,11 @@ ssh proxmox3 "sudo -u zabbix zabbix_agent2 -t varundus.vanus; sudo crontab -l | 
 Probleemi algus- ja lahenemise aja leiad **Monitoring → Problems**, filtris **Show: History**.
 
 ??? note "Lõppseis"
-    Cron'i kirje on lubatud, märgistusfaili aeg uueneb iga 5 minuti järel, item kogub värskeid väärtusi ja trigger on olekus OK. Probleemi tekkimine ja lahenemine on README-s kirjas. Praktikumi agendiseadistus on alles: pärast kodutööd käivita playbook veel kord ja kontrolli, et mõlema masina väärtused uuenevad.
+    Cron'i kirje on lubatud, märgistusfaili aeg uueneb iga 5 minuti järel, item kogub värskeid väärtusi ja trigger on olekus OK. Probleemi algus ja lahenemine on `BOONUS.md`-s kirjas. Praktikumi agendiseadistus on alles: pärast kodutööd käivita playbook veel kord ja kontrolli, et mõlema masina väärtused uuenevad.
 
 ## Töö esitamine
 
-Repositooriumis on `konf/varundus.conf`, täiendatud `konf/agent.yml` ja `logid/kodutoo-varundus.txt`. README osas **Kodutöö** kirjuta iga `_kodutöö_` asemele lühike vastus:
+Repositooriumis on `konf/varundus.conf`, täiendatud `konf/agent.yml` ja `logid/kodutoo-varundus.txt`. Failis `BOONUS.md` kirjuta iga `_vastus_` asemele lühike vastus:
 
 1. sinu trigger'i avaldis;
 2. probleemi algus- ja lahenemise aeg (**Monitoring → Problems**, **Show: History**);
@@ -104,7 +104,7 @@ Oma arvutis repositooriumi kaustas:
 
 ```bash
 git status
-git add konf logid README.md
+git add konf logid BOONUS.md
 git commit -m "Kodutöö 4: varunduse vanus"
 git push
 ```
