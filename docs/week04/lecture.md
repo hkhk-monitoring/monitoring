@@ -19,7 +19,7 @@ N2-s käivitasid Zabbixi ja see kontrollis pingiga, kas `proxmox2` ja `proxmox3`
 
 ## 1. Ping ei näe masina sisse
 
-N2-s kontrollis Zabbix pingiga, kas masin vastab, mitte seda, mis masina sees toimub. Ketas võib olla täis, kuigi masin vastab pingile ja Zabbix näitab rohelist. Ketta täituvust loed jälgitava masina sees, nagu N3 loengus käsuga `df -h`. Pidevaks mõõtmiseks on vaja programmi, mis töötab jälgitavas masinas, loeb numbrid ja annab need serverile. Seda programmi nimetatakse **agendiks** (agent).
+N2-s kontrollis Zabbix pingiga, kas masin vastab, mitte masina sisemist olekut. Ketas võib olla täis, kuigi masin vastab pingile ja Zabbix näitab rohelist. Ketta täituvust loed jälgitava masina sees, nagu N3 loengus käsuga `df -h`. Pidevaks mõõtmiseks on vaja programmi, mis töötab jälgitavas masinas, loeb numbrid ja annab need serverile. Seda programmi nimetatakse **agendiks** (agent).
 
 Need on kaks vaadet: **blackbox**- ja **whitebox**-monitooring ([Application monitoring: black box vs white box](https://dev.to/rafaeljcamara/application-monitoring-black-box-vs-white-box-32ij)). Blackbox-kontroll vaatab süsteemi väljast. Ping kontrollib, kas masin vastab, veebikontroll võib kontrollida, kas leht avaneb. Tulemus näitab ainult seda, mida see kontroll katsetab. Whitebox-kontroll kasutab süsteemi sisemisi näite: protsessori kasutust, mälu, kettaruumi ja teenuste olekut. See näitab probleemi sageli enne, kui kasutaja seda märkab, näiteks ketas täitub. N2 ping oli blackbox, tänane agent on whitebox. Vaja on mõlemat, N11-s lisandub veebiteenuse blackbox-kontroll.
 
