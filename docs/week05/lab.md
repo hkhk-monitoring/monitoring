@@ -34,7 +34,7 @@ Töötad neljas kohas. Kasutatavad versioonid on node_exporter 1.12.1 ja Prometh
     | `proxmox2`, `proxmox3` | node_exporter (systemd teenus) | paigaldad node_exporteri, `proxmox2`-s esmalt käsitsi |
     | Brauser | Prometheuse veebiliides | vaatad Targets-lehte ja kirjutad päringuid |
 
-Ava Classroom 50 link ([Praktikum 4 - Server küsib mõõdikuid](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium. Käivita käsud oma arvutis:
+Ava Classroom 50 link ([Praktikum 5 - Server küsib mõõdikuid](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium. Käivita käsud oma arvutis:
 
 ```bash
 git clone <sinu-repo-URL>
@@ -447,7 +447,7 @@ Repositooriumis on playbook, Prometheuse seaded, tõendid kaustas `logid/` ja RE
 ```bash
 git status
 git add README.md konf logid
-git commit -m "Praktikum 4: server küsib mõõdikuid"
+git commit -m "Praktikum 5: server küsib mõõdikuid"
 git push
 ```
 
