@@ -4,21 +4,27 @@ tags:
   - Monitooring
 ---
 
-# Töökeskkond
+# Töökeskkond ja eelkontroll
 
-Kasutad samu kolme Proxmoxi sõlme, mis automatiseerimise kursusel. Uut masinat ei ole vaja.
+Kasutad automatiseerimise kursusest tuttavaid laborimasinaid `proxmox1`, `proxmox2` ja `proxmox3`. Enne esimest praktikumi kontrolli VPN-i, SSH-ühendusi ja Ansible'i ligipääsu. Kui keskkond puudub, taasta see automatiseerimise kursuse [töökeskkonna juhendi](https://hkhk-automation.github.io/devops/kodulabor/) järgi.
+
+## 1. Masinad ja nende rollid
+
+`proxmox1`, `proxmox2` ja `proxmox3` on kooli Proxmoxis töötavad virtuaalmasinad (AlmaLinux 9). Nimed on SSH aliased sinu `~/.ssh/config`-is.
 
 | Masin | Roll |
 |---|---|
 | Sinu arvuti | VS Code, terminal, Ansible, Git, brauser |
 | `proxmox1` | keskserver: logiserver (rsyslog), seiresüsteemid (Docker Compose) |
-| `proxmox2`, `proxmox3` | jälgitavad masinad |
+| `proxmox2`, `proxmox3` | jälgitavad masinad: agendid ja exporter'id |
 
-*Tabel 1. Kes mida teeb*
+## 2. Ühenda kooli võrku
 
-## Kontrolli SSH-ühendust ja Ansible'i
+Koolis on laborimasinad otse kättesaadavad. Kodust töötades ühenda enne VPN. VPN-i profiili annab õpetaja.
 
-Kodust töötades ühenda enne VPN. Seejärel käivita oma arvutis:
+## 3. Kontrolli SSH-ühendusi
+
+Käivita oma arvutis:
 
 ```bash
 for h in proxmox1 proxmox2 proxmox3; do
@@ -26,35 +32,59 @@ for h in proxmox1 proxmox2 proxmox3; do
 done
 ```
 
-Iga käsk väljastab masina hostinime ja parooli ei küsita, sest ühendus kasutab SSH-võtit. Kui mõni ühendus ei õnnestu, tee läbi automatiseerimise kursuse [1. nädala praktikum](https://hkhk-automation.github.io/devops/week01/lab/) (SSH-võti ja `~/.ssh/config`).
+??? success "Oodatav tulemus"
+    Iga käsk väljastab masina hostinime. Parooli ei küsita, sest ühendus kasutab SSH-võtit.
+
+??? warning "Kui mõni ühendus ei õnnestu"
+    Kontrolli, et VPN on ühendatud. Seejärel tee läbi automatiseerimise kursuse [1. nädala praktikum](https://hkhk-automation.github.io/devops/week01/lab/) (SSH-võti ja `~/.ssh/config`). Ära jätka enne, kui kõik kolm ühendust töötavad.
+
+## 4. Kontrolli Ansible'i ligipääsu
 
 ```bash
 ansible all -i proxmox1,proxmox2,proxmox3, -m ping
 ```
 
-Väljundis on kolm `pong`-i. Koma loendi lõpus näitab Ansible'ile, et `-i` järel on masinate loend, mitte inventarifaili nimi.
+Koma loendi lõpus näitab Ansible'ile, et `-i` järel on masinate loend, mitte inventarifaili nimi.
 
-## Pordid
+??? success "Oodatav tulemus"
+    Väljundis on kolm rida olekuga `SUCCESS` ja `"ping": "pong"`.
 
-Monitooringusüsteemid töötavad sõlmes `proxmox1`, agendid ja exporter'id jälgitavates masinates. Veebiliidese avad brauseris aadressil `http://<proxmox1-IP>:<port>`. Kasuta IP-aadressi, mille said automatiseerimise kursusel.
+## 5. Millal oled valmis?
 
-| Teenus | Port | Masin | Brauseris | Alates |
-|---|---|---|---|---|
-| rsyslog (logide vastuvõtt) | 514/tcp | `proxmox1` | ei | N1 |
-| Zabbix veebiliides | 8080/tcp | `proxmox1` | jah | N2 |
-| Zabbix agent | 10050/tcp | `proxmox2`, `proxmox3` | ei | N4 |
-| Prometheus | 9090/tcp | `proxmox1` | jah | N5 |
-| node_exporter | 9100/tcp | `proxmox2`, `proxmox3` | ei | N5 |
-| Grafana | 3000/tcp | `proxmox1` | jah | N6 |
-| Alertmanager | 9093/tcp | `proxmox1` | jah | N6 |
-| InfluxDB | 8086/tcp | `proxmox1` | ei | N7 |
-| Loki | 3100/tcp | `proxmox1` | ei | N8 |
-| OpenSearch Dashboards | 5601/tcp | `proxmox1` | jah | N9 |
-| Jaeger | 16686/tcp | `proxmox1` | jah | N10 |
-| Uptime Kuma | 3001/tcp | `proxmox1` | jah | N11 |
+Oled valmis, kui pääsed SSH-ga kõigisse kolme laborimasinasse ja Ansible'i kontroll õnnestub kõigi kolme puhul. Monitooringuteenused paigaldad vastavates praktikumides.
 
-*Tabel 2. Teenused ja pordid*
+## 6. Teenuste peatamine ja taaskäivitamine
 
-## Mälu
+`proxmox1` mälu on piiratud. Iga praktikumi alguses on kirjas, millised teenused peavad töötama ja millised peatada. Enne uue seirekomplekti käivitamist kontrolli saadaval mälu:
 
-Iga seiresüsteem vajab `proxmox1`-l 0,5–2 GB mälu. Iga praktikumi alguses on kirjas, millised süsteemid peavad töötama. Ülejäänud peata nende Compose'i projekti kaustas käsuga `docker compose stop`. See peatab konteinerid, kuid ei eemalda neid ega nende andmeköiteid, nii et `docker compose start` käivitab need samas olekus uuesti. Kontrolli `ssh proxmox1 free -h`, veerg `available`. Kui see on alla 3 GB, anna õpetajale teada.
+```bash
+ssh proxmox1 free -h
+```
+
+Kui veerus `available` on alla 3 GB, peata mittevajalikud teenused või anna õpetajale teada.
+
+Teenuse ajutiseks peatamiseks kasuta selle Compose'i projekti kaustas käsku `docker compose stop`. See peatab konteinerid, kuid ei eemalda neid ega nende andmeköiteid. Käsk `docker compose start` käivitab olemasolevad konteinerid uuesti. Pärast käivitamist kontrolli teenuse valmisolekut vastava praktikumi järgi ([docker compose stop](https://docs.docker.com/reference/cli/docker/compose/stop/)).
+
+!!! warning "`docker compose down -v` kustutab andmed"
+    Võti `-v` eemaldab ka andmeköited, näiteks Zabbixi andmebaasi koos kõigi hostidega. Kasuta seda ainult siis, kui tahad teenuse andmed teadlikult kustutada.
+
+## Teenused ja ühendused
+
+Tabel on kursuse teatmik. Kõiki teenusi ei pea korraga käivitama ega kõiki porte enne kursuse algust avama. Veebiliidese avad brauseris aadressil `http://<proxmox1-IP>:<port>`.
+
+??? note "Tabel 1. Teenused, pordid ja kes ühendub"
+    | Teenus | Sihtmasin | Sihtport | Kes ühendub | Alates |
+    |---|---|---|---|---|
+    | rsyslog, logide vastuvõtt | `proxmox1` | 514/tcp | `proxmox2` ja `proxmox3` rsyslog | N1 |
+    | Zabbixi veebiliides | `proxmox1` | 8080/tcp | sinu brauser | N2 |
+    | Zabbixi passiivsed kontrollid | `proxmox2`, `proxmox3` | 10050/tcp | Zabbixi server | N4 |
+    | Zabbixi aktiivsed kontrollid | `proxmox1` | 10051/tcp | `proxmox3` agent | N4 |
+    | Prometheus | `proxmox1` | 9090/tcp | sinu brauser | N5 |
+    | node_exporter | `proxmox2`, `proxmox3` | 9100/tcp | Prometheus | N5 |
+    | Grafana | `proxmox1` | 3000/tcp | sinu brauser | N6 |
+    | Alertmanager | `proxmox1` | 9093/tcp | sinu brauser, Prometheus | N6 |
+    | InfluxDB | `proxmox1` | 8086/tcp | Telegraf | N7 |
+    | Loki | `proxmox1` | 3100/tcp | Grafana Alloy | N8 |
+    | OpenSearch Dashboards | `proxmox1` | 5601/tcp | sinu brauser | N9 |
+    | Jaeger | `proxmox1` | 16686/tcp | sinu brauser | N10 |
+    | Uptime Kuma | `proxmox1` | 3001/tcp | sinu brauser | N11 |
