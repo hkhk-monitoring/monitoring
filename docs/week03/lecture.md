@@ -11,7 +11,7 @@ tags:
 N2-s seadistasid Zabbixi, mis pingib masinaid ja annab teada, kui mõni ei vasta. Täna vaatad, mida masina sees mõõdetakse, kust need numbrid tulevad ja miks on nende kogumiseks vaja agenti.
 
 ??? abstract "Õpiväljundid"
-    Pärast loengut ja praktikumi oskad:
+    Pärast loengut oskad:
 
     - eristada mõõdikut (number ajas) ja sündmust (kirje sellest, mis juhtus);
     - selgitada, mis on aegrida ja proovivõtu intervall;
@@ -109,7 +109,7 @@ kell 10:00:10   8 425 163 210 baiti
 vahe 10 sekundiga: 12 500 000 baiti → 1,25 MB sekundis
 ```
 
-Seda arvutust nimetatakse **kiiruseks** (rate). Täpselt nii töötab ka `top`: protsessori protsendi arvutab ta, lugedes protsessori aja counterit kaks korda ja võrreldes vahet. Praktikumis teed seda ise.
+Seda arvutust nimetatakse **kiiruseks** (rate). Täpselt nii töötab ka `top`: protsessori protsendi arvutab ta, lugedes protsessori aja counterit kaks korda ja võrreldes vahet.
 
 Counteril on üks lõks: kui masin taaskäivitub, algab loendur nullist. Hea monitooringusüsteem tunneb selle ära ega joonista graafikule tohutut negatiivset hüpet.
 

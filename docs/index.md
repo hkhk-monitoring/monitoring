@@ -19,7 +19,7 @@ Kursuse lõpuks oskad:
 |---|---|---|
 | N1 | Masina logid ja keskne logiserver | journald, rsyslog, logrotate, auditd |
 | N2 | Keskne jälgimissüsteem | Zabbix, Docker Compose |
-| N3 | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, vmstat, stress-ng |
+| N3 | Mõõdik, aegrida, agent *(veebiõpe)* | top, free, df, Zabbix Cloud |
 | N4 | Agent räägib serverile | Zabbix agent 2, Ansible |
 | N5 | Server küsib ise | Prometheus, node_exporter, PromQL |
 | N6 | Numbrid pildiks ja alarm | Grafana, Alertmanager |
