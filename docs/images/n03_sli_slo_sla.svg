@@ -13,7 +13,7 @@
   </g>
   <line x1="360" y1="102" x2="360" y2="180" stroke="#c62828" stroke-width="3"/>
   <text x="360" y="78" text-anchor="middle" font-size="14" font-weight="700" fill="#c62828">SLA 99,0%</text>
-  <text x="360" y="94" text-anchor="middle" font-size="11" fill="#c62828">leping kliendiga, alla selle hüvitis</text>
+  <text x="360" y="94" text-anchor="middle" font-size="11" fill="#c62828">kokkulepe kliendiga</text>
   <line x1="640" y1="102" x2="640" y2="180" stroke="#e65100" stroke-width="3"/>
   <text x="640" y="78" text-anchor="middle" font-size="14" font-weight="700" fill="#e65100">SLO 99,5%</text>
   <text x="640" y="94" text-anchor="middle" font-size="11" fill="#e65100">meeskonna eesmärk</text>
@@ -22,9 +22,9 @@
   <text x="764" y="112" text-anchor="middle" font-size="14" font-weight="700" fill="#00796b">SLI 99,7%</text>
   <path d="M640,230 v10 h180 v-10" fill="none" stroke="#e65100" stroke-width="2"/>
   <text x="730" y="262" text-anchor="middle" font-size="13" font-weight="700" fill="#e65100">veaeelarve 0,5%</text>
-  <text x="730" y="280" text-anchor="middle" font-size="11" fill="#5d4037">umbes 3,6 tundi häireid kuus</text>
-  <text x="300" y="262" text-anchor="middle" font-size="12" fill="#263238">SLI on mõõdetud, SLO on eesmärk, SLA on lubadus.</text>
-  <text x="300" y="282" text-anchor="middle" font-size="12" fill="#263238">SLO on kõrgem kui SLA, et probleem tuleks välja enne lepingu rikkumist.</text>
+  <text x="730" y="280" text-anchor="middle" font-size="11" fill="#5d4037">kuni 500 ebaõnnestunud päringut 100 000-st</text>
+  <text x="300" y="262" text-anchor="middle" font-size="12" fill="#263238">SLI on mõõdetud, SLO on eesmärk, SLA on kokkulepe.</text>
+  <text x="300" y="282" text-anchor="middle" font-size="12" fill="#263238">SLO on rangem kui SLA, et jääks reageerimisvaru.</text>
   <text x="220" y="165" text-anchor="middle" font-size="11" fill="#c62828">SLA rikutud</text>
   <text x="500" y="165" text-anchor="middle" font-size="11" fill="#e65100">SLO rikutud</text>
   <text x="450" y="318" text-anchor="middle" font-size="11" fill="#546e7a">Näiteväärtused on illustratiivsed. Skaala ei ole lineaarne.</text>

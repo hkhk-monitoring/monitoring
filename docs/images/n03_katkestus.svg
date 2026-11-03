@@ -1,0 +1,23 @@
+<svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="300" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Kaks 20-sekundilist katkestust, mõõtmine iga 60 s järel</text>
+  <!-- ajatelg 0..130 s: x = 80 + t*5.5 -->
+  <line x1="80" y1="200" x2="830" y2="200" stroke="#37474f" stroke-width="2"/>
+  <g font-size="12" text-anchor="middle" fill="#37474f" font-family="JetBrains Mono, Menlo, monospace">
+    <text x="80" y="222">0 s</text><text x="245" y="222">30 s</text><text x="410" y="222">60 s</text><text x="575" y="222">90 s</text><text x="740" y="222">120 s</text>
+  </g>
+  <rect x="190" y="110" width="110" height="40" rx="6" fill="#ffebee" stroke="#c62828" stroke-width="2"/>
+  <text x="245" y="135" text-anchor="middle" font-size="15" font-weight="700" fill="#c62828">A</text>
+  <text x="245" y="98" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">katkestus A: 20–40 s</text>
+  <rect x="355" y="60" width="110" height="40" rx="6" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="385" y="85" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">B</text>
+  <text x="475" y="85" font-size="13" font-weight="700" fill="#e65100">katkestus B: 50–70 s</text>
+  <g stroke="#00796b" stroke-width="3">
+    <line x1="80" y1="170" x2="80" y2="210"/><line x1="410" y1="50" x2="410" y2="210"/><line x1="740" y1="170" x2="740" y2="210"/>
+  </g>
+  <g fill="#00796b"><circle cx="80" cy="170" r="6"/><circle cx="410" cy="170" r="6"/><circle cx="740" cy="170" r="6"/></g>
+  <text x="80" y="160" text-anchor="middle" font-size="11" fill="#00796b">mõõtmine</text>
+  <text x="430" y="165" font-size="11" fill="#00796b">mõõtmine</text>
+  <text x="740" y="160" text-anchor="middle" font-size="11" fill="#00796b">mõõtmine</text>
+  <text x="450" y="260" text-anchor="middle" font-size="12" fill="#546e7a">Lihtsustatud: igal märgitud hetkel tehakse üks hetkeline kontroll. Väärtused on illustratiivsed.</text>
+</svg>

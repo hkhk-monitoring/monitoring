@@ -18,25 +18,25 @@ N2-s seadistasid Zabbixi, mis pingib masinaid ja annab teada, kui mõni ei vasta
     - eristada gauge'i ja counterit ning tuua mõlemast näite;
     - kasutada USE-meetodit uurimisküsimuste koostamiseks ja nimetada mõõtmiste piirid;
     - selgitada nelja kuldset signaali ning SLI, SLO ja SLA erinevust;
-    - tõlgendada koormust (load average) tuumade arvu järgi ja mälu veeru `available` järgi;
+    - tõlgendada koormust (load average) koos protsessorite arvu ja ketta ootamisega ning mälu veeru `available` järgi;
     - selgitada, miks Zabbix näeb N2 seadistusega ainult seda, kas masin vastab, ja miks on vaja agenti.
 
 ## 1. Zabbix ütles „kõik korras“
 
 N2 lõpuks pingis Zabbix iga minut `proxmox2` ja `proxmox3`. Kui masin ei vastanud, tekkis probleem ja pärast parandust lahenes see ise. See on juba monitooring, aga see vastab ainult ühele küsimusele: **kas masin on võrgus, jah või ei.**
 
-Ping ei näita masina sisemist olekut. Näiteks võib e-poe server vastata pingile, kuigi leht laeb 15 sekundit, sest ketas on 100% täis: logifail kasvas terve nädala. Kolmapäeval oli ketas 85% täis ja täitus 5% päevas. Kui ketast oleks mõõdetud, oleks hoiatus tulnud kaks päeva enne, kui klient poe aeglusest teatas.
+Ping ei näita masina sisemist olekut. Näiteks võib e-poe server vastata pingile, kuigi leht laeb 15 sekundit, sest ketas on 100% täis: logifail kasvas terve nädala. Kolmapäeval oli ketas 90% täis ja täitus 5 protsendipunkti päevas, reedeks oli see täis. Kui ketta täituvust oleks kogutud ja sellele oleks olnud seadistatud alarmireegel, oleks hoiatus tulnud kaks päeva enne, kui klient poe aeglusest teatas.
 
 <figure markdown="span">
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#e0f2f1','primaryBorderColor':'#00796b','primaryTextColor':'#212121','lineColor':'#26a69a'}}}%%
 graph LR
-    A["Kolmapäev<br/>ketas 85%"] --> B["Reede 21:00<br/>ketas 100%<br/>pood aeglane"]
+    A["Kolmapäev<br/>ketas 90%"] --> B["Reede 21:00<br/>ketas 100%<br/>pood aeglane"]
     B --> C["Reede 23:00<br/>klient kurdab"]
     C --> D["Esmaspäev<br/>administraator saab teada"]
-    A -. "kettat mõõdetakse: hoiatus siin" .-> E["vanade logide<br/>kustutamine<br/>5 minutit"]
+    A -. "ketast mõõdetakse ja alarm on seadistatud: hoiatus siin" .-> E["kettaruumi kasvu<br/>uurimine ja säilitus-<br/>poliitika kontroll"]
 ```
-  <figcaption>Joonis 3.1. Sama probleem kahe teekonnaga. Ping oli kogu aeg korras, seega N2 seadistusega Zabbix ei oleks midagi teatanud. Ketta mõõtmine oleks andnud hoiatuse kaks päeva varem (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 3.1. Sama probleem kahe teekonnaga. Ping oli kogu aeg korras, seega N2 seadistusega Zabbix ei oleks midagi teatanud. Ketta mõõtmine koos alarmireegliga oleks andnud hoiatuse kaks päeva varem (Talvik, 2026).</figcaption>
 </figure>
 
 Rike tuleks avastada enne kasutaja teadet. Selleks ei piisa sellest, et masin vastab. Mõõta tuleb ka masina sisu: protsessori koormust, mälu ja kettaruumi.
@@ -59,7 +59,7 @@ Logirida on teist tüüpi andmed. `Oct 29 21:04:11 pood nginx: disk full` on **s
     | Millal tekib | siis, kui midagi juhtub | iga kindla aja tagant, ka siis, kui midagi ei juhtu |
     | Kuidas loed | otsid, filtreerid, loed läbi | võrdled, joonistad graafiku |
 
-Kas 37% akut on hea või halb? Sellest numbrist üksi ei saa aru. Kui hommikul oli 100% ja praegu on kell 10, on midagi valesti. Kui kell on 22, on kõik hästi.
+Kas 37% akut on hea või halb? Sellest numbrist üksi ei saa aru. Kui hommikul oli 100% ja praegu on kell 10, on aku kulunud kiiresti ja põhjuse leidmiseks vaatad, mis akut kasutas. Kui kell on 22, on see tavaline päev.
 
 Telefoni seadetes on aku graafik: sama number iga paari minuti järel terve päeva jooksul. Sellist numbrite rida koos ajatemplitega nimetatakse **aegreaks** (time series).
 
@@ -77,7 +77,20 @@ aku %
   <figcaption>Joonis 3.2. Aegrida: sama mõõdik (aku laetus) mõõdetuna iga kahe tunni järel. Graafikult on näha, et kell 12–14 ei kulunud akut peaaegu üldse (Talvik, 2026).</figcaption>
 </figure>
 
-Mõõtmiste vahe on **proovivõtu intervall** (sampling interval). Zabbixi *ICMP Ping* template mõõdab iga 1 minuti järel. See tähendab, et 20-sekundilist katkestust ta tõenäoliselt ei näe: see jääb kahe mõõtmise vahele. Mida tihedam intervall, seda rohkem andmeid tuleb hoida. Masina mõõdikute jaoks on tavaline 15 kuni 60 sekundit.
+Mõõtmiste vahe on **proovivõtu intervall** (sampling interval). Zabbixi *ICMP Ping* template mõõdab iga 1 minuti järel.
+
+<figure markdown="span">
+  ![Ajatelg 0 kuni 120 sekundit, mõõtmised 0, 60 ja 120 sekundi juures; katkestus A kestab 20 kuni 40 sekundit, katkestus B 50 kuni 70 sekundit](../images/n03_katkestus.svg)
+  <figcaption>Joonis 3.3. Kaks sama pikka katkestust ja mõõtmine iga 60 sekundi järel. Lihtsustatud: igal märgitud hetkel tehakse üks hetkeline kontroll (Talvik, 2026).</figcaption>
+</figure>
+
+??? question "Kumba katkestust mõõtmised märkavad?"
+    Mõlemad katkestused kestavad 20 sekundit. Kumma neist mõõtmised märkavad ja miks ei määra katkestuse kestus üksi, kas see jääb nägemata?
+
+    ??? success "Vastus"
+        B, sest see kestab ka 60. sekundil, kui tehakse mõõtmine. A jääb kahe mõõtmise vahele. Lühike katkestus jääb nägemata siis, kui see ei kattu ühegi mõõtmise hetkega, seega loeb nii kestus kui ka see, millal katkestus juhtub.
+
+Mida tihedam intervall, seda rohkem andmeid tuleb hoida. Masina mõõdikute jaoks on tavaline 15 kuni 60 sekundit.
 
 ??? question "Kontrolli ennast"
     1. Mis vahe on mõõdikul ja aegreal? Too näide autost.
@@ -97,7 +110,7 @@ Mõõdikute maailmas on need kaks tüüpi:
     | Tüüp | Mis teeb | Auto | Masinas |
     |---|---|---|---|
     | **Gauge** (näidik) | käib üles ja alla, näitab hetkeseisu | spidomeeter, kütusenäit | koormus, vaba mälu, ketta täituvus, temperatuur |
-    | **Counter** (loendur) | ainult kasvab, loeb kokku alates algusest | läbisõidumõõdik | protsessori aeg, võrgukaardi baidid, päringute arv |
+    | **Counter** (loendur) | loeb kokku alates algusest, tavaliselt ei vähene, kuid võib taaskäivitusel nullist alata | läbisõidumõõdik | protsessori aeg, võrgukaardi baidid, päringute arv |
 
 Gauge'i väärtust saad lugeda otse: „vaba mälu on 1,3 GiB“ on kohe arusaadav.
 
@@ -117,8 +130,8 @@ On ka kolmas tüüp, **histogramm** (histogram), mis jagab mõõtmised korvidess
 
 ??? question "Kontrolli ennast"
     1. Kumb on gauge ja kumb counter: ketta täituvus protsentides, sisse loginud kasutajate arv, kokku saadetud e-kirjade arv, protsessori temperatuur?
-    2. Miks ei ole mõtet joonistada graafikut counteri toorväärtusest?
-    3. Võrgukaardi counter näitas kell 12:00 väärtust 5 000 000 ja kell 12:01 väärtust 1 200. Mis juhtus?
+    2. Millisele küsimusele vastab counteri toorväärtuse graafik ja millisele selle kasvu kiirus?
+    3. Võrgukaardi counter näitas kell 12:00 väärtust 5 000 000 ja kell 12:01 väärtust 1 200. Millised sündmused võiksid seda langust selgitada?
 
 ## 4. Mida masinas mõõta: neli küsimust ja USE
 
@@ -141,12 +154,12 @@ Brendan Gregg sõnastas sama mõtte **USE-meetodina**. Iga ressursi kohta küsid
 - **E**rrors (vead): kas on vigu?
 
 ??? note "Tabel 3.4. USE-meetod kolme ressursi kohta"
-    | Ressurss | Kasutus | Küllastus | Vead |
+    | Ressurss | Kasutus | Küllastus: uurimisküsimus ja vihje | Vead |
     |---|---|---|---|
-    | Protsessor | `top`: `us` + `sy` (või 100 - `id`) | koormus suurem kui tuumade arv | harva, vaata `dmesg` |
-    | Mälu | `free -h`: `used` võrreldes `total`-iga | `available` nulli lähedal, swap kasutusel | OOM killer logis (`journalctl -k`) |
-    | Ketta maht | `df -h`: `Use%` | failisüsteem täis, programmid ei saa kirjutada | `No space left on device` logis |
-    | Ketta sisend-väljund | `iostat -x`: `%util` | `iostat -x`: järjekord `aqu-sz`, ooteaeg `r_await`; `top`: `wa` | `I/O error` logis |
+    | Protsessor | `top`: `us` + `sy` (programmid ja tuum). 100 − `id` sisaldab lisaks ka `wa` ja muud | Kas ülesanded ootavad protsessoriaega? Vihje: koormus üle protsessorite arvu, kui `wa` on väike. Koormus üksi seda ei tõenda | harva, vaata `dmesg` |
+    | Mälu | `free -h`: `used` võrreldes `total`-iga | Kas mälusurve tekitab aktiivset saalimist? Vihje: `available` nulli lähedal ja swap'i kasutus kasvab. Swap kasutusel üksi seda ei tõenda | OOM killer logis (`journalctl -k`) |
+    | Ketta maht | `df -h`: `Use%` | Kas programmid saavad veel kirjutada? Vihje: failisüsteem täis | `No space left on device` logis |
+    | Ketta sisend-väljund | `iostat -x`: `%util` | Kas päringud kuhjuvad ja nende täitmise aeg kasvab? Vihje: `iostat -x` järjekord `aqu-sz`, `r_await` (ootamine järjekorras koos teenindamisega); `top`: `wa` | `I/O error` logis |
 
 Pane tähele viimast veergu: vead leiad sageli **logidest**, mitte mõõdikutest. Siin saavad N1 ja N2 kokku. Lähemalt loe [Greggi lehelt](https://www.brendangregg.com/usemethod.html).
 
@@ -168,28 +181,38 @@ USE vaatab masinat. Kasutaja masinat ei näe, ta näeb teenust: kas leht avaneb 
 
 <figure markdown="span">
   ![Kasutaja saadab päringud e-poodi; teenuse kohta mõõdetakse latentsust, liiklust, vigu ja küllastust](../images/n03_kuldsed_signaalid.svg)
-  <figcaption>Joonis 3.3. Neli kuldset signaali kirjeldavad teenust kasutaja vaatest. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 3.4. Neli kuldset signaali kirjeldavad teenust kasutaja vaatest. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
 </figure>
 
 Küllastus on sama mõte mis USE-s: kui ressurss saab täis, tekib järjekord ja latentsus kasvab. Masina mõõdikud näitavad põhjust, kuldsed signaalid näitavad, kas kasutaja seda tunneb. Latentsust ja vigu mõõdetakse päringute kohta, kursusel teed seda N11-s.
+
+??? example "Keskmine on hea, aga osa kasutajaid ootab"
+    Kümnest päringust üheksa vastas 100 ms-ga ja üks 5 sekundiga. Enne arvutamist mõtle: kas keskmine vastamisaeg kirjeldab hästi kõigi kasutajate kogemust?
+
+    Arvuta keskmine ja võrdle seda aeglaseima päringuga. Mida ütleb keskmine ja mida jääb sellest nägemata?
+
+    ??? success "Vastus"
+        Keskmine on (9 × 100 ms + 5000 ms) / 10 = 590 ms, see tundub talutav. Üks kasutaja ootas aga 5 sekundit. Keskmine peidab aeglased päringud, seepärast vaadatakse latentsuse juures ka aeglaseimaid päringuid.
 
 Kuldsetest signaalidest saab teenuse kvaliteedi mõõdupuu ([Measurement is critical](https://manishagarwal.hashnode.dev/measurement-is-critical)):
 
 - **SLI** (service level indicator) on mõõdetud näitaja, näiteks õnnestunud päringute osakaal viimase 30 päeva jooksul.
 - **SLO** (service level objective) on meeskonna eesmärk sellele näitajale, näiteks 99,5%.
-- **SLA** (service level agreement) on leping kliendiga. Kui teenus jääb lubatud tasemest allapoole, maksab teenusepakkuja hüvitist.
+- **SLA** (service level agreement) on teenustaseme kokkulepe kliendiga. See määrab lubatud taseme, kuidas seda mõõdetakse ja mis juhtub rikkumise korral, näiteks teenusekrediit.
 
-SLA on tavaliselt madalam kui SLO, et meeskond märkaks probleemi enne lepingu rikkumist. SLO ja 100% vahe on **veaeelarve** (error budget). SLO 99,5% tähendab, et 30 päeva jooksul võib teenus olla häiritud umbes 3,6 tundi (30 × 24 h × 0,005). Kui veaeelarve on kulunud, tegeleb meeskond töökindlusega, mitte uute funktsioonidega.
+Meeskond võib seada sisemise SLO rangemaks kui kliendiga kokku lepitud tase, et jääks reageerimisvaru enne kokkuleppe rikkumist. SLO ja 100% vahe on **veaeelarve** (error budget). Kui SLO on, et 99,5% päringutest õnnestub, ja 30 päeva jooksul oli 100 000 päringut, võib ebaõnnestuda kuni 500 päringut.
+
+Kui eesmärk on hoopis teenuse kasutatava aja osakaal, tähendab 99,5% 30 päeva jooksul umbes 3,6 tundi kasutamatut aega (30 × 24 h × 0,005). See on teine arvutus kui päringupõhise SLI puhul. Mida meeskond teeb, kui veaeelarve on kulunud, lepitakse kokku eraldi (veaeelarve poliitika), näiteks tegeletakse uute funktsioonide asemel töökindlusega ([Implementing SLOs](https://sre.google/workbook/implementing-slos/)).
 
 <figure markdown="span">
   ![Skaala 98 kuni 100 protsenti: SLA 99,0 protsenti, SLO 99,5 protsenti, mõõdetud SLI 99,7 protsenti; SLO ja 100 protsendi vahe on veaeelarve](../images/n03_sli_slo_sla.svg)
-  <figcaption>Joonis 3.4. SLI on mõõdetud, SLO on eesmärk, SLA on lubadus kliendile. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 3.5. SLI on mõõdetud, SLO on eesmärk, SLA on kokkulepe kliendiga. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
 </figure>
 
 ??? question "Kontrolli ennast"
     1. E-poe leht avaneb, aga vastus võtab 8 sekundit. Ping ja USE näitavad, et masinal on kõik korras. Milline kuldne signaal seda näitab ja kust selle mõõtmise saaksid?
-    2. SLO on 99,9% 30 päeva kohta. Mitu minutit võib teenus selle aja jooksul olla häiritud?
-    3. Miks ei panda SLA-sse sama numbrit kui SLO-sse?
+    2. SLO on ajapõhine: teenus on kasutatav 99,9% ajast 30 päeva jooksul. Mitu minutit võib teenus selle aja jooksul olla kasutamatu?
+    3. Miks võib meeskond seada sisemise SLO rangemaks kui kliendiga kokku lepitud teenustase?
 
 ## 6. Kust numbrid tulevad ja kes neid kogub
 
@@ -205,26 +228,26 @@ graph LR
     P -. "N4" .-> A["Zabbix agent"]
     P -. "N5" .-> N["node_exporter"]
 ```
-  <figcaption>Joonis 3.5. Käsud `uptime`, `free` ja `top` ei mõõda midagi ise. Nad loevad tuuma numbreid kaustast `/proc`. Hiljem teevad sama Zabbix agent ja node_exporter (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 3.6. Käsud `uptime`, `free` ja `top` loevad tuuma avaldatud andmeid kaustast `/proc` ja töötlevad need loetavaks, näiteks arvutavad counterist protsendi. Hiljem teevad sama Zabbix agent ja node_exporter (Talvik, 2026).</figcaption>
 </figure>
 
 ??? note "Tabel 3.6. Olulisemad failid kaustas `/proc`"
-    | Fail | Mis seal on | Tüüp | Mis käsk seda loeb |
+    | Fail | Selles näites kasutatav väli | Tüüp | Mis käsk seda loeb |
     |---|---|---|---|
-    | `/proc/uptime` | sekundid alates käivitusest | counter | `uptime` |
+    | `/proc/uptime` | esimene väli: sekundid alates käivitusest | counter | `uptime` |
     | `/proc/loadavg` | koormus 1, 5 ja 15 minuti keskmisena | gauge | `uptime`, `top` |
-    | `/proc/meminfo` | mälu, umbes 50 rida | gauge | `free`, `top` |
+    | `/proc/meminfo` | väljad `MemTotal`, `MemAvailable` | gauge | `free`, `top` |
     | `/proc/stat` | protsessori aeg alates käivitusest | counter | `top` |
     | `/proc/net/dev` | võrgukaardi baidid ja paketid | counter | `ip -s link` |
 
 Ketta kohta küsib `df` tuumalt otse iga failisüsteemi kohta eraldi. Põhimõte on sama: number tuleb tuumast.
 
-Neid faile saab lugeda **ainult masina seest**. N2 Zabbix töötab `proxmox1`-s ja saadab `proxmox2`-le pingi. Ping näitab ainult, kas masin vastab ja kui kiiresti. Mälu ega ketast ta ei näe.
+Need failid kirjeldavad selle Linuxi masina olekut, kus neid loetakse. N2 Zabbix töötab `proxmox1`-s ja saadab `proxmox2`-le pingi. Ping näitab, kas masin vastab ja kui kiiresti, nende failide sisu see ei tagasta. Pidevaks kogumiseks lisame kursusel jälgitavasse masinasse agendi.
 
-Mõõdikute kogumiseks on kaks võimalust:
+Järgmisena võrdleme kahte kursusel kasutatavat kogumisviisi:
 
-??? note "Tabel 3.7. Agendiga ja agendita kogumine"
-    | | Agendita (agentless) | Agendiga |
+??? note "Tabel 3.7. Kursuse N2 ja N4 kogumisviiside võrdlus"
+    | | N2 pingikontroll | N4 Zabbixi agent |
     |---|---|---|
     | Kuidas | server mõõdab väljast: ping, kas port on lahti, kas veebileht vastab | masinas töötab väike programm (agent), mis loeb `/proc`-i ja annab numbrid serverile |
     | Mida näeb | kas masin või teenus vastab, vastuse aeg | protsessor, mälu, ketas, protsessid, logid |
@@ -246,9 +269,9 @@ Käsk `uptime` näitab rea lõpus kolme numbrit:
  10:14:02 up 3 days,  2:41,  1 user,  load average: 1.85, 0.92, 0.40
 ```
 
-Need on **koormus** (load average): keskmiselt mitu protsessi tahtis viimase 1, 5 ja 15 minuti jooksul protsessorit kasutada (kas töötas või ootas järjekorras).
+Need on **koormus** (load average): käivitatavate ja katkestamatus ooteolekus ülesannete keskmine arv viimase 1, 5 ja 15 minuti jooksul. Käivitatavad ülesanded töötavad või ootavad protsessorit, katkestamatus ooteolekus ülesanded ootavad näiteks ketast ([proc_loadavg(5)](https://man7.org/linux/man-pages/man5/proc_loadavg.5.html)). Seega võib koormus olla kõrge nii protsessori kui ka ketta ootamise tõttu. Koormus ei ole protsessori kasutusprotsent.
 
-Mõtle poele. Kassad on protsessori **tuumad** (core). Ostjad on protsessid.
+See võrdlus on lihtsustatud ja kehtib protsessorikeskse koormuse kohta, kus ülesanded ketast ei oota. Mõtle poele. Kassad on loogilised protsessorid. Ostjad on protsessid.
 
 - 2 kassat, koormus 1: üks kassa töötab, teine ootab ostjat. Kõik on rahulik.
 - 2 kassat, koormus 2: mõlemad kassad töötavad, järjekorda pole. Täis, aga hea.
@@ -264,18 +287,18 @@ graph LR
         P5((P5))
         P6((P6))
     end
-    subgraph C["Protsessor: 2 tuuma"]
-        T1["Tuum 1<br/>P1"]
-        T2["Tuum 2<br/>P2"]
+    subgraph C["Protsessor: 2 loogilist protsessorit"]
+        T1["CPU 1<br/>P1"]
+        T2["CPU 2<br/>P2"]
     end
     J --> C
 ```
-  <figcaption>Joonis 3.6. Koormus 6 kahe tuumaga masinas: kaks protsessi töötavad, neli ootavad. Koormus jagatud tuumade arvuga on 3: masin on kolm korda üle koormatud. See on USE-meetodi küllastus (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 3.7. Lihtsustatud protsessorikoormuse näide: kaks ülesannet töötavad ja neli ootavad protsessoriaega. Tegeliku masina hindamisel vaata ka protsessori kasutust ja ketta ootamist (Talvik, 2026).</figcaption>
 </figure>
 
-**Koormus ilma tuumade arvuta ei tähenda midagi.** Tuumade arvu näitab käsk `nproc`. Rusikareegel: jaga koormus tuumade arvuga. Kuni 1 on korras, üle selle tekib järjekord.
+Koormust võrdle protsessorite arvuga. Käsk `nproc` näitab, mitu loogilist protsessorit on saadaval. Protsessorikeskse koormuse korral aitab suhe koormus / protsessorite arv hinnata, kui palju protsessoriaega soovitakse. See suhe üksi ei tõenda riket: vaata ka `top`-is protsessori kasutust ja `wa` väärtust.
 
-Kolm numbrit koos näitavad suunda. `1.85, 0.92, 0.40` (viimane minut on kõrgeim) tähendab, et koormus **kasvab**. `0.40, 0.92, 1.85` tähendab, et koormus **langeb** ja hullem on möödas.
+Kolm numbrit koos näitavad suunda. `1.85, 0.92, 0.40` (viimane minut on kõrgeim) tähendab, et koormus **kasvab**. `0.40, 0.92, 1.85` tähendab, et viimase minuti keskmine on pikema perioodi keskmisest väiksem ehk koormus **langeb**.
 
 ### Mälu: miks „vaba“ on väike
 
@@ -288,20 +311,41 @@ Mem:           3.8Gi       1.1Gi       210Mi        12Mi       2.5Gi       2.4Gi
 
 Väike väärtus veerus `free` ei tähenda selles näites probleemi.
 
-Linux ei lase mälul tühjalt seista. Kõik, mida programmid parasjagu ei kasuta, läheb **puhvrisse ja vahemällu** (buff/cache): seal hoitakse hiljuti loetud faile, et järgmine lugemine oleks kiire. Kui mõni programm vajab mälu, annab tuum selle vahemälust kohe ära.
+Linux kasutab osa vabast mälust **puhvrite ja vahemäluna** (buff/cache): seal hoitakse hiljuti loetud faile, et järgmine lugemine oleks kiire. Osa sellest mälust saab tuum vajaduse korral programmidele vabastada.
 
-Seepärast vaata veergu **`available`**: see on mälu, mille programm saaks kohe kasutada. Selles näites 2,4 GiB, mis on täiesti piisav. Kui `available` läheb nulli lähedale, alles siis on mure.
+Seepärast vaata veergu **`available`**: see on hinnang, kui palju mälu on uutele programmidele saadaval ilma saalimiseta ([free(1)](https://man7.org/linux/man-pages/man1/free.1.html)). Väike `free` ei tõenda selles näites mälupuudust. Kas 2,4 GiB on piisav, sõltub programmide vajadusest. Kui `available` läheb nulli lähedale, tasub uurida.
 
 ??? question "Kontrolli ennast"
-    1. Kahel masinal on koormus 4. Ühel on 2 tuuma, teisel 8. Kumb on hädas ja miks?
+    1. Kahel masinal on koormus 4 ja `wa` on väike. Ühel on 2 loogilist protsessorit, teisel 8. Kummas tasub protsessorikoormust lähemalt uurida ja miks?
     2. Mida tähendab `load average: 0.20, 1.50, 3.80`? Kas olukord läheb paremaks või halvemaks?
     3. Sõber saadab sulle `free -h` väljundi, kus `free` on 90 MiB ja `available` on 3 GiB. Mida talle vastad?
 
+### Uurimisülesanne: kumb masin on hädas?
+
+Kahes masinas on 4 loogilist protsessorit. Väärtused on illustratiivsed.
+
+??? note "Tabel 3.8. Kaks masinat sama koormusega"
+    | | Masin A | Masin B |
+    |---|---|---|
+    | Loogilisi protsessoreid | 4 | 4 |
+    | `load1` | 8 | 8 |
+    | Protsessori kasutus | 95% | 15% |
+    | Teenuse vastamisaeg | tavapärane | tavapärasest pikem |
+
+??? question "Kumb masin on hädas?"
+    1. Kas sama `load1` tähendab mõlemas masinas sama probleemi?
+    2. Kummas masinas kahtlustad protsessoriaja puudujääki ja miks?
+    3. Mida uuriksid masina B puhul järgmisena?
+    4. Kummas masinas on tõend, et probleem mõjutab kasutajaid?
+
+??? tip "Vihje"
+    Loe uuesti, mida koormus sisaldab: lisaks protsessorit kasutavatele ja ootavatele ülesannetele ka katkestamatus ooteolekus ülesandeid ([proc_loadavg(5)](https://man7.org/linux/man-pages/man5/proc_loadavg.5.html)). Millised mõõtmised näitavad, mida need ülesanded ootavad?
+
 ## 8. Number üksi ei ütle midagi
 
-Sama number võib ühes masinas tähendada tavalist olekut ja teises riket. Varukoopiaserver pakib iga öö kell 02:00 failid kokku ja protsessor on tund aega 95% hõivatud. See on tavaline öö. Kui sama 95% on keskpäeval, kui varukoopiat ei tehta, on midagi valesti.
+Sama number võib ühes masinas tähendada tavalist olekut ja teises riket. Varukoopiaserver pakib iga öö kell 02:00 failid kokku ja protsessor on tund aega 95% hõivatud. See on tavaline öö. Kui sama 95% on keskpäeval, kui varukoopiat ei tehta, erineb see tavalisest mustrist ja vajab uurimist.
 
-Masina tavaline olek on **baasjoon** (baseline). Ilma baasjooneta ei saa öelda, kas number on hea või halb. Baasjoone leiad ainult aegreast: pead nägema, millised on numbrid tavaliselt päeval, öösel ja nädalavahetusel.
+Masina tavaline olek on **baasjoon** (baseline). Ilma baasjooneta ei saa öelda, kas number on hea või halb. Baasjoone kujundamiseks võrdled aegreas näite eri aegadel ja arvestad töökoormust: millised on numbrid tavaliselt päeval, öösel ja nädalavahetusel.
 
 Siin on käsitsi vaatamise piir. `top` näitab ainult **praegust hetke**. Kui avad selle kolmapäeval kell 10, ei tea sa midagi sellest, mis juhtus öösel kell 3. Sellepärast kogub monitooringusüsteem numbreid ise ja hoiab neid andmebaasis, nagu N2-s nägid.
 
@@ -318,7 +362,7 @@ Testides tekitatakse koormus meelega. Tööriist **`stress-ng`** paneb protsesso
     Zabbix agent saab töötada kahel moel: server küsib (passiivne) või agent saadab ise (aktiivne). Prometheus (N5) küsib andmeid ise, Telegraf (N7) saadab need ise. Kumb on parem, sõltub võrgust: kas server pääseb masinani või ainult masin serverini.
 
 ??? abstract "Kokkuvõte"
-    Monitooring mõõdab masinate olekut, et rike tuleks välja enne kasutaja teadet. Mõõdik on number ajas, sündmus on kirje sellest, mis juhtus. Gauge käib üles-alla, counter ainult kasvab ja sealt loed kiirust. Masina mõõdikud loetakse tuumast kausta `/proc` kaudu ja neid saab lugeda ainult masina seest, selleks on agent. Koormust loe tuumade arvu järgi, mälu puhul vaata `available` veergu. Üks number ütleb vähe, aegrida ja baasjoon ütlevad palju.
+    Monitooring mõõdab masinate olekut, et rike tuleks välja enne kasutaja teadet. Mõõdik on number ajas, sündmus on kirje sellest, mis juhtus. Gauge käib üles-alla, counter kasvab (taaskäivitusel algab nullist) ja sealt loed kiirust. Masina mõõdikud loetakse tuumast kausta `/proc` kaudu, pidevaks kogumiseks on jälgitavas masinas agent. Koormust loe protsessorite arvu ja ketta ootamise järgi, mälu puhul vaata `available` veergu. Üks number ütleb vähe, aegrida ja baasjoon ütlevad palju.
 
     | Mõiste | Selgitus | Kuidas näed |
     |---|---|---|
@@ -327,18 +371,19 @@ Testides tekitatakse koormus meelega. Tööriist **`stress-ng`** paneb protsesso
     | **Aegrida (time series)** | sama mõõdik mitu korda ajas | Zabbixi graafik |
     | **Intervall** | kui tihti mõõdetakse | ICMP Ping: 1 minut |
     | **Gauge** | käib üles ja alla, hetkeseis | `cat /proc/loadavg` |
-    | **Counter** | ainult kasvab, loeb kokku | `cat /proc/net/dev` |
+    | **Counter** | loeb kokku, võib taaskäivitusel nullist alata | `cat /proc/net/dev` |
     | **USE** | kasutus, küllastus, vead iga ressursi kohta | Tabel 3.4 |
     | **Neli kuldset signaali** | latentsus, liiklus, vead, küllastus teenuse kohta | Tabel 3.5 |
-    | **SLI, SLO, SLA** | mõõdetud näitaja, eesmärk, leping kliendiga | Joonis 3.4 |
-    | **Koormus (load average)** | mitu protsessi tahab protsessorit, 1/5/15 min | `uptime` |
+    | **SLI, SLO, SLA** | mõõdetud näitaja, eesmärk, kokkulepe kliendiga | Joonis 3.5 |
+    | **Koormus (load average)** | käivitatavad ja ketast ootavad ülesanded, 1/5/15 min | `uptime` |
     | **Agent** | programm masinas, mis loeb `/proc`-i ja annab numbrid serverile | N4 |
     | **Baasjoon (baseline)** | masina tavaline olek | ainult aegreast |
 
 ??? question "Kontrolli ennast"
     1. Selgita oma sõnadega, miks N2 seadistusega Zabbix ei oleks e-poe täis ketast märganud.
     2. Too kaks gauge'i ja kaks counterit oma telefonist või arvutist.
-    3. Selgita poe kassade abil, mida tähendab koormus 3.0 neljatuumalises masinas.
+    3. Selgita poe kassade abil, mida võib tähendada koormus 3.0 nelja loogilise protsessoriga masinas, kui `wa` on väike.
     4. Miks Linux kasutab peaaegu kogu „vaba“ mälu ära ja miks see ei ole viga?
     5. Kasutajad ütlevad: „Server on täna aeglane.“ Käi USE-meetod läbi protsessori, mälu ja ketta kohta ja ütle, millise käsuga igale küsimusele vastuse leiad.
     6. Miks on vaja agenti? Mida see näeb, mida ping ei näe?
+    7. Ping vastab, protsessor pole täis ja mälu jätkub. Kas sellest piisab, et öelda „teenus töötab hästi“? Nimeta üks kontroll, millega uuriksid kasutaja tegelikku kogemust.
