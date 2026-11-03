@@ -58,7 +58,7 @@ Vasta README jaotises **Kodutöö**:
 
 ## Töö esitamine
 
-Skript, täiendatud playbook, päringu tulemus ja vastused on samas repositooriumis, kus praktikum 5.
+Skript, täiendatud playbook, päringu tulemus ja vastused on samas repositooriumis, kus praktikum 4.
 
 ```bash
 git status

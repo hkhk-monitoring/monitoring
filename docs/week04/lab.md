@@ -28,7 +28,7 @@ Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Vastus on 
 
 ## Osa 1 · Repositoorium ja Zabbix
 
-Ava Classroom 50 link ([Praktikum 4 - Agent räägib serverile](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium:
+Ava Classroom 50 link ([Praktikum 3 - Agent räägib serverile](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium:
 
 ```bash
 git clone <sinu-repo-url>
@@ -351,7 +351,7 @@ Repositooriumis on README vastused, täidetud playbook `konf/agent.yml` ja kolm 
 ```bash
 git status
 git add README.md konf logid
-git commit -m "Praktikum 4: agent räägib serverile"
+git commit -m "Praktikum 3: agent räägib serverile"
 git push
 ```
 
