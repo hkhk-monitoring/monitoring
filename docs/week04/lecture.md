@@ -5,7 +5,7 @@ tags:
   - Ansible
 ---
 
-# Loeng: agent räägib serverile
+# Loeng: agent suhtleb serveriga
 
 N2-s käivitasid Zabbixi ja see kontrollis pingiga, kas `proxmox2` ja `proxmox3` vastavad. N3-s mõõtsid `proxmox2` sees käsitsi protsessorit, mälu ja ketast. Täna paigaldad mõlemasse masinasse agendi, seod hostid valmis template'iga ja kirjutad oma trigger'i.
 

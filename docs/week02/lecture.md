@@ -46,7 +46,7 @@ Zabbix, Prometheus ja teised monitooringusüsteemid teevad nelja tööd:
 
 Ilma teavituseta peab inimene graafikuid ise jälgima. Teavitused seadistad N6-s.
 
-## 3. Zabbix: kes kellega räägib
+## 3. Zabbix: kes kellega suhtleb
 
 Kursusel kasutad Zabbixi versiooni **7.0 LTS** (pikaajalise toega). Zabbix sobib eriti kohtadesse, kus on palju eri tüüpi seadmeid: serverid, võrguseadmed, printerid ja UPS-id ([Zabbixi kirjeldus](https://www.zabbix.com/documentation/7.0/en/manual/introduction/about)).
 

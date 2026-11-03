@@ -232,7 +232,7 @@ Ava brauseris `http://<proxmox1-IP>:8080`. Kasutaja on **Admin**, parool **zabbi
 Ava **Data collection → Hosts** ([Hosts](https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/data_collection/hosts)). Seal on üks host: **Zabbix server**. Veerus **Availability** on punane **ZBX**.
 
 ??? question "Leia põhjus"
-    Hoia hiirt punase ZBX kohal. Millise aadressiga üritab Zabbix ühendust võtta? Mitu konteinerit sul töötab ja kas mõni neist on agent? Vaata [loengu 3. peatükki](lecture.md#3-zabbix-kes-kellega-raagib). Kirjuta vastus README jaotisse **A3**.
+    Hoia hiirt punase ZBX kohal. Millise aadressiga üritab Zabbix ühendust võtta? Mitu konteinerit sul töötab ja kas mõni neist on agent? Vaata [loengu 3. peatükki](lecture.md#3-zabbix-kes-kellega-suhtleb). Kirjuta vastus README jaotisse **A3**.
 
 Ava **Monitoring → Latest data** ja vali host **Zabbix server**.
 

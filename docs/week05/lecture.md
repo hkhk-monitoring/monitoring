@@ -5,7 +5,7 @@ tags:
   - Ansible
 ---
 
-# Loeng: server küsib ise
+# Loeng: server küsib mõõdikuid
 
 N4-s paigaldasid Zabbixi agendi ja valmis template andis hostile item'id ja trigger'id. Täna vaatad teist kogumisteed: node_exporter avaldab masina mõõdikud, Prometheus küsib need ise ja päringud koostad sina. Kogu nädala läbiv küsimus on: **millises masinas on ressursse kõige vähem alles?**
 

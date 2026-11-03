@@ -4,7 +4,7 @@
     <marker id="z1g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00796b"/></marker>
   </defs>
   <rect width="900" height="360" fill="#ffffff"/>
-  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Zabbix: kes kellega räägib</text>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Zabbix: kes kellega suhtleb</text>
   <!-- proxmox1 -->
   <rect x="20" y="50" width="520" height="290" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2" stroke-dasharray="6 4"/>
   <text x="40" y="74" font-size="14" font-weight="700" fill="#e65100">proxmox1 · Docker Compose</text>
