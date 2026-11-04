@@ -142,7 +142,7 @@ Kui päring ei leia midagi, võib viga olla viies kohas. Kontrolli neid järjest
 
 Prometheuse päringukeel on [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/). Päringu kirjutad Prometheuse veebiliideses lehel **Query**. Praktikumis koostad päringud kolmele küsimusele ja iga küsimus lisab päringukeelest ühe osa.
 
-**Kui palju mälu on masinas saadaval?** Kõige lihtsam päring on mõõdiku nimi. See tagastab viimase väärtuse igast aegreast, seega iga masina kohta ühe rea. Sildifilter loogelistes sulgudes piirab tulemuse ühe masinaga. Ühik on nimes: `_bytes`. Osakaalu saad, kui jagad saadaval mälu kogu mäluga. Need on kaks eraldi käivitatavat päringut:
+**Kui palju mälu on masinas saadaval?** Kõige lihtsam päring on mõõdiku nimi. See tagastab viimase väärtuse igast aegreast, seega iga masina kohta ühe rea. Sildifilter loogelistes sulgudes piirab tulemuse ühe masinaga. Ühik on nimes: `_bytes`. Osakaalu saad, kui jagad saadaval oleva mälu kogu mäluga. Need on kaks eraldi käivitatavat päringut:
 
 ```text
 node_memory_MemAvailable_bytes{instance="192.168.35.12:9100"}

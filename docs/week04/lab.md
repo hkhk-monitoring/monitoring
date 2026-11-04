@@ -24,7 +24,7 @@ Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse m
   <figcaption>Joonis 4.8. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
 </figure>
 
-Lisad playbook'i ülesanded ükshaaval. Enne käivitamist ennusta tulemust, seejärel vaata väljundit ja põhjenda, mis muutus. Kui tulemus erineb oodatust, uuri erinevust enne järgmise sammu lisamist. Esimesed ülesanded on näidatud tervikuna, järgmised koostad ise sama mustri järgi. Näidislahendus on kokkuvolditud plokis, ava see, kui jääd kinni või tahad oma lahendust kontrollida. Kirjuta ennustused ja tulemuste võrdlus README vastava osa alla. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
+Lisad playbook'i ülesanded ükshaaval. Enne käivitamist ennusta tulemust, seejärel vaata väljundit ja põhjenda, mis muutus. Kui tulemus erineb oodatust, uuri erinevust enne järgmise sammu lisamist. Esimesed ülesanded on näidatud tervikuna, järgmised koostad ise sama mustri järgi. Näidislahendus on kokkuvolditud plokis. Ava see, kui jääd kinni või tahad oma lahendust kontrollida. Kirjuta ennustused ja tulemuste võrdlus README vastava osa alla. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
 
 ## Osa 1 · Repositoorium ja Zabbix
 
@@ -94,7 +94,7 @@ ssh proxmox1 "hostname -I"
 
 ## Osa 2 · Agent Ansible'i playbook'iga kahes masinas
 
-Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teed paigalduse Ansible'i playbook'iga: Ansible teeb samad sammud mõlemas masinas ja masina nimi tuleb muutujast. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Iga sammu juures on selgitus ja ülesanne. Esimesed näited kopeerid faili kommentaariga märgitud kohta, järgmised koostad ise sama mustri järgi. Vajadusel ava näidislahendus. Käivita playbook pärast iga sammu ja uuri, milline ülesanne midagi muutis.
+Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teed paigalduse Ansible'i playbook'iga: Ansible teeb samad sammud mõlemas masinas ja masina nimi tuleb muutujast. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet.
 
 Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=) käsitsi teeb: impordib allkirjavõtme, lisab Zabbix 7.0 hoidla, välistab EPEL-ist Zabbixi vanemad paketid, paigaldab `zabbix-agent2`, muudab seadeid, avab tulemüüris pordi ja käivitab teenuse. Uued moodulid on tabelis 4.5.
 
@@ -154,7 +154,7 @@ Starteri fail `konf/agent.yml` näeb välja nii. Read, mis algavad märgiga `# >
 
         # >>> Osa 2.5: lisa siia agendi seadete ülesanne
 
-        # >>> Osa 2.6: lisa siia tulemüüri ja teenuse ülesanded
+        # >>> Osa 2.6: lisa siia pordi ja teenuse ülesanded
 
       # >>> Osa 2.5: lisa siia handlers-plokk (taandega nagu tasks:)
     ```
@@ -163,12 +163,10 @@ Starteri fail `konf/agent.yml` näeb välja nii. Read, mis algavad märgiga `# >
 |---|---|---|
 | 2.1 | `proxmox1` IP-aadress | rida `zabbix_server:` |
 | 2.2 | hoidla ülesanne | `# >>> Osa 2.2` |
-| 2.3 | midagi, loed läbi | EPEL-i ülesanded on olemas |
+| 2.3 | ei midagi, loed läbi | EPEL-i ülesanded on juba olemas |
 | 2.4 | agendi paketi ülesanne | `# >>> Osa 2.4` |
 | 2.5 | seadete ülesanne ja handler | `# >>> Osa 2.5` (kaks kohta) |
 | 2.6 | pordi ja teenuse ülesanded | `# >>> Osa 2.6` |
-
-Igas osas on näidislahendus kokkuvolditud plokis. Proovi kõigepealt ise, siis võrdle.
 
 ### 2.1 Play algus ja allkirjavõti
 
@@ -507,9 +505,9 @@ Agent töötab mõlemas masinas, kuid Linuxi mõõdikute kogumine pole veel temp
   <figcaption>Joonis 4.10. Template'i sidumine hostiga ja väärtuste kontroll Latest data lehel (Talvik, 2026).</figcaption>
 </figure>
 
-**Data collection → Hosts → proxmox2**, väljal **Templates** kirjuta `Linux by` ja vali **Linux by Zabbix agent**. *ICMP Ping* jääb alles. **Update**.
+Ava **Data collection → Hosts → proxmox2**, kirjuta väljale **Templates** `Linux by` ja vali **Linux by Zabbix agent**. *ICMP Ping* jääb alles. Vajuta **Update**.
 
-**Data collection → Hosts → proxmox3**, vali **Linux by Zabbix agent active**. **Update**.
+Tee sama hostiga `proxmox3`, aga vali **Linux by Zabbix agent active**.
 
 Oota 1–2 minutit ja ava **Monitoring → Latest data**, filtris **Hosts:** `proxmox2` ja `proxmox3`.
 
@@ -522,7 +520,7 @@ Ava **Data collection → Hosts → proxmox2 → Items** ja sama `proxmox3` koht
 Kui mõne hosti mõõteväärtused ei uuene, alusta agendi logist `/var/log/zabbix/zabbix_agent2.log` (`sudo tail -20 /var/log/zabbix/zabbix_agent2.log`).
 
 ??? warning "Kui `proxmox2` ZBX on punane, kuigi port on lahti"
-    Otsi agendi logist sõna `rejected`. Seal on aadress, kust päring tuli, ja aadressid, mis on seades `Server`. Need peavad klappima. Pärast seadete muutmist taaskäivita agent (playbook teeb seda handleriga).
+    Otsi agendi logist sõna `rejected`. Seal on aadress, kust päring tuli, ja aadressid, mis on seades `Server`. Need peavad klappima. Pärast seadete muutmist taaskäivita agent (playbook teeb seda handler'iga).
 
 ??? warning "Kui `proxmox3` andmeid ei tule"
     Otsi agendi logist sõna `not found`. Kui server ei leidnud hosti, ei klapi agendi `Hostname` veebiliidese väljaga **Host name** (ka suur- ja väiketäht loevad). Kui logis on `cannot connect`, kontrolli `proxmox3`-st: `timeout 3 bash -c '</dev/tcp/<proxmox1-IP>/10051' && echo lahti` ja `proxmox1`-s `docker compose ps`.
@@ -541,7 +539,7 @@ Kirjuta README tabelisse **Osa 3** iga item'i väärtus ja **Last check** aeg. O
 ??? warning "Kui `Space: Available` rida puudub"
     Kettaruumi item'id loob discovery-reegel. Vali **Data collection → Hosts → proxmox2 → Discovery**, märgi reeglid ja vajuta **Execute now**.
 
-Võrdle üht väärtust masina seest loetuga. Agent ise loeb sama võtme nii:
+Võrdle üht väärtust masina seest loetuga. Sama võtme väärtuse saad masinas käsuga:
 
 ```bash
 ssh proxmox2 "sudo zabbix_agent2 -t 'vm.memory.size[available]'"

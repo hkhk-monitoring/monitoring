@@ -112,8 +112,8 @@ mkdir -p ~/zabbix && cd ~/zabbix
 Andmebaasi parool läheb faili `.env`, mitte Compose'i faili. See fail on saladus ja reposse seda ei kopeerita. Parool luuakse ainult siis, kui faili veel pole: kui teed seda sammu uuesti, jääb vana parool alles ja olemasolev andmebaas avaneb edasi.
 
 ```bash
-test -e .env || echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env
-cat .env
+test -e .env || (umask 077; echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env)
+ls -l .env
 ```
 
 Loo `compose.yaml` (VS Code Remote-SSH või `nano compose.yaml`). Täida kolm kohta `<...>` manuaalist leitud image'i ja sildiga:

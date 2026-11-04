@@ -25,7 +25,7 @@ Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel 
   <figcaption>Joonis 5.15. Praktikumi topoloogia: masinad, pordid ja ühendused (Talvik, 2026).</figcaption>
 </figure>
 
-Lisad seadistusi ja playbook'i ülesandeid ükshaaval. Enne käivitamist ennusta tulemust, seejärel vaata väljundit ja põhjenda, mis muutus. Kui tulemus erineb oodatust, uuri erinevust enne järgmise sammu lisamist. Esimesed osad on näidatud tervikuna, järgmised koostad ise sama mustri järgi. Näidislahendus on kokkuvolditud plokis, ava see, kui jääd kinni või tahad oma lahendust kontrollida. Kirjuta ennustused ja tulemuste võrdlus README vastava osa alla. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
+Lisad seadistusi ja playbook'i ülesandeid ükshaaval. Enne käivitamist ennusta tulemust, seejärel vaata väljundit ja põhjenda, mis muutus. Kui tulemus erineb oodatust, uuri erinevust enne järgmise sammu lisamist. Esimesed osad on näidatud tervikuna, järgmised koostad ise sama mustri järgi. Näidislahendus on kokkuvolditud plokis. Ava see, kui jääd kinni või tahad oma lahendust kontrollida. Kirjuta ennustused ja tulemuste võrdlus README vastava osa alla. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
 
 ## Osa 1 · Repositoorium ja mälu
 
@@ -93,7 +93,7 @@ for h in proxmox1 proxmox2 proxmox3; do echo "$h: $(ssh $h hostname -I)"; done
 
 Iga masina juures võib olla mitu aadressi. Vali laborivõrgu IPv4-aadress (näiteks `192.168.35.12`), mitte Dockeri sisevõrgu (`172.…`) ega loopback-aadress (`127.…`).
 
-Koormuskatseks osas 6 on vaja programmi `stress-ng`, mis on EPEL-i hoidlas. Paigalda see nüüd `proxmox2`-sse. Kui see on N3-st juba olemas, ei muuda käsk midagi:
+Koormuskatseks osas 6 on vaja programmi `stress-ng`, mis on EPEL-i hoidlas. Paigalda see nüüd `proxmox2`-sse. Kui see on juba olemas, ei muuda käsk midagi:
 
 ```bash
 ssh proxmox2 "sudo dnf install -y epel-release && sudo dnf install -y stress-ng && stress-ng --version"
@@ -121,7 +121,7 @@ sha256sum --check --ignore-missing sha256sums.txt
 ??? success "Oodatav tulemus"
     `node_exporter-1.12.1.linux-amd64.tar.gz: OK`. Kontrollsumma kinnitab, et allalaaditud fail vastab samal väljalaskelehel avaldatud summale. Allika usaldusväärsust see ei asenda: summa ja fail tulevad samast kohast.
 
-Paki fail lahti, paigalda programm kausta `/usr/local/bin` ja loo talle oma süsteemikasutaja. Teenus ei tööta `root`-ina, sest see ainult loeb masina näite:
+Paki fail lahti, paigalda programm kausta `/usr/local/bin` ja loo talle oma süsteemikasutaja. Teenus ei tööta `root`-ina, sest see ainult loeb masina näitajaid:
 
 Muutuja `V` hoiab versiooni, et seda ei peaks mitu korda kirjutama:
 
@@ -231,7 +231,7 @@ Kirjuta README jaotisse **Osa 3** kummagi nimi, tüüp ja ühik. Kuidas tunned c
 
 ## Osa 4 · Sama playbook'iga kahes masinas
 
-`proxmox3` vajab samu samme. Käsitsi tehtud paigaldus ei kordu teises masinas täpselt samamoodi, playbook kordub. Koostad playbook'i `konf/node_exporter.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Iga ülesanne vastab ühele osa 2 sammule.
+`proxmox3` vajab samu samme. Käsitsi võib teises masinas mõne sammu teisiti teha, playbook teeb igas masinas samad sammud. Koostad playbook'i `konf/node_exporter.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Iga ülesanne vastab ühele osa 2 sammule.
 
 ??? question "Ennusta"
     Milline osa seadistusest on mõlemas masinas sama ja mis võib masinati erineda? Kirjuta vastus README jaotisse **Osa 4**.
@@ -590,7 +590,7 @@ Kontrolli ühikut. Mis ühikus on väärtus ja kui palju on see gigabaitides?
 ??? question "Ennusta"
     Masinas on ka mõõdik `node_memory_MemFree_bytes`. Kas `MemAvailable` on suurem või väiksem kui `MemFree`? Kontrolli mõlemat ja kirjuta README jaotisse **Osa 6**, mida nende erinevus näitab.
 
-Arvuta osakaal. Muuda päringut nii, et see näitab iga masina kohta saadaval mälu protsentides kogu mälust (`node_memory_MemTotal_bytes`). Kirjuta päring ja tulemus iga masina kohta README jaotisse **Osa 6**.
+Arvuta osakaal. Muuda päringut nii, et see näitab iga masina kohta saadaval oleva mälu protsentides kogu mälust (`node_memory_MemTotal_bytes`). Kirjuta päring ja tulemus iga masina kohta README jaotisse **Osa 6**.
 
 ??? tip "Vihje"
     Kaks mõõdikut saab jagada nagu arve, Prometheus paaritab read samade siltide järgi (loengu joonis 5.9). Protsendi saamiseks korruta tulemus.

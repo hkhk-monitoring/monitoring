@@ -97,7 +97,7 @@ Tulemuse näed Classroom 50-s.
 
 ## Lisaülesanded
 
-**A. Iga hommik kell 7.** Seadista raport käivituma systemd taimeriga iga päev kell 07:00 ja kirjutama tulemuse faili `/var/log/logiraport.log`. Kontrolli `systemctl list-timers`-iga, millal see järgmine kord käivitub.
+**A. Iga hommik kell 7.** Seadista systemd taimer, mis käivitab raporti iga päev kell 07:00 ja kirjutab tulemuse faili `/var/log/logiraport.log`. Kontrolli `systemctl list-timers`-iga, millal see järgmine kord käivitub.
 
 **B. Ainult eilne ja tänane päev.** Praegu loeb skript kõiki ridu. Muuda nii, et raportis on ainult eilse ja tänase päeva read. Vihje: logirea algus on kuupäev; `date -d yesterday '+%b %e'` annab eilse kuupäeva samas vormingus.
 
