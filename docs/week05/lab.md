@@ -149,7 +149,7 @@ node_exporteri repositooriumis on ametlik näidis kaustas [examples/systemd](htt
 
 Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` (`sudo nano`). Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu.
 
-??? example "Fail: /etc/systemd/system/node_exporter.service"
+???+ example "Fail: /etc/systemd/system/node_exporter.service"
     ```ini
     [Unit]
     Description=Prometheus node_exporter
@@ -255,7 +255,7 @@ Kirjuta README jaotisse **Osa 3** kummagi nimi, tüüp ja ühik. Kuidas tunned c
 
 Loo fail `konf/node_exporter.yml`. Play algus ütleb, millistes masinates ülesanded käivituvad (`hosts: all` tähendab kõiki, mille annad käsus `-i`) ja et need käivituvad `sudo` kaudu (`become: true`). Versioon ja aadressid on muutujates, et versiooni vahetamiseks piisaks ühest reast. `{{ ... }}` asendab muutuja väärtusega.
 
-??? example "Ülesanne: play algus"
+???+ example "Ülesanne: play algus"
     ```yaml
     - name: node_exporter jälgitavatesse masinatesse
       hosts: all
@@ -269,7 +269,7 @@ Loo fail `konf/node_exporter.yml`. Play algus ütleb, millistes masinates ülesa
 
 Esimene ülesanne laadib arhiivi alla ja kontrollib kontrollsummat, nagu tegid osas 2 käskudega `curl` ja `sha256sum`. `dest` on fail sihtmasinas. `checksum` ütleb, et summa võetakse veebiaadressilt `sha256sums.txt`: kui fail ei vasta, ülesanne ebaõnnestub.
 
-??? example "Ülesanne: väljalase alla koos kontrollsummaga"
+???+ example "Ülesanne: väljalase alla koos kontrollsummaga"
     ```yaml
         - name: Väljalase alla koos kontrollsummaga
           ansible.builtin.get_url:
@@ -294,7 +294,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml
 
 Need kaks ülesannet teevad sama, mis osas 2 käsud `tar` ja `install`. Arhiiv ja programm on juba sihtmasinas, mitte sinu arvutis, seda ütleb `remote_src: true`. `creates` jätab lahtipakkimise vahele, kui programm on juba lahti pakitud, muidu oleks ülesanne igal käivitusel `changed`.
 
-??? example "Ülesanne: arhiiv lahti"
+???+ example "Ülesanne: arhiiv lahti"
     ```yaml
         - name: Arhiiv lahti
           ansible.builtin.unarchive:
@@ -304,7 +304,7 @@ Need kaks ülesannet teevad sama, mis osas 2 käsud `tar` ja `install`. Arhiiv j
             creates: "/tmp/{{ ne_name }}/node_exporter"
     ```
 
-??? example "Ülesanne: programm kausta /usr/local/bin"
+???+ example "Ülesanne: programm kausta /usr/local/bin"
     ```yaml
         - name: Programm kausta /usr/local/bin
           ansible.builtin.copy:
@@ -320,7 +320,7 @@ Käivita playbook ja kontrolli: `ssh proxmox3 "/usr/local/bin/node_exporter --ve
 
 See ülesanne teeb sama, mis osas 2 käsk `useradd`: süsteemikasutaja ilma kodukaustata ja ilma sisselogimisõiguseta. Võrdle parameetreid käsu võtmetega: `system` on `--system`, `shell` on `--shell` ja `create_home: false` on `--no-create-home`.
 
-??? example "Ülesanne: süsteemikasutaja"
+???+ example "Ülesanne: süsteemikasutaja"
     ```yaml
         - name: Süsteemikasutaja node_exporter
           ansible.builtin.user:
@@ -336,7 +336,7 @@ Unit-faili sisu peab olema täpselt sama, mis osas 2 käsitsi loodud failis. Kui
 
 `notify` teavitab handler'it, kui fail muutus. Handler käivitub play lõpus ja ainult siis, kui teda teavitati.
 
-??? example "Ülesanne: unit-fail"
+???+ example "Ülesanne: unit-fail"
     ```yaml
         - name: Unit-fail, sama sisu mis osas 2
           ansible.builtin.copy:
@@ -373,7 +373,7 @@ Handler'id on play lõpus eraldi plokis `handlers:`, samal tasemel kui `tasks:`.
 
 Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewall-cmd`. Teenuse ülesanne nõuab soovitud olekut (`started`, `enabled`), mitte taaskäivitust: kui teenus juba töötab, ei tee see midagi. Tulemüüri reegel peab kehtima kohe (`immediate`) ja jääma alles pärast taaskäivitust (`permanent`). Need ülesanded lähevad `tasks:` loendi lõppu, enne plokki `handlers:`.
 
-??? example "Ülesanne: teenus"
+???+ example "Ülesanne: teenus"
     ```yaml
         - name: Teenus töötab ja käivitub koos masinaga
           ansible.builtin.systemd_service:
@@ -383,7 +383,7 @@ Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewa
             daemon_reload: true
     ```
 
-??? example "Ülesanne: port tulemüüris"
+???+ example "Ülesanne: port tulemüüris"
     ```yaml
         - name: Port 9100 tulemüüris
           ansible.posix.firewalld:
@@ -425,7 +425,7 @@ Prometheus töötab `proxmox1`-s konteineris. Kirjutad kaks faili: Prometheuse s
 
 **Seaded, `konf/prometheus.yml`.** Esimene osa on üldseaded: `scrape_interval` ütleb, kui tihti Prometheus kõiki target'eid küsib.
 
-??? example "Failiosa: global"
+???+ example "Failiosa: global"
     ```yaml
     global:
       scrape_interval: 15s
@@ -433,7 +433,7 @@ Prometheus töötab `proxmox1`-s konteineris. Kirjutad kaks faili: Prometheuse s
 
 Teine osa on `scrape_configs`: loend job'e. Igal job'il on nimi (`job_name`, sellest tuleb silt `job`) ja `static_configs`, mille all `targets` on aadresside loend kujul `"<IP>:<port>"`. Esimene job küsib Prometheust ennast.
 
-??? example "Failiosa: scrape_configs ja job prometheus"
+???+ example "Failiosa: scrape_configs ja job prometheus"
     ```yaml
     scrape_configs:
       - job_name: prometheus
@@ -443,7 +443,7 @@ Teine osa on `scrape_configs`: loend job'e. Igal job'il on nimi (`job_name`, sel
 
 Teine job küsib mõlemat node_exporterit. Kasuta osas 1 kirja pandud IP-aadresse, mitte SSH aliaseid: Prometheus konteineris ei tunne nimesid `proxmox2` ja `proxmox3`. Job läheb samasse `scrape_configs` loendisse.
 
-??? example "Failiosa: job node"
+???+ example "Failiosa: job node"
     ```yaml
       - job_name: node
         static_configs:
@@ -452,7 +452,7 @@ Teine job küsib mõlemat node_exporterit. Kasuta osas 1 kirja pandud IP-aadress
 
 **Compose'i fail, `konf/compose.yaml`.** Teenus kasutab image'it kindla sildiga ([sildid Docker Hubis](https://hub.docker.com/r/prom/prometheus/tags)), et sama fail annaks ka hiljem sama tulemuse. `ports` avab masinas pordi 9090 ja `restart` käivitab konteineri uuesti, kui see seiskub.
 
-??? example "Failiosa: teenus, image ja port"
+???+ example "Failiosa: teenus, image ja port"
     ```yaml
     services:
       prometheus:
@@ -464,7 +464,7 @@ Teine job küsib mõlemat node_exporterit. Kasuta osas 1 kirja pandud IP-aadress
 
 `volumes` ühendab konteinerisse kaks asja. Kaust `./config` läheb konteineris kausta `/etc/prometheus`, ainult lugemiseks (`:ro`). Kaust, mitte üksik fail: kui fail hiljem uuega asendatakse, näeb konteiner kausta kaudu uut faili, üksiku faili ühendus võib jääda vana faili külge. Nimega andmeköide `prometheus-data` hoiab Prometheuse andmeid kaustas `/prometheus`, nii et need jäävad alles ka siis, kui konteiner luuakse uuesti. Võti `volumes` läheb teenuse alla, sama taandega kui `ports`.
 
-??? example "Failiosa: ühendused teenuse all"
+???+ example "Failiosa: ühendused teenuse all"
     ```yaml
         volumes:
           - ./config:/etc/prometheus:ro
@@ -473,7 +473,7 @@ Teine job küsib mõlemat node_exporterit. Kasuta osas 1 kirja pandud IP-aadress
 
 Nimega andmeköide tuleb kirjeldada ka faili lõpus, ilma taandeta.
 
-??? example "Failiosa: andmeköide faili lõppu"
+???+ example "Failiosa: andmeköide faili lõppu"
     ```yaml
     volumes:
       prometheus-data:

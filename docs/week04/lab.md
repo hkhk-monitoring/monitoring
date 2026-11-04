@@ -123,7 +123,7 @@ Esimene ülesanne impordib Zabbixi allkirjavõtme. Ilma selleta keeldub `dnf` Za
 
 See ülesanne on starteri failis juba olemas. Vaata see läbi:
 
-??? example "Ülesanne: Zabbixi pakettide allkirjavõti"
+???+ example "Ülesanne: Zabbixi pakettide allkirjavõti"
     ```yaml
         - name: Zabbixi pakettide allkirjavõti
           ansible.builtin.rpm_key:
@@ -159,7 +159,7 @@ Agent ei ole AlmaLinuxi enda hoidlates, see tuleb Zabbixi hoidlast. Hoidla kirje
 
 Ülesanne kasutab moodulit `ansible.builtin.dnf`, mis oskab paketi paigaldada ka veebiaadressilt. `name` on paketi nimi või aadress, `state: present` tähendab, et pakett peab olema paigaldatud. Aadress on sama, mis juhendi käsus `rpm -Uvh`. Kopeeri ülesanne faili allkirjavõtme ülesande järele (kommentaari `# Osa 2.2` asemele):
 
-??? example "Ülesanne: Zabbix 7.0 hoidla"
+???+ example "Ülesanne: Zabbix 7.0 hoidla"
     ```yaml
         - name: Zabbix 7.0 hoidla
           ansible.builtin.dnf:
@@ -183,7 +183,7 @@ Kui masinas on ka EPEL-i hoidla, pakub see Zabbixi vanemat versiooni ja `dnf` v�
 
 Agendi pakett tuleb nüüd Zabbixi hoidlast. Ülesanne on sama kujuga nagu hoidla oma, ainult `name` on paketi nimi, mitte aadress. Paketi nimi on Zabbixi juhendi käsus `dnf install`. Kopeeri ülesanne EPEL-i ülesannete järele (kommentaari `# Osa 2.4–2.6` alla):
 
-??? example "Ülesanne: agendi pakett"
+???+ example "Ülesanne: agendi pakett"
     ```yaml
         - name: Agendi pakett
           ansible.builtin.dnf:
@@ -223,7 +223,7 @@ Agent loeb seaded ainult käivitumisel, seega pärast muudatust tuleb see taask�
 
 Kopeeri seadete ülesanne paketi ülesande järele:
 
-??? example "Ülesanne: agendi seaded"
+???+ example "Ülesanne: agendi seaded"
     ```yaml
         - name: Agendi seaded
           ansible.builtin.lineinfile:
@@ -239,7 +239,7 @@ Kopeeri seadete ülesanne paketi ülesande järele:
 
 Handler'id on play lõpus eraldi plokis `handlers:`, samal taandel kui `tasks:`. Kopeeri see kommentaari `# Osa 2.5` asemele:
 
-??? example "Handler: taaskäivita agent"
+???+ example "Handler: taaskäivita agent"
     ```yaml
       handlers:
         - name: Taaskäivita agent
@@ -266,7 +266,7 @@ Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirj
 ??? tip "Vihje"
     Kirjuta `ansible-doc` väljundis `/immediate` ja vajuta **Enter**, nii leiad parameetri kirjelduse. Loe ka `permanent` kirjeldust: kumb muudab seadistust kohe, kumb alles pärast tulemüüri uuesti laadimist või taaskäivitust?
 
-??? example "Ülesanne: passiivse agendi port tulemüüris"
+???+ example "Ülesanne: passiivse agendi port tulemüüris"
     ```yaml
         - name: Passiivse agendi port tulemüüris
           ansible.posix.firewalld:
@@ -278,7 +278,7 @@ Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirj
 
 Viimane ülesanne tagab, et agent töötab (`state: started`) ja käivitub koos masinaga (`enabled: true`):
 
-??? example "Ülesanne: agent töötab"
+???+ example "Ülesanne: agent töötab"
     ```yaml
         - name: Agent töötab ja käivitub koos masinaga
           ansible.builtin.service:
