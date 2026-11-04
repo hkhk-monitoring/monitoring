@@ -130,13 +130,13 @@ Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](h
 
 ### 2.1 Play algus ja allkirjavõti
 
-Ava `konf/agent.yml` VS Code'is. Faili alguses on play: `hosts: all` tähendab kõiki masinaid, mille annad käsus `-i`, ja `become: true` kasutab ülesannete täitmiseks õiguste tõstmist, selles laboris `sudo` kaudu. Määra muutuja `zabbix_server` väärtuseks `proxmox1` laborivõrgu IP-aadress osast 1. Seda kasutavad hiljem agendi seaded.
+Selles osas kirjutad faili ühe väärtuse, paigaldad vajadusel Ansible'i kollektsiooni ja käivitad playbook'i esimest korda. Starteri failis on play algus ja esimene ülesanne juba olemas, nii näed enne oma ülesannete kirjutamist, kuidas playbook töötab.
 
-Esimene ülesanne impordib Zabbixi allkirjavõtme. Ilma selleta keeldub `dnf` Zabbixi hoidla pakette paigaldamast, sest ei saa kontrollida, et need tulevad Zabbixilt. Iga ülesanne on samal kujul: `name` ütleb inimesele, mida see teeb, järgmine rida on mooduli nimi ja selle all mooduli parameetrid.
+**1. Kirjuta `proxmox1` IP-aadress.** Ava `konf/agent.yml` VS Code'is. Faili alguses on play: `hosts: all` tähendab kõiki masinaid, mille annad käsus `-i`, ja `become: true` käivitab ülesanded `sudo` kaudu. Real `zabbix_server:` asenda `<TÄIDA: …>` `proxmox1` laborivõrgu IP-aadressiga osast 1. Seda kasutavad hiljem agendi seaded.
 
-See ülesanne on starteri failis juba olemas. Vaata see läbi:
+**2. Loe läbi esimene ülesanne.** See impordib Zabbixi allkirjavõtme. Ilma selleta keeldub `dnf` Zabbixi hoidla pakette paigaldamast, sest ei saa kontrollida, et need tulevad Zabbixilt. Iga ülesanne on samal kujul: `name` ütleb inimesele, mida see teeb, järgmine rida on mooduli nimi ja selle all mooduli parameetrid. `state: present` tähendab soovitud olekut: võti peab olemas olema. Kui see juba on, ei tee Ansible midagi.
 
-???+ example "Ülesanne: Zabbixi pakettide allkirjavõti"
+???+ example "Starteris olemas: Zabbixi pakettide allkirjavõti"
     ```yaml
         - name: Zabbixi pakettide allkirjavõti
           ansible.builtin.rpm_key:
@@ -144,10 +144,8 @@ See ülesanne on starteri failis juba olemas. Vaata see läbi:
             state: present
     ```
 
-`state: present` tähendab soovitud olekut: võti peab olemas olema. Kui see juba on, ei tee Ansible midagi.
-
-??? tip "Vihje"
-    YAML-is loeb taane. `tasks:` ja `handlers:` on samal taandel, nende loendite elemendid (`- name:`) algavad ühe taandetaseme võrra sügavamalt. Taande illustratsioon, mitte faili lisatav ülesanne:
+??? tip "Vihje: YAML-i taane"
+    `tasks:` ja `handlers:` on samal taandel, nende loendite elemendid (`- name:`) algavad ühe taandetaseme võrra sügavamalt. Taande illustratsioon, mitte faili lisatav ülesanne:
 
     ```yaml
     - name: Näidisplay
@@ -167,12 +165,14 @@ See ülesanne on starteri failis juba olemas. Vaata see läbi:
 
     Kui `ansible-playbook` annab vea `mapping values are not allowed here`, kontrolli taanet ja koolonit pärast võtit. VS Code näitab taandeid, kui valid **View → Render Whitespace**.
 
-Moodul `ansible.posix.firewalld`, mida vajad hiljem, on kollektsioonis `ansible.posix`, mis ei kuulu `ansible-core` koosseisu. Kontrolli, kas see on olemas, ja paigalda vajadusel:
+**3. Kontrolli Ansible'i kollektsiooni.** Osas 2.6 vajad moodulit `ansible.posix.firewalld`. See on kollektsioonis `ansible.posix`, mis ei kuulu `ansible-core` koosseisu. Kontrolli, kas see on olemas, ja paigalda vajadusel:
 
 ```bash
 ansible-galaxy collection list ansible.posix
 ansible-galaxy collection install ansible.posix
 ```
+
+**4. Käivita playbook.**
 
 ??? question "Ennusta"
     Kas agendi puudumisest piisab, et ennustada allkirjavõtme ülesande olekuks `changed`? Millest tulemus tegelikult sõltub?
