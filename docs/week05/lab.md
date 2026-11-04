@@ -64,8 +64,10 @@ ssh proxmox1 "cd ~/zabbix 2>/dev/null && docker compose stop; free -h"
 Pane kirja kolme masina IP-aadressid. Neid on vaja Prometheuse seadetes:
 
 ```bash
-for h in proxmox1 proxmox2 proxmox3; do echo "$h $(ssh $h "hostname -I | cut -d' ' -f1")"; done
+for h in proxmox1 proxmox2 proxmox3; do echo "$h: $(ssh $h hostname -I)"; done
 ```
+
+Iga masina juures võib olla mitu aadressi. Vali laborivõrgu IPv4-aadress (näiteks `192.168.35.12`), mitte Dockeri sisevõrgu aadress (`172.…`).
 
 ## Osa 2 · node_exporter käsitsi proxmox2-s
 
