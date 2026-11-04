@@ -244,6 +244,9 @@ ansible-doc ansible.posix.firewalld
 
 Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirjuta vastus README jaotisse **Osa 2**. Ülesandes on mõlemad: `permanent: true` jätab pordi alles ka pärast taaskäivitust ja `immediate: true` avab selle kohe. Kopeeri ülesanne seadete ülesande järele:
 
+??? tip "Vihje"
+    Kirjuta `ansible-doc` väljundis `/immediate` ja vajuta **Enter**, nii leiad parameetri kirjelduse. Loe ka `permanent` kirjeldust: kumb muudab seadistust kohe, kumb alles pärast tulemüüri uuesti laadimist või taaskäivitust?
+
 ??? example "Ülesanne: passiivse agendi port tulemüüris"
     ```yaml
         - name: Passiivse agendi port tulemüüris
@@ -325,6 +328,9 @@ ssh proxmox1 "timeout 3 bash -c '</dev/tcp/<proxmox2-IP>/10050' && echo lahti ||
 
 **Küsimus (README):** mis juhtuks, kui playbook'is poleks tulemüüri ülesannet? Kumma hosti andmed jääksid tulemata?
 
+??? tip "Vihje"
+    Mõtle, kumb kontroll vajab sissetulevat ühendust jälgitavasse masinasse ja kumb mitte (loengu joonis 4.3). Ilma tulemüüri ülesandeta oleks port 10050 kinni.
+
 ## Osa 3 · Template'id: passiivne ja aktiivne
 
 Agent töötab mõlemas masinas, kuid Linuxi mõõdikute kogumine pole veel template'itega seadistatud. Template annab hostile item'id ja trigger'id. `proxmox2` saab passiivse agendi template'i ja `proxmox3` aktiivse oma (loengu [tabel 4.2](lecture.md#3-passiivne-ja-aktiivne-agent)).
@@ -351,6 +357,9 @@ Kui mõni host jääb andmeteta, alusta agendi logist `/var/log/zabbix/zabbix_ag
 
 **Küsimus (README):** mis on veerus **Type** `proxmox2` ja `proxmox3` item'ite erinevus ja mida see tähendab selle kohta, kes ühenduse avab?
 
+??? tip "Vihje"
+    Võrdle ühe ja sama item'i (näiteks *Load average (1m avg)*) rida mõlemal hostil. Üks tüüp on *Zabbix agent*, teine *Zabbix agent (active)*. Loengu tabel 4.2 seob tüübi sellega, kes ühenduse avab.
+
 ### 3.1 Kas väärtused uuenevad
 
 Template annab kümneid item'eid. Kontrolli kolme põhinäitu: mälu, protsessor ja kettaruum. Ava **Monitoring → Latest data**, filtris **Hosts:** `proxmox2` ja kirjuta väljale **Name** järjest `Available memory`, `CPU utilization` ja `Space: Available`. Iga rea juures on veerud **Last check** ja **Last value**.
@@ -370,6 +379,9 @@ ssh proxmox2 "sudo zabbix_agent2 -t 'vm.memory.size[available]'"
     Rida `vm.memory.size[available]  [u|1432551424]`. Väärtus on baitides, veebiliides näitab sama arvu ümardatuna (näiteks `1.33 GB`). Väike erinevus tuleb sellest, et mõõtmised tehti eri hetkel.
 
 **Küsimus (README):** kas käsu ja veebiliidese väärtus klapivad? Kui ei, siis miks?
+
+??? tip "Vihje"
+    Vaata ühikuid: käsk annab baidid, veebiliides ümardab gigabaitideks. Vaata ka aega: millal tehti käsu mõõtmine ja millal veebiliidese **Last check**?
 
 ## Osa 4 · Kes avab ühenduse
 
@@ -405,6 +417,9 @@ ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
     Ülesanne *Passiivse agendi port tulemüüris* on mõlemas masinas `changed`, kõik teised `ok`. Moodul nägi, et port puudub tulemüüri töötavast seadistusest, ja lisas selle tagasi (`immediate: true`). Mõne minuti pärast on `proxmox2` ZBX jälle roheline ja probleem lahenes.
 
 **Küsimus (README):** miks uuenesid `proxmox3` väärtused edasi ja kuidas playbook'i uus käivitus triivi parandas?
+
+??? tip "Vihje"
+    Kumb pool avab ühenduse aktiivse kontrolli puhul ja millisesse porti? Playbook'i teise osa jaoks vaata, milline ülesanne oli `changed` ja mida tähendab, et kõik teised olid `ok`.
 
 ## Osa 5 · Oma trigger: vaba kettaruum alla 20%
 
@@ -514,6 +529,9 @@ cat logid/a5-andmebaas.txt
     Esimeses tabelis on `proxmox2` juures *ICMP Ping* ja *Linux by Zabbix agent*, `proxmox3` juures *ICMP Ping* ja *Linux by Zabbix agent active*. Teises tabelis on *Vaba kettaruum alla 20%*, `severity` on `2` (Warning) ning olemas on nii `algas` kui ka `lahenes`. Kui `lahenes` on tühi, pole probleem veel lahenenud: kontrolli, et `/ketas-tais` on kustutatud, ja oota veel minut. Salvesta tõend samal päeval, kui probleem lahenes. Zabbixi koristus (housekeeping) võib vanad lahenenud probleemid tabelist hiljem eemaldada.
 
 **Küsimus (README):** mitu minutit kulus täitmisest probleemini ja kustutamisest lahenemiseni? Võrdle oma `date` kellaaegu tabeli veergudega `algas` ja `lahenes`. Miks see ei juhtunud kohe?
+
+??? tip "Vihje"
+    Viivitus koosneb kahest osast: millal item toob järgmise väärtuse (**Update interval**) ja millal trigger seda hindab. Võrdle oma kellaaegu joonisega 4.11.
 
 ## Töö esitamine
 

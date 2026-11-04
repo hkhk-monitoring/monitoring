@@ -229,6 +229,9 @@ ssh proxmox2 "curl -fsS localhost:9100/metrics" | grep -E '^# TYPE node_(memory_
 
 Kirjuta README jaotisse **Osa 3** kummagi nimi, tüüp ja ühik. Kuidas tunned counteri ära ka ilma `# TYPE` reata?
 
+??? tip "Vihje"
+    Vaata mõõdiku nime lõppu. Prometheuse nimetustava järgi on counteri nime lõpus kindel järelliide ([Metric and label naming](https://prometheus.io/docs/practices/naming/)).
+
 ## Osa 4 · Sama playbook'iga kahes masinas
 
 `proxmox3` vajab samu samme. Käsitsi tehtud paigaldus ei kordu teises masinas täpselt samamoodi, playbook kordub. Ehitad playbook'i `konf/node_exporter.yml` üles ülesanne haaval: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Iga ülesanne vastab ühele osa 2 sammule.
@@ -273,6 +276,9 @@ Esimene ülesanne laadib arhiivi alla ja kontrollib kontrollsummat, nagu tegid o
     ```
 
 Leia `ansible-doc ansible.builtin.get_url` väljundist parameetri `checksum` kirjeldus ja kirjuta README jaotisse **Osa 4**, mis kujul saab kontrollsumma anda. Käivita playbook:
+
+??? tip "Vihje"
+    Kirjuta `ansible-doc` väljundis `/checksum` ja vajuta **Enter**. Kirjelduses on kaks kuju: summa otse ja summa failist veebiaadressil.
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml
@@ -385,6 +391,9 @@ Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewa
     ```
 
 Leia `ansible-doc ansible.posix.firewalld` väljundist, mis juhtub, kui on ainult `permanent: true` ilma `immediate`-ita. Kirjuta vastus README jaotisse **Osa 4**.
+
+??? tip "Vihje"
+    Otsi väljundist `/immediate`. Võrdle osa 2 käsitsi käsku: miks oli seal pärast `--permanent` vaja ka `--reload`-i?
 
 ### 4.6 Kaks käivitust
 
@@ -540,6 +549,9 @@ node_memory_MemAvailable_bytes
 
 Miks tagastab üks mõõdiku nimi mitu tulemust? Kirjuta vastus README jaotisse **Osa 6**.
 
+??? tip "Vihje"
+    Vaata tulemuse ridade silte. Milline silt on igal real erinev? Loengu joonis 5.4.
+
 Piira tulemus ühe masinaga:
 
 ```text
@@ -551,6 +563,9 @@ Kontrolli ühikut. Mis ühikus on väärtus ja kui palju on see gigabaitides?
 **Ennusta:** masinas on ka mõõdik `node_memory_MemFree_bytes`. Kas `MemAvailable` on suurem või väiksem kui `MemFree`? Kontrolli mõlemat ja kirjuta README jaotisse **Osa 6**, mida nende erinevus näitab.
 
 Arvuta osakaal. Muuda päringut nii, et see näitab iga masina kohta saadaval mälu protsentides kogu mälust (`node_memory_MemTotal_bytes`). Kirjuta päring ja tulemus iga masina kohta README jaotisse **Osa 6**.
+
+??? tip "Vihje"
+    Kaks mõõdikut saab jagada nagu arve, Prometheus paaritab read samade siltide järgi (loengu joonis 5.9). Protsendi saamiseks korruta tulemus.
 
 ??? success "Oodatav tulemus"
     Mõõdiku nimi annab rea iga target'i kohta, sest silt `instance` on erinev. Väärtus on baitides, näiteks `1.47e+09` on umbes 1,4 GiB. `MemAvailable` on suurem. `MemFree` jätab välja puhvri- ja vahemälu, mille tuum vajadusel vabastab. `MemAvailable` on tuuma hinnang mälule, mille uued programmid saavad ilma saalimiseta, mitte garantii igale programmile. Osakaalu päring annab iga masina kohta arvu 0 ja 100 vahel.
@@ -601,12 +616,18 @@ date +%T; ssh proxmox2 'stress-ng --cpu $(nproc) --timeout 60s'; date +%T
 
 Kirjuta README jaotisse **Osa 6** protsessori kasutus enne katset, katse ajal ja pärast katset. Kas graafiku muutus algas ja lõppes täpselt samal hetkel kui katse? Mis seda selgitab?
 
+??? tip "Vihje"
+    Kaks asja mõjutavad, millal muutus graafikule jõuab: kui tihti Prometheus kogub (`scrape_interval` failis `prometheus.yml`) ja kui pika ajavahemiku põhjal `rate()` arvutab (`[1m]`).
+
 ??? success "Oodatav tulemus"
     Enne ja pärast on kasutus mõne protsendi juures, katse ajal 100 lähedal. Servad on kaldu ja nihkes. Prometheus kogub iga 15 sekundi järel ja `rate(...[1m])` on viimase minuti keskmine, seega jõuab muutus graafikule täielikult alles umbes minuti jooksul.
 
 ### 6.4 Võrdlus
 
 Kirjuta päring, mis tagastab ainult masinad, kus juurfailisüsteemis on vaba ruumi alla 90%. Kirjuta päring README jaotisse **Osa 6**. N6-s saab sellisest päringust alarmireegel.
+
+??? tip "Vihje"
+    Võta oma 6.2 päring ja lisa selle lõppu võrdlus. Võrdlus jätab alles ainult read, mille kohta tingimus kehtib (loengu joonis 5.13).
 
 ## Osa 7 · Kokkuvõte
 
