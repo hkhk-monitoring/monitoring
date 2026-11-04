@@ -1,0 +1,18 @@
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="420" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Counter ja selle kasv sekundis</text>
+  <rect x="330" y="50" width="240" height="340" fill="#fff8e1"/>
+  <text x="210" y="66" text-anchor="middle" font-size="12" fill="#546e7a">protsessor puhkab</text>
+  <text x="450" y="66" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">koormuskatse</text>
+  <text x="690" y="66" text-anchor="middle" font-size="12" fill="#546e7a">protsessor puhkab</text>
+  <line x1="90" y1="200" x2="810" y2="200" stroke="#90a4ae"/><line x1="90" y1="80" x2="90" y2="200" stroke="#90a4ae"/>
+  <text x="80" y="95" text-anchor="end" font-size="11" fill="#546e7a">idle</text><text x="80" y="110" text-anchor="end" font-size="11" fill="#546e7a">sekundid</text>
+  <polyline points="90,190 330,110 570,105 810,82" fill="none" stroke="#e65100" stroke-width="3"/>
+  <text x="820" y="86" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#e65100">counter</text>
+  <text x="450" y="218" text-anchor="middle" font-size="11" fill="#546e7a">toorväärtus ainult kasvab, katse ajal peaaegu ei kasva</text>
+  <line x1="90" y1="370" x2="810" y2="370" stroke="#90a4ae"/><line x1="90" y1="250" x2="90" y2="370" stroke="#90a4ae"/>
+  <text x="80" y="262" text-anchor="end" font-size="11" fill="#546e7a">1</text><text x="80" y="374" text-anchor="end" font-size="11" fill="#546e7a">0</text>
+  <polyline points="90,262 330,262 380,360 540,360 600,262 810,262" fill="none" stroke="#00796b" stroke-width="3"/>
+  <text x="820" y="266" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#00796b">rate()</text>
+  <text x="450" y="400" text-anchor="middle" font-size="11" fill="#546e7a">rate(node_cpu_seconds_total{mode="idle"}[1m]): jõudeaja kasv sekundis, kaldus servad tulevad 1-minutilisest aknast</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg viewBox="0 0 900 450" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="g3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker></defs>
+  <rect width="900" height="450" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Kogumise kontroll: kus andmetee katkes</text>
+  <g font-size="14">
+    <rect x="40" y="55" width="310" height="58" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/><text x="195" y="80" text-anchor="middle" font-weight="700" fill="#004d40">1. exporter töötab</text><text x="195" y="100" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#004d40">systemctl is-active</text>
+    <rect x="40" y="133" width="310" height="58" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/><text x="195" y="158" text-anchor="middle" font-weight="700" fill="#004d40">2. /metrics vastab</text><text x="195" y="178" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#004d40">curl localhost:9100/metrics</text>
+    <rect x="40" y="211" width="310" height="58" rx="8" fill="#eceff1" stroke="#546e7a" stroke-width="2"/><text x="195" y="236" text-anchor="middle" font-weight="700" fill="#37474f">3. võrk ja tulemüür</text><text x="195" y="256" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">port 9100 proxmox1-st</text>
+    <rect x="40" y="289" width="310" height="58" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/><text x="195" y="314" text-anchor="middle" font-weight="700" fill="#e65100">4. Prometheus kogus</text><text x="195" y="334" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">Target health: UP, Error</text>
+    <rect x="40" y="367" width="310" height="58" rx="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/><text x="195" y="392" text-anchor="middle" font-weight="700" fill="#0d47a1">5. päring leiab aegread</text><text x="195" y="412" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#0d47a1">Query: nimi ja sildid</text>
+  </g>
+  <g stroke="#546e7a" stroke-width="2"><line x1="195" y1="113" x2="195" y2="129" marker-end="url(#g3)"/><line x1="195" y1="191" x2="195" y2="207" marker-end="url(#g3)"/><line x1="195" y1="269" x2="195" y2="285" marker-end="url(#g3)"/><line x1="195" y1="347" x2="195" y2="363" marker-end="url(#g3)"/></g>
+  <g font-size="13" fill="#263238">
+    <text x="380" y="88">Kas systemd peab teenust aktiivseks?</text>
+    <text x="380" y="166">Kas jälgitavas masinas tuleb mõõdikute väljund?</text>
+    <text x="380" y="244">Kas ühendus õnnestub Prometheuse poolt?</text>
+    <text x="380" y="322">Mis on target'i olek ja viimane kogumisviga?</text>
+    <text x="380" y="400">Kas siltide hulgas on mõlemad oodatud target'id?</text>
+  </g>
+  <text x="620" y="440" text-anchor="middle" font-size="11" fill="#546e7a">Iga samm eeldab eelmist. Alusta sealt, kus esimene kontroll ebaõnnestub.</text>
+</svg>

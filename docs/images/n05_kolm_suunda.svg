@@ -1,0 +1,32 @@
+<svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="g1o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker>
+    <marker id="g1g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00796b"/></marker>
+  </defs>
+  <rect width="900" height="330" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Kolm kogumisviisi: kes avab ühenduse</text>
+  <g font-size="13" text-anchor="middle">
+    <text x="150" y="62" font-weight="700" fill="#263238">Zabbix, passiivne</text>
+    <text x="450" y="62" font-weight="700" fill="#263238">Zabbix, aktiivne</text>
+    <text x="750" y="62" font-weight="700" fill="#263238">Prometheus</text>
+    <rect x="60" y="80" width="180" height="56" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/><text x="150" y="113" font-weight="700" fill="#e65100">Zabbix server</text>
+    <rect x="60" y="220" width="180" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/><text x="150" y="245" font-weight="700" fill="#004d40">agent</text><text x="150" y="264" font-size="11" fill="#263238">port 10050</text>
+    <rect x="360" y="80" width="180" height="56" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/><text x="450" y="105" font-weight="700" fill="#e65100">Zabbix server</text><text x="450" y="124" font-size="11" fill="#5d4037">port 10051</text>
+    <rect x="360" y="220" width="180" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/><text x="450" y="253" font-weight="700" fill="#004d40">agent</text>
+    <rect x="660" y="80" width="180" height="56" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/><text x="750" y="113" font-weight="700" fill="#e65100">Prometheus</text>
+    <rect x="660" y="220" width="180" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/><text x="750" y="245" font-weight="700" fill="#004d40">node_exporter</text><text x="750" y="264" font-size="11" fill="#263238">port 9100</text>
+  </g>
+  <line x1="140" y1="136" x2="140" y2="216" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#g1o)"/>
+  <line x1="160" y1="220" x2="160" y2="140" stroke="#ff8f00" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#g1o)"/>
+  <line x1="450" y1="220" x2="450" y2="140" stroke="#00796b" stroke-width="2.5" marker-end="url(#g1g)"/>
+  <line x1="740" y1="136" x2="740" y2="216" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#g1o)"/>
+  <line x1="760" y1="220" x2="760" y2="140" stroke="#ff8f00" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#g1o)"/>
+  <g font-size="11">
+    <text x="130" y="175" text-anchor="end" fill="#e65100">küsib</text><text x="170" y="185" fill="#e65100">vastab</text>
+    <text x="460" y="185" fill="#004d40">saadab ise</text>
+    <text x="730" y="175" text-anchor="end" fill="#e65100">GET /metrics</text><text x="770" y="185" fill="#e65100">kogu väljund</text>
+  </g>
+  <text x="150" y="305" text-anchor="middle" font-size="12" fill="#263238">pull: server alustab</text>
+  <text x="450" y="305" text-anchor="middle" font-size="12" fill="#263238">push: agent alustab</text>
+  <text x="750" y="305" text-anchor="middle" font-size="12" fill="#263238">pull: Prometheus alustab</text>
+</svg>

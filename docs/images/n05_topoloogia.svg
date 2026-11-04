@@ -1,0 +1,39 @@
+<svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="t5o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker>
+    <marker id="t5b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker>
+    <marker id="t5u" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1565c0"/></marker>
+  </defs>
+  <rect width="900" height="430" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Praktikumi topoloogia: masinad, pordid ja ühendused</text>
+  <rect x="20" y="300" width="250" height="110" rx="10" fill="#eceff1" stroke="#546e7a" stroke-width="2"/>
+  <text x="145" y="326" text-anchor="middle" font-size="15" font-weight="700" fill="#37474f">sinu arvuti</text>
+  <text x="145" y="350" text-anchor="middle" font-size="12" fill="#37474f">Ansible, Git, repositoorium</text>
+  <text x="145" y="370" text-anchor="middle" font-size="12" fill="#37474f">brauser</text>
+  <text x="145" y="392" text-anchor="middle" font-size="11" fill="#546e7a">koolis otse, kodust VPN-iga</text>
+  <rect x="20" y="60" width="300" height="190" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="40" y="84" font-size="14" font-weight="700" fill="#e65100">proxmox1 · Docker Compose</text>
+  <rect x="45" y="100" width="250" height="80" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="170" y="130" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Prometheus</text>
+  <text x="170" y="152" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">veebiliides 9090/tcp</text>
+  <text x="170" y="168" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">~/prometheus/prometheus.yml</text>
+  <text x="170" y="210" text-anchor="middle" font-size="11" fill="#5d4037">Zabbix on peatatud (docker compose stop)</text>
+  <rect x="590" y="60" width="290" height="100" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="735" y="86" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox2</text>
+  <text x="735" y="110" text-anchor="middle" font-size="12" fill="#263238">node_exporter (systemd)</text>
+  <text x="735" y="130" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">9100/tcp lahti tulemüüris</text>
+  <text x="735" y="148" text-anchor="middle" font-size="11" fill="#546e7a">esmalt käsitsi, siis playbook</text>
+  <rect x="590" y="200" width="290" height="100" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="735" y="226" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox3</text>
+  <text x="735" y="250" text-anchor="middle" font-size="12" fill="#263238">node_exporter (systemd)</text>
+  <text x="735" y="270" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">9100/tcp lahti tulemüüris</text>
+  <text x="735" y="288" text-anchor="middle" font-size="11" fill="#546e7a">playbook</text>
+  <line x1="295" y1="125" x2="586" y2="105" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#t5o)"/>
+  <line x1="295" y1="155" x2="586" y2="240" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#t5o)"/>
+  <text x="450" y="104" text-anchor="middle" font-size="12" fill="#e65100">kogub iga 15 s: GET :9100/metrics</text>
+  <line x1="270" y1="330" x2="586" y2="150" stroke="#546e7a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#t5b)"/>
+  <line x1="270" y1="345" x2="586" y2="290" stroke="#546e7a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#t5b)"/>
+  <text x="560" y="340" text-anchor="end" font-size="12" fill="#546e7a">SSH: ansible-playbook paigaldab</text>
+  <line x1="120" y1="300" x2="120" y2="254" stroke="#1565c0" stroke-width="2" marker-end="url(#t5u)"/>
+  <text x="128" y="282" font-size="12" fill="#1565c0">brauser → :9090</text>
+</svg>

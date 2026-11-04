@@ -20,6 +20,11 @@ Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel 
     4. koostada ja kohandada PromQL-i päringuid saadaval oleva mälu, failisüsteemi vaba ruumi ja protsessori kasutuse uurimiseks ning selgitada tulemuste ühikuid ja ulatust;
     5. selgitada, kes avab ühenduse ja milline komponent tagastab väärtused Zabbixi agendi ja Prometheuse puhul.
 
+<figure markdown="span">
+  ![Sinu arvutist paigaldab Ansible SSH kaudu node_exporteri proxmox2 ja proxmox3 masinasse, kus port 9100 on lahti; proxmox1 Prometheus kogub neilt iga 15 sekundi järel; brauser avab Prometheuse pordil 9090](../images/n05_topoloogia.svg)
+  <figcaption>Joonis 5.9. Praktikumi topoloogia: masinad, pordid ja ühendused (Talvik, 2026).</figcaption>
+</figure>
+
 Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Ennustuse kirjutad README-sse. Vastus on kokkuvolditud plokis.
 
 ## Osa 1 · Repositoorium ja mälu
