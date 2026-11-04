@@ -1,0 +1,26 @@
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="h4" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00796b"/></marker></defs>
+  <rect width="900" height="360" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Jagamine sobitab read samade siltide järgi</text>
+  <g font-size="12" font-family="JetBrains Mono, Menlo, monospace" text-anchor="middle">
+    <text x="215" y="62" fill="#e65100" font-weight="700">node_memory_MemAvailable_bytes</text>
+    <text x="685" y="62" fill="#e65100" font-weight="700">node_memory_MemTotal_bytes</text>
+    <rect x="70" y="75" width="140" height="34" fill="#e0f2f1" stroke="#00796b"/><text x="140" y="97">…12  1.4</text>
+    <rect x="220" y="75" width="140" height="34" fill="#fff8e1" stroke="#ff8f00"/><text x="290" y="97">…13  2.1</text>
+    <rect x="540" y="75" width="140" height="34" fill="#e0f2f1" stroke="#00796b"/><text x="610" y="97">…12  2.0</text>
+    <rect x="690" y="75" width="140" height="34" fill="#fff8e1" stroke="#ff8f00"/><text x="760" y="97">…13  4.0</text>
+    <rect x="690" y="120" width="140" height="34" fill="#f5f5f5" stroke="#bdbdbd" stroke-dasharray="4 3"/><text x="760" y="142" fill="#9e9e9e">…14  8.0</text>
+  </g>
+  <text x="450" y="97" text-anchor="middle" font-size="22" font-weight="700" fill="#263238">/</text>
+  <path d="M140,109 C140,190 610,150 610,109" fill="none" stroke="#00796b" stroke-width="2" stroke-dasharray="4 3"/>
+  <path d="M290,109 C290,210 760,170 760,109" fill="none" stroke="#ff8f00" stroke-width="2" stroke-dasharray="4 3"/>
+  <line x1="350" y1="200" x2="350" y2="228" stroke="#00796b" stroke-width="2" marker-end="url(#h4)"/>
+  <g font-size="12" font-family="JetBrains Mono, Menlo, monospace" text-anchor="middle">
+    <rect x="270" y="235" width="160" height="34" fill="#e0f2f1" stroke="#00796b"/><text x="350" y="257">…12  0.70</text>
+    <rect x="440" y="235" width="160" height="34" fill="#fff8e1" stroke="#ff8f00"/><text x="520" y="257">…13  0.52</text>
+  </g>
+  <text x="760" y="175" text-anchor="middle" font-size="11" fill="#9e9e9e">paariline puudub,</text>
+  <text x="760" y="190" text-anchor="middle" font-size="11" fill="#9e9e9e">jääb tulemusest välja</text>
+  <text x="450" y="305" text-anchor="middle" font-size="12" fill="#263238">Tulemuses on ainult read, mille sildid on mõlemal pool samad. Korrutad 100-ga ja saad protsendi.</text>
+  <text x="450" y="330" text-anchor="middle" font-size="11" fill="#546e7a">…12 tähendab instance="…12:9100". Väärtused GiB-des, illustratiivsed.</text>
+</svg>

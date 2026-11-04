@@ -1,0 +1,18 @@
+<svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="300" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Mida Prometheus salvestab: võti ja väärtus</text>
+  <path d="M40,62 v-8 h650 v8" fill="none" stroke="#1565c0" stroke-width="2"/><text x="365" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="#1565c0">võti: millise aegrea punkt</text>
+  <path d="M710,62 v-8 h150 v8" fill="none" stroke="#00796b" stroke-width="2"/><text x="785" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="#00796b">väärtus</text>
+  <g font-size="12" font-weight="700" text-anchor="middle"><text x="140" y="84" fill="#e65100">nimi</text><text x="410" y="84" fill="#00796b">sildid</text><text x="620" y="84" fill="#546e7a">ajatempel</text><text x="785" y="84" fill="#1565c0">mõõtmine</text></g>
+  <g font-size="13" font-family="JetBrains Mono, Menlo, monospace">
+    <rect x="30" y="96" width="840" height="34" rx="6" fill="#fafafa" stroke="#e0e0e0"/>
+    <text x="40" y="118"><tspan fill="#e65100">node_memory_MemAvailable_bytes</tspan><tspan fill="#00796b">{instance="…12:9100",job="node"}</tspan><tspan fill="#546e7a"> @10:00:00</tspan><tspan fill="#1565c0"> → 1.40e+09</tspan></text>
+    <rect x="30" y="136" width="840" height="34" rx="6" fill="#fafafa" stroke="#e0e0e0"/>
+    <text x="40" y="158"><tspan fill="#e65100">node_memory_MemAvailable_bytes</tspan><tspan fill="#00796b">{instance="…12:9100",job="node"}</tspan><tspan fill="#546e7a"> @10:00:15</tspan><tspan fill="#1565c0"> → 1.38e+09</tspan></text>
+    <rect x="30" y="176" width="840" height="34" rx="6" fill="#fafafa" stroke="#e0e0e0"/>
+    <text x="40" y="198"><tspan fill="#e65100">node_memory_MemAvailable_bytes</tspan><tspan fill="#00796b">{instance="…13:9100",job="node"}</tspan><tspan fill="#546e7a"> @10:00:00</tspan><tspan fill="#1565c0"> → 2.10e+09</tspan></text>
+  </g>
+  <text x="450" y="240" text-anchor="middle" font-size="12" fill="#263238">Kaks esimest rida on sama aegrea kaks punkti: nimi ja sildid on samad, ajatempel erineb.</text>
+  <text x="450" y="260" text-anchor="middle" font-size="12" fill="#263238">Kolmas rida on teine aegrida, sest silt instance on teine.</text>
+  <text x="450" y="288" text-anchor="middle" font-size="11" fill="#546e7a">Aadressid on lühendatud, väärtused on illustratiivsed.</text>
+</svg>

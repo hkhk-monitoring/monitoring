@@ -22,7 +22,7 @@ Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel 
 
 <figure markdown="span">
   ![Sinu arvutist paigaldab Ansible SSH kaudu node_exporteri proxmox2 ja proxmox3 masinasse, kus port 9100 on lahti; proxmox1 Prometheus kogub neilt iga 15 sekundi järel; brauser avab Prometheuse pordil 9090](../images/n05_topoloogia.svg)
-  <figcaption>Joonis 5.9. Praktikumi topoloogia: masinad, pordid ja ühendused (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.15. Praktikumi topoloogia: masinad, pordid ja ühendused (Talvik, 2026).</figcaption>
 </figure>
 
 Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Ennustuse kirjutad README-sse. Vastus on kokkuvolditud plokis.
@@ -31,7 +31,7 @@ Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Ennustuse 
 
 Töötad neljas kohas. Kasutatavad versioonid on node_exporter 1.12.1 ja Prometheus 3.15.1, jälgitavates masinates on AlmaLinux 9.
 
-??? note "Tabel 5.3. Kus mida teed"
+??? note "Tabel 5.4. Kus mida teed"
     | Koht | Mis seal töötab | Mida seal teed | Eeltingimus |
     |---|---|---|---|
     | Sinu arvuti | repositoorium, Ansible | kirjutad playbook'i ja seaded, käivitad `ansible-playbook`, salvestad tõendid | Ansible ja kollektsioon `ansible.posix` |
@@ -222,7 +222,7 @@ Kirjuta README jaotisse **Osa 3** kummagi nimi, tüüp ja ühik. Kuidas tunned c
 - teenus töötab ja käivitub koos masinaga;
 - teine käivitus annab `changed=0`, kui esimene käivitus õnnestus, failid kaustas `/tmp` on alles ja masinaid pole vahepeal käsitsi muudetud.
 
-??? note "Tabel 5.4. Playbook'i moodulid"
+??? note "Tabel 5.5. Playbook'i moodulid"
     | Moodul | Mida teeb | Parameetrid selles playbook'is |
     |---|---|---|
     | [`ansible.builtin.get_url`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html) | laadib faili alla ja kontrollib kontrollsummat | `url`, `dest`, `checksum` |
@@ -309,7 +309,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml | tee logid/n5-tei
     Esimesel käivitusel on `proxmox3` all mitu `changed` ülesannet. `proxmox2`-s tegid osa samme käsitsi, seal on muudatusi vähem. Kui unit-faili sisu erineb käsitsi failist kas või ühe tühiku poolest, on ka `proxmox2`-s unit-fail `changed`. Teisel käivitusel on mõlemal real `changed=0` ja `failed=0`.
 
 ??? warning "Kui teisel käivitusel on `changed=1`"
-    Tavaliselt on põhjus `command` või `shell` ülesanne, mis käivitub iga kord. Kasuta mooduleid tabelist 5.4. Kui muutub unit-faili ülesanne, kontrolli, et `content:` ei sõltu ajast ega muutujast, mis iga kord muutub.
+    Tavaliselt on põhjus `command` või `shell` ülesanne, mis käivitub iga kord. Kasuta mooduleid tabelist 5.5. Kui muutub unit-faili ülesanne, kontrolli, et `content:` ei sõltu ajast ega muutujast, mis iga kord muutub.
 
 Kontrolli, et mõlemad masinad vastavad:
 

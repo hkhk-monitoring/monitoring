@@ -1,0 +1,26 @@
+<svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="h1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker>
+  <marker id="h1o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker></defs>
+  <rect width="900" height="400" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Prometheuse ülesehitus</text>
+  <text x="110" y="62" text-anchor="middle" font-size="12" font-weight="700" fill="#546e7a">TARGET'ID</text>
+  <rect x="20" y="75" width="180" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/><text x="110" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#004d40">node_exporter</text><text x="110" y="118" text-anchor="middle" font-size="11" fill="#263238">masina näidud :9100</text>
+  <rect x="20" y="145" width="180" height="56" rx="8" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/><text x="110" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#004d40">rakendus</text><text x="110" y="188" text-anchor="middle" font-size="11" fill="#263238">oma /metrics</text>
+  <rect x="20" y="215" width="180" height="56" rx="8" fill="#fafafa" stroke="#90a4ae" stroke-dasharray="5 4"/><text x="110" y="240" text-anchor="middle" font-size="13" fill="#546e7a">teised exporter'id</text><text x="110" y="258" text-anchor="middle" font-size="11" fill="#546e7a">andmebaas, Blackbox (N11)</text>
+  <rect x="290" y="65" width="320" height="230" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="450" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#e65100">Prometheuse server</text>
+  <rect x="310" y="105" width="280" height="44" rx="6" fill="#ffffff" stroke="#ff8f00"/><text x="450" y="132" text-anchor="middle" font-size="13" fill="#5d4037"><tspan font-weight="700">kogumine</tspan> (scrape) iga 15 s</text>
+  <rect x="310" y="163" width="280" height="44" rx="6" fill="#ffffff" stroke="#ff8f00"/><text x="450" y="190" text-anchor="middle" font-size="13" fill="#5d4037"><tspan font-weight="700">aegridade andmebaas</tspan> (TSDB)</text>
+  <rect x="310" y="221" width="280" height="44" rx="6" fill="#ffffff" stroke="#ff8f00"/><text x="450" y="248" text-anchor="middle" font-size="13" fill="#5d4037"><tspan font-weight="700">PromQL</tspan> ja alarmireeglid</text>
+  <g stroke="#ff8f00" stroke-width="1.5"><line x1="450" y1="149" x2="450" y2="161" marker-end="url(#h1o)"/><line x1="450" y1="207" x2="450" y2="219" marker-end="url(#h1o)"/></g>
+  <g stroke="#ff8f00" stroke-width="2.5"><line x1="308" y1="122" x2="204" y2="103" marker-end="url(#h1o)"/><line x1="308" y1="127" x2="204" y2="173" marker-end="url(#h1o)"/><line x1="308" y1="132" x2="204" y2="240" marker-end="url(#h1o)" stroke-dasharray="5 4"/></g>
+  <text x="255" y="300" text-anchor="middle" font-size="11" fill="#e65100">GET /metrics</text>
+  <text x="790" y="62" text-anchor="middle" font-size="12" font-weight="700" fill="#546e7a">KASUTAB ANDMEID</text>
+  <rect x="700" y="75" width="180" height="56" rx="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/><text x="790" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#0d47a1">veebiliides</text><text x="790" y="118" text-anchor="middle" font-size="11" fill="#263238">Query, Target health (N5)</text>
+  <rect x="700" y="145" width="180" height="56" rx="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/><text x="790" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#0d47a1">Grafana</text><text x="790" y="188" text-anchor="middle" font-size="11" fill="#263238">töölaud (N6)</text>
+  <rect x="700" y="215" width="180" height="56" rx="8" fill="#ffebee" stroke="#c62828" stroke-width="2"/><text x="790" y="240" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">Alertmanager</text><text x="790" y="258" text-anchor="middle" font-size="11" fill="#263238">teavitused (N6)</text>
+  <g stroke="#546e7a" stroke-width="2"><line x1="612" y1="240" x2="696" y2="103" marker-end="url(#h1)"/><line x1="612" y1="243" x2="696" y2="173" marker-end="url(#h1)"/><line x1="612" y1="246" x2="696" y2="243" marker-end="url(#h1)"/></g>
+  <text x="450" y="335" text-anchor="middle" font-size="12" fill="#263238">Prometheus küsib target'itelt mõõdikud, salvestab need aegridadena ja vastab PromQL-i päringutele.</text>
+  <text x="450" y="355" text-anchor="middle" font-size="12" fill="#263238">Täna kasutad veebiliidest, N6-s lisanduvad Grafana ja Alertmanager.</text>
+  <text x="450" y="385" text-anchor="middle" font-size="11" fill="#546e7a">Kriipsjoonega osad on selle kursuse hilisemates nädalates.</text>
+</svg>

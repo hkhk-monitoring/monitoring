@@ -1,0 +1,41 @@
+<svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="z9" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker></defs>
+  <rect width="900" height="470" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Sama küsimus: kas vaba kettaruumi on alla 20%?</text>
+  <text x="195" y="62" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Zabbix (N4)</text>
+  <text x="705" y="62" text-anchor="middle" font-size="15" font-weight="700" fill="#00796b">Prometheus (N5)</text>
+  <g font-size="10" fill="#546e7a" font-weight="700"><text x="450" y="98" text-anchor="middle">MIDA KOGUTAKSE</text><text x="450" y="198" text-anchor="middle">KUS ARVUTATAKSE</text><text x="450" y="298" text-anchor="middle">KUS ON TINGIMUS</text><text x="450" y="398" text-anchor="middle">KUIDAS SEADISTAD</text></g>
+  <g font-size="12">
+    <rect x="20" y="80" width="350" height="76" rx="8" fill="#fff8e1" stroke="#ff8f00"/>
+    <text x="32" y="102" fill="#263238">üks item, mille lõid ise:</text>
+    <text x="32" y="122" font-family="JetBrains Mono, Menlo, monospace" fill="#e65100">vfs.fs.size[/,pfree]</text>
+    <text x="32" y="143" fill="#546e7a">server küsib ainult seda, mis on item'ina olemas</text>
+    <rect x="530" y="80" width="350" height="76" rx="8" fill="#e0f2f1" stroke="#00796b"/>
+    <text x="542" y="102" fill="#263238">exporteri kogu väljund, sh toorandmed:</text>
+    <text x="542" y="122" font-family="JetBrains Mono, Menlo, monospace" fill="#00796b">node_filesystem_avail_bytes, _size_bytes</text>
+    <text x="542" y="143" fill="#546e7a">sadu mõõdikuid, ka neid, mida veel ei vaata</text>
+    <rect x="20" y="180" width="350" height="76" rx="8" fill="#fff8e1" stroke="#ff8f00"/>
+    <text x="32" y="202" fill="#263238">agent arvutab protsendi ise</text>
+    <text x="32" y="222" fill="#263238">(võti pfree tähendab vaba ruumi protsenti)</text>
+    <text x="32" y="243" fill="#546e7a">serverisse jõuab valmis arv, näiteks 15</text>
+    <rect x="530" y="180" width="350" height="76" rx="8" fill="#e0f2f1" stroke="#00796b"/>
+    <text x="542" y="202" fill="#263238">päring arvutab baitidest protsendi:</text>
+    <text x="542" y="222" font-family="JetBrains Mono, Menlo, monospace" fill="#00796b">avail / size * 100</text>
+    <text x="542" y="243" fill="#546e7a">sama andmetega saab hiljem küsida teisiti</text>
+    <rect x="20" y="280" width="350" height="76" rx="8" fill="#fff8e1" stroke="#ff8f00"/>
+    <text x="32" y="302" fill="#263238">trigger'i avaldis veebiliideses:</text>
+    <text x="32" y="322" font-family="JetBrains Mono, Menlo, monospace" fill="#e65100">last(/proxmox2/vfs.fs.size[/,pfree])&lt;20</text>
+    <text x="32" y="343" fill="#546e7a">probleem ja raskusaste on Zabbixis</text>
+    <rect x="530" y="280" width="350" height="76" rx="8" fill="#e0f2f1" stroke="#00796b"/>
+    <text x="542" y="302" fill="#263238">PromQL-i võrdlus, N6-s alarmireegel:</text>
+    <text x="542" y="322" font-family="JetBrains Mono, Menlo, monospace" fill="#00796b">avail / size * 100 &lt; 20</text>
+    <text x="542" y="343" fill="#546e7a">teavituse saadab eraldi Alertmanager</text>
+    <rect x="20" y="380" width="350" height="60" rx="8" fill="#fff8e1" stroke="#ff8f00"/>
+    <text x="32" y="403" fill="#263238">klõpsad veebiliideses, seaded on andmebaasis</text>
+    <text x="32" y="424" fill="#546e7a">valmis template annab palju korraga</text>
+    <rect x="530" y="380" width="350" height="60" rx="8" fill="#e0f2f1" stroke="#00796b"/>
+    <text x="542" y="403" fill="#263238">tekstifailid prometheus.yml ja reeglid</text>
+    <text x="542" y="424" fill="#546e7a">saab panna Giti ja paigaldada Ansible'iga</text>
+  </g>
+  <text x="450" y="462" text-anchor="middle" font-size="11" fill="#546e7a">Mõlemad vastavad küsimusele. Vahe on selles, kus otsus tehakse ja kuidas seda muudad.</text>
+</svg>

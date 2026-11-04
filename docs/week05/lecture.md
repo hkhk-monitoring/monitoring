@@ -17,6 +17,11 @@ N4-s paigaldasid Zabbixi agendi ja valmis template andis hostile item'id ja trig
     - kontrollida kogumist sammhaaval: exporter, `/metrics`, Targets-leht, päring;
     - koostada ja kohandada PromQL-i päringuid saadaval oleva mälu, failisüsteemi vaba ruumi ja protsessori kasutuse uurimiseks ning selgitada tulemuste ühikuid ja ulatust.
 
+<figure markdown="span">
+  ![Prometheuse server küsib target'itelt mõõdikud, salvestab need aegridade andmebaasi ja vastab PromQL-i päringutele; andmeid kasutavad veebiliides, Grafana ja Alertmanager](../images/n05_ylesehitus.svg)
+  <figcaption>Joonis 5.1. Prometheuse ülesehitus: kogumine, aegridade andmebaas ja PromQL ([Prometheuse ülevaade](https://prometheus.io/docs/introduction/overview/)) (Talvik, 2026).</figcaption>
+</figure>
+
 ## 1. Kes alustab ühendust ja kes tagastab väärtused
 
 Mõõdikute kogumisel on kaks küsimust: kes avab ühenduse ja milline komponent tagastab väärtused. Zabbixi passiivse kontrolli puhul küsib server väärtusi ja agent vastab. Aktiivse kontrolli puhul avab ühenduse agent ja saadab väärtused ise. Prometheuse puhul avab ühenduse Prometheus ja exporter tagastab korraga kõik oma mõõdikud.
@@ -35,12 +40,12 @@ Zabbixi passiivne kontroll ja Prometheus on seega sarnased: mõlemal juhul küsi
 
 <figure markdown="span">
   ![Prometheus proxmox1-s saadab proxmox2 ja proxmox3 node_exporterile päringu GET /metrics ja saab vastuseks mõõteväärtused](../images/n05_kes_kusib.svg)
-  <figcaption>Joonis 5.1. Prometheus küsib jälgitavate masinate node_exporteritelt mõõdikuid. Ühenduse avab Prometheus, exporter ainult vastab (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.2. Prometheus küsib jälgitavate masinate node_exporteritelt mõõdikuid. Ühenduse avab Prometheus, exporter ainult vastab (Talvik, 2026).</figcaption>
 </figure>
 
 <figure markdown="span">
   ![Kolm veergu: Zabbixi passiivne kontroll, kus server küsib agendilt; aktiivne kontroll, kus agent saadab ise serveri porti 10051; Prometheus, mis küsib node_exporterilt GET /metrics](../images/n05_kolm_suunda.svg)
-  <figcaption>Joonis 5.2. Zabbixi passiivne kontroll ja Prometheus on pull, Zabbixi aktiivne kontroll on push (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.3. Zabbixi passiivne kontroll ja Prometheus on pull, Zabbixi aktiivne kontroll on push (Talvik, 2026).</figcaption>
 </figure>
 
 ??? question "Kontrolli ennast"
@@ -66,7 +71,7 @@ node_cpu_seconds_total{cpu="0",mode="idle"} 81432.17
 
 <figure markdown="span">
   ![Mõõdikurida node_cpu_seconds_total cpu 0 mode idle väärtusega: mõõdiku nimi, sildid ja väärtus; sama nimi eri siltidega annab eri aegread](../images/n05_moodikurida.svg)
-  <figcaption>Joonis 5.3. Mõõdiku nimi ja sildid ehk label'id valivad päringu jaoks õige aegrea. Prometheus lisab kogumisel sildid `job` ja `instance` (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.4. Mõõdiku nimi ja sildid ehk label'id valivad päringu jaoks õige aegrea. Prometheus lisab kogumisel sildid `job` ja `instance` (Talvik, 2026).</figcaption>
 </figure>
 
 Mõõteväärtuse real on mõõdiku **nimi** (`node_filesystem_avail_bytes`) ja **väärtus** (`1.2034e+10`). Kui mõõdikul on **sildid** ehk label'id, on need nime järel loogelistes sulgudes (`mountpoint="/"`), mälumõõdikul neid pole. `e+10` tähendab korrutamist arvuga 10¹⁰. Read `# TYPE` ja `# HELP` kirjeldavad mõõdiku tüüpi (`gauge` või `counter`) ja tähendust. Ühik on nime lõpus: `_bytes` tähendab baite ja `_seconds_total` sekundeid kokku. See on nimetustava, tähenduse kontrollimiseks loe ka `HELP`-rida. Prometheuse tavade järgi tähistab `_total` counterit ([Metric types](https://prometheus.io/docs/concepts/metric_types/)).
@@ -97,7 +102,12 @@ scrape_configs:
 
 <figure markdown="span">
   ![Neli kogumist 15 sekundi järel: kolm õnnestuvad ja annavad väärtuse ning up=1, üks ebaõnnestub, väärtus puudub ja up=0](../images/n05_scrape_ajas.svg)
-  <figcaption>Joonis 5.4. Iga kogumine lisab aegreale punkti ja salvestab mõõdiku up. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.5. Iga kogumine lisab aegreale punkti ja salvestab mõõdiku up. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Kolm salvestatud punkti: mõõdiku nimi, sildid ja ajatempel moodustavad võtme, millele kuulub väärtus; kaks punkti on samast aegreast, kolmas teisest](../images/n05_aegrea_punkt.svg)
+  <figcaption>Joonis 5.6. Mida Prometheus salvestab: nimi, sildid ja ajatempel kokku on võti, millele kuulub mõõdetud väärtus (Talvik, 2026).</figcaption>
 </figure>
 
 Mõõdiku nimi koos siltide väärtustega määrab ühe aegrea. Kui näidismasin avaldab iga loogilise protsessori kohta kaheksa `mode` väärtust, tekib kahe loogilise protsessori korral `node_cpu_seconds_total` jaoks 16 aegrida. Kaks sellist masinat annavad 32 aegrida.
@@ -122,7 +132,7 @@ Kui päring ei leia midagi, võib viga olla viies kohas. Kontrolli neid järjest
 
 <figure markdown="span">
   ![Viis järjestikust kontrollpunkti: exporter töötab, /metrics vastab, võrk ja tulemüür, Prometheus kogus, päring leiab aegread; iga sammu juures küsimus](../images/n05_kontroll.svg)
-  <figcaption>Joonis 5.5. Kogumise kontroll: alusta sealt, kus esimene kontroll ebaõnnestub (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.7. Kogumise kontroll: alusta sealt, kus esimene kontroll ebaõnnestub (Talvik, 2026).</figcaption>
 </figure>
 
 ??? question "Kontrolli ennast"
@@ -143,16 +153,36 @@ Jagamine paneb kokku read, millel on samad sildid, seega saad iga masina kohta �
 
 <figure markdown="span">
   ![Ainult mõõdiku nimi annab kaks rida, sildifilter jätab ühe masina, jagamine annab iga masina kohta ühe protsendi](../images/n05_sildifilter.svg)
-  <figcaption>Joonis 5.6. Sildifilter valib aegread, jagamine paaritab read samade siltide järgi. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.8. Sildifilter valib aegread, jagamine paaritab read samade siltide järgi. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
 </figure>
 
+<figure markdown="span">
+  ![MemAvailable ja MemTotal read paaritatakse silti instance järgi; rida, millel paarilist pole, jääb tulemusest välja](../images/n05_sobitamine.svg)
+  <figcaption>Joonis 5.9. Jagamine sobitab read samade siltide järgi (Talvik, 2026).</figcaption>
+</figure>
+
+Sildifiltris saab kasutada nelja operaatorit ([Querying basics](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)):
+
+??? note "Tabel 5.3. Sildifiltri operaatorid"
+    | Operaator | Tähendus | Näide |
+    |---|---|---|
+    | `=` | võrdne | `node_filesystem_avail_bytes{mountpoint="/"}` |
+    | `!=` | ei ole võrdne | `node_filesystem_avail_bytes{mountpoint!="/boot"}` |
+    | `=~` | vastab regulaaravaldisele | `node_filesystem_avail_bytes{fstype=~"xfs\|ext4"}` |
+    | `!~` | ei vasta regulaaravaldisele | `node_filesystem_avail_bytes{mountpoint!~"/run.*"}` |
+
 **Millises masinas on juurfailisüsteemis kõige vähem vaba ruumi?** Masinas on mitu failisüsteemi ja `node_filesystem_avail_bytes` annab rea igaühe kohta. Õige failisüsteemi valid sildiga `mountpoint="/"`. Vaba ruumi osakaal tuleb samamoodi nagu mälu puhul, jagades suurusega `node_filesystem_size_bytes`.
+
+<figure markdown="span">
+  ![Vasakul instant vector: igast aegreast üks viimane väärtus; paremal range vector: viimase minuti väärtused, mis lähevad funktsiooni rate sisse](../images/n05_vektorid.svg)
+  <figcaption>Joonis 5.10. Instant vector annab ühe väärtuse, range vector `[1m]` annab väärtused ajavahemikus (Talvik, 2026).</figcaption>
+</figure>
 
 **Kuidas muutub protsessori kasutus koormuskatse ajal?** `node_cpu_seconds_total` on counter. N3 loengus nägid, et counterist arvutatakse kiirus: loed kaks väärtust ja jagad vahe ajaga. Funktsioon `rate()` teeb sama mõtte järgi rohkem: see arvutab ajavahemiku `[1m]` väärtuste põhjal counteri keskmise kasvu sekundis ja arvestab ka counteri lähtestumist ([rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate)). Kasuta seda counterite, mitte gauge'ide jaoks. Jõudeoleku (`mode="idle"`) kasv on iga protsessori kohta 0 ja 1 vahel. `avg by (instance)` arvutab iga masina loogiliste protsessorite jõudeaja aritmeetilise keskmise ja `100 * (1 - ...)` teeb sellest jõudeajast üle jäänud aja protsendi:
 
 <figure markdown="span">
   ![Ülal counteri toorväärtus, mis koormuse ajal peaaegu ei kasva; all rate, mis koormuse ajal langeb nulli lähedale](../images/n05_counter_rate.svg)
-  <figcaption>Joonis 5.7. Counteri toorväärtus ja selle kasv sekundis koormuskatse ajal. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.11. Counteri toorväärtus ja selle kasv sekundis koormuskatse ajal. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
 </figure>
 
 ```text
@@ -164,12 +194,17 @@ avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m]))
 
 <figure markdown="span">
   ![Neli sammu: node_cpu_seconds_total idle, siis rate, siis avg by instance, siis 100 korda 1 miinus tulemus; iga sammu kõrval tulemuse näide](../images/n05_paring.svg)
-  <figcaption>Joonis 5.8. Protsessori kasutuse päring tekib neljas sammus: loendur, kasv sekundis, keskmine masina kohta ja jõudeajast üle jäänud aja osakaal protsentides. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 5.12. Protsessori kasutuse päring tekib neljas sammus: loendur, kasv sekundis, keskmine masina kohta ja jõudeajast üle jäänud aja osakaal protsentides. Väärtused on illustratiivsed (Talvik, 2026).</figcaption>
 </figure>
 
 Selle praktikumi 15-sekundilise kogumisintervalli juures kasutame üheminutilist akent. Mitut mõõtmist hõlmav aken teeb tulemuse stabiilsemaks, pikem aken silub lühikesi muutusi rohkem. Uus mõõtmine mõjutab tulemust kohe, aga täielikult jõuab muutus tulemusse alles akna jooksul.
 
 Võrdlus, näiteks `< 20`, jätab alles ainult read, mille kohta tingimus kehtib. Sellest tuleb N6-s alarmireegel.
+
+<figure markdown="span">
+  ![Kolm rida vaba ruumi protsendiga; tingimus alla 20 jätab alles ainult proxmox3 juurfailisüsteemi rea](../images/n05_vordlus.svg)
+  <figcaption>Joonis 5.13. Võrdlus filtreerib read: alles jäävad ainult need, mille kohta tingimus kehtib (Talvik, 2026).</figcaption>
+</figure>
 
 ??? question "Kontrolli ennast"
     1. Mida näitab päringu `node_cpu_seconds_total` graafik ja miks vajad kasutuse uurimiseks teistsugust päringut?
@@ -179,6 +214,11 @@ Võrdlus, näiteks `< 20`, jätab alles ainult read, mille kohta tingimus kehtib
 ## 6. Zabbix ja Prometheus
 
 Mõlemad koguvad mõõdikuid ja annavad teada probleemidest. N4-s valis Zabbixi template item'id ja trigger'id sinu eest. N5-s avaldab exporter oma collector'ite mõõdikud ja päringu koostad ise. Prometheuse seadistus on tekstifail, mille saab panna Giti ja paigaldada Ansible'iga. Paljudes ettevõtetes on kasutusel mõlemad.
+
+<figure markdown="span">
+  ![Kõrvutus sama küsimuse kohta: Zabbix kogub item'i vfs.fs.size pfree, agent arvutab protsendi, tingimus on trigger'is; Prometheus kogub toorbaidid, protsendi arvutab päring, tingimus on PromQL-i võrdlus](../images/n05_zabbix_vs_prometheus.svg)
+  <figcaption>Joonis 5.14. Sama küsimus Zabbixis (N4) ja Prometheuses (N5): mida kogutakse, kus arvutatakse ja kus on tingimus (Talvik, 2026).</figcaption>
+</figure>
 
 ??? question "Kontrolli ennast"
     Sul on samad kolm püsivat laborimasinat. Milline tegevus oli Zabbixis ja Prometheuses erinev: jälgimise lisamine, mõõdikute leidmine või probleemitingimuse koostamine? Too oma tööst kaks näidet.

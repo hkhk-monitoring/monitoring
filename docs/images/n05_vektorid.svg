@@ -1,0 +1,16 @@
+<svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="330" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Instant vector ja range vector</text>
+  <g font-size="14" font-weight="700" text-anchor="middle"><text x="225" y="62" fill="#e65100">instant vector: üks väärtus</text><text x="675" y="62" fill="#00796b">range vector: väärtused ajavahemikus</text></g>
+  <g stroke="#90a4ae"><line x1="60" y1="250" x2="410" y2="250"/><line x1="60" y1="90" x2="60" y2="250"/><line x1="510" y1="250" x2="860" y2="250"/><line x1="510" y1="90" x2="510" y2="250"/></g>
+  <g fill="#cfd8dc"><circle cx="100" cy="190" r="5"/><circle cx="160" cy="175" r="5"/><circle cx="220" cy="185" r="5"/><circle cx="280" cy="160" r="5"/><circle cx="340" cy="150" r="5"/></g>
+  <circle cx="380" cy="140" r="8" fill="#e65100"/>
+  <line x1="380" y1="140" x2="380" y2="250" stroke="#e65100" stroke-dasharray="3 3"/>
+  <text x="380" y="270" text-anchor="middle" font-size="11" fill="#e65100">praegu</text>
+  <rect x="680" y="100" width="160" height="150" fill="#e0f2f1" opacity="0.6"/>
+  <g fill="#cfd8dc"><circle cx="550" cy="190" r="5"/><circle cx="610" cy="175" r="5"/><circle cx="660" cy="185" r="5"/></g>
+  <g fill="#00796b"><circle cx="700" cy="160" r="7"/><circle cx="740" cy="150" r="7"/><circle cx="780" cy="165" r="7"/><circle cx="820" cy="140" r="7"/></g>
+  <path d="M680,262 v6 h160 v-6" fill="none" stroke="#00796b" stroke-width="2"/><text x="760" y="285" text-anchor="middle" font-size="11" fill="#00796b">[1m] = viimane minut, 4 mõõtmist</text>
+  <g font-size="13" font-family="JetBrains Mono, Menlo, monospace" text-anchor="middle"><text x="225" y="310" fill="#e65100">node_cpu_seconds_total</text><text x="675" y="310" fill="#00796b">node_cpu_seconds_total[1m]</text></g>
+  <text x="675" y="326" text-anchor="middle" font-size="11" fill="#546e7a">range vector läheb funktsiooni rate() sisse</text>
+</svg>
