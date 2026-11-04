@@ -7,7 +7,7 @@ tags:
 
 # Praktikum: server küsib mõõdikuid
 
-Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel playbook'iga mõlemasse jälgitavasse masinasse, käivitad `proxmox1`-s Prometheuse ja leiad PromQL-iga vastuse küsimusele: millises masinas on ressursse kõige vähem alles?
+Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel Ansible'i playbook'iga mõlemasse jälgitavasse masinasse, käivitad `proxmox1`-s Prometheuse ja leiad PromQL-iga vastuse küsimusele: millises masinas on ressursse kõige vähem alles?
 
 **Edenemine:** laboritahvel <http://192.168.125.187:8092/> (VPN-iga).
 
@@ -15,7 +15,7 @@ Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel 
     Pärast loengut ja praktikumi oskad:
 
     1. paigaldada node_exporteri ametlikust väljalaskest systemd teenusena ja kontrollida aadressi `/metrics`;
-    2. kirjutada playbook'i, mis paigaldab node_exporteri mitmesse masinasse ja annab teisel käivitusel `changed=0`;
+    2. kirjutada Ansible'i playbook'i, mis paigaldab node_exporteri mitmesse masinasse ja annab teisel käivitusel `changed=0`;
     3. käivitada Prometheuse Docker Compose'iga, kontrollida **Targets**-lehelt, et target'id on olekus `UP`, ja leida seal viimase kogumise viga, kui target on `DOWN`;
     4. koostada ja kohandada PromQL-i päringuid saadaval oleva mälu, failisüsteemi vaba ruumi ja protsessori kasutuse uurimiseks ning selgitada tulemuste ühikuid ja ulatust;
     5. selgitada, kes avab ühenduse ja milline komponent tagastab väärtused Zabbixi agendi ja Prometheuse puhul.
