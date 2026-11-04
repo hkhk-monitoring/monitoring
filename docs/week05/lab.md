@@ -25,7 +25,7 @@ Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel 
   <figcaption>Joonis 5.15. Praktikumi topoloogia: masinad, pordid ja ühendused (Talvik, 2026).</figcaption>
 </figure>
 
-Praktikum läheb lihtsamast keerulisemani ja iga sammu saad teha iseseisvalt. Loe enne käsku selgitus, mõtle läbi plokk **Ennusta**, tee samm ja võrdle tulemust plokiga **Oodatav tulemus**. Kui jääd kinni, ava **Vihje**. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
+Lisad seadistusi ja playbook'i ülesandeid ükshaaval. Enne käivitamist ennusta tulemust, seejärel vaata väljundit ja põhjenda, mis muutus. Kui tulemus erineb oodatust, uuri erinevust enne järgmise sammu lisamist. Esimesed osad on näidatud tervikuna, järgmised koostad ise sama mustri järgi. Näidislahendus on kokkuvolditud plokis, ava see, kui jääd kinni või tahad oma lahendust kontrollida. Kirjuta ennustused ja tulemuste võrdlus README vastava osa alla. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
 
 ## Osa 1 · Repositoorium ja mälu
 
@@ -139,17 +139,26 @@ systemd käivitab programmi teenusena, kui sellel on **unit-fail**. Unit-failis 
 - `[Service]`: millise kasutajana ja millise käsuga programm käivitub ning mida teha, kui see seiskub;
 - `[Install]`: millise süsteemi oleku osana teenus koos masinaga käivitub.
 
-node_exporteri repositooriumis on ametlik näidis kaustas [examples/systemd](https://github.com/prometheus/node_exporter/tree/master/examples/systemd). See on tehtud teistsuguse paigalduse jaoks (socket-fail ja keskkonnafail), sinu paigalduses on see lihtsam. Võrdle allolevat faili näidisega ja vaata, mis on erinev:
+node_exporteri repositooriumis on ametlik näidis kaustas [examples/systemd](https://github.com/prometheus/node_exporter/tree/master/examples/systemd). See on tehtud teistsuguse paigalduse jaoks (socket-fail ja keskkonnafail), sinu fail on lihtsam.
 
-- `After=network-online.target` käivitab teenuse alles siis, kui võrk on üleval;
-- `User=node_exporter` käivitab programmi kasutajana, mille just lõid, mitte `root`-ina;
-- `ExecStart` on programmi täielik tee sinu paigalduses;
-- `Restart=on-failure` käivitab teenuse uuesti, kui see vea tõttu seiskub;
-- `WantedBy=multi-user.target` paneb teenuse käivituma koos masinaga, kui see on lubatud (`enable`).
+Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` (`sudo nano`). Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu. Esimene sektsioon on antud: `Description` on teenuse kirjeldus ja `After=network-online.target` käivitab teenuse alles siis, kui võrk on üleval.
 
-Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` (`sudo nano`). Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu.
+???+ example "Failiosa: [Unit]"
+    ```ini
+    [Unit]
+    Description=Prometheus node_exporter
+    After=network-online.target
+    ```
 
-???+ example "Fail: /etc/systemd/system/node_exporter.service"
+Kaks järgmist sektsiooni kirjuta ise. Vaata ametlikust näidisest, kuidas read on kirjutatud, ja kohanda neid oma paigaldusele:
+
+- `[Service]`: programm käivitub kasutajana `node_exporter` (`User`), käsk on programmi täielik tee `/usr/local/bin/node_exporter` (`ExecStart`) ja kui programm vea tõttu seiskub, käivitab systemd selle uuesti (`Restart=on-failure`);
+- `[Install]`: teenus käivitub koos masinaga, kui see on lubatud (`WantedBy=multi-user.target`).
+
+??? tip "Vihje"
+    Iga rida on kujul `Võti=väärtus`, sektsiooni nimi on nurksulgudes omaette real. Ametlikus näidises on `ExecStart` real ka lisavõtmed, sinu failis on ainult programmi tee.
+
+??? example "Näidislahendus: kogu fail"
     ```ini
     [Unit]
     Description=Prometheus node_exporter
@@ -288,7 +297,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml
 ```
 
 ??? success "Oodatav tulemus"
-    Ülesanne on `proxmox3`-s `changed`. Käivita uuesti: nüüd on see `ok`, sest fail on olemas ja kontrollsumma klapib.
+    Ülesanne on `proxmox3`-s `changed`. `proxmox2`-s laadisid osas 2 sama arhiivi kausta `/tmp`, seal on see `ok`, kui fail on alles ja kontrollsumma klapib. Käivita uuesti: nüüd on see mõlemas `ok`.
 
 ### 4.2 Lahtipakkimine ja programm
 
@@ -316,11 +325,17 @@ Need kaks ülesannet teevad sama, mis osas 2 käsud `tar` ja `install`. Arhiiv j
 
 Käivita playbook ja kontrolli: `ssh proxmox3 "/usr/local/bin/node_exporter --version"`.
 
+??? success "Oodatav tulemus"
+    Kaks uut ülesannet on `proxmox3`-s `changed`, allalaadimine on `ok`. `proxmox2`-s on programm osast 2 juba olemas, seal võib programmi ülesanne olla `ok`. `--version` näitab `node_exporter, version 1.12.1`.
+
 ### 4.3 Kasutaja
 
-See ülesanne teeb sama, mis osas 2 käsk `useradd`: süsteemikasutaja ilma kodukaustata ja ilma sisselogimisõiguseta. Võrdle parameetreid käsu võtmetega: `system` on `--system`, `shell` on `--shell` ja `create_home: false` on `--no-create-home`.
+Alates siit kirjutad ülesanded ise. Lisa ülesanne, mis teeb sama, mis osas 2 käsk `useradd`: süsteemikasutaja `node_exporter` ilma kodukaustata ja ilma sisselogimisõiguseta. Moodul on `ansible.builtin.user`. Leia `ansible-doc ansible.builtin.user` väljundist parameetrid, mis vastavad käsu võtmetele `--system`, `--shell` ja `--no-create-home`.
 
-???+ example "Ülesanne: süsteemikasutaja"
+??? tip "Vihje"
+    Otsi väljundist `/system`, `/shell` ja `/create_home`. Ühe neist väärtus on `false`.
+
+??? example "Näidislahendus"
     ```yaml
         - name: Süsteemikasutaja node_exporter
           ansible.builtin.user:
@@ -330,13 +345,23 @@ See ülesanne teeb sama, mis osas 2 käsk `useradd`: süsteemikasutaja ilma kodu
             create_home: false
     ```
 
+Käivita playbook.
+
+??? success "Oodatav tulemus"
+    `proxmox3`-s on uus ülesanne `changed`. `proxmox2`-s lõid kasutaja osas 2 juba käsitsi, seal on see `ok`. Varasemad ülesanded on `ok`.
+
 ### 4.4 Unit-fail ja handler
 
-Unit-faili sisu peab olema täpselt sama, mis osas 2 käsitsi loodud failis. Kui sisu erineb kas või ühe tühiku võrra, kirjutab playbook `proxmox2`-s faili üle. Moodul `copy` kirjutab faili ka ilma lähtefailita, sisu on siis parameetris `content`. Märk `|` tähendab mitmerealist teksti, read on selle all ühe taandega.
+Unit-faili sisu peab olema täpselt sama, mis osas 2 käsitsi loodud failis. Kui sisu erineb kas või ühe tühiku võrra, kirjutab playbook `proxmox2`-s faili üle. Moodul `ansible.builtin.copy` kirjutab faili ka ilma lähtefailita: sisu on siis parameetris `content`. Märk `|` tähendab mitmerealist teksti, read on selle all ühe taandega.
 
-`notify` teavitab handler'it, kui fail muutus. Handler käivitub play lõpus ja ainult siis, kui teda teavitati.
+Lisa ülesanne, mis kirjutab faili `/etc/systemd/system/node_exporter.service` õigustega `0644` ja sisuga osast 2. Lisa ülesandele `notify` handler'i jaoks nimega `node_exporter uuesti`.
 
-???+ example "Ülesanne: unit-fail"
+Handler'id on play lõpus eraldi plokis `handlers:`, samal tasemel kui `tasks:`. Handler kasutab moodulit `ansible.builtin.systemd_service`: see taaskäivitab teenuse, aga enne peab systemd unit-faili uuesti lugema, nagu tegid osas 2 käsuga `daemon-reload`. Leia `ansible-doc ansible.builtin.systemd_service` väljundist parameeter, mis teeb `daemon-reload`-i, ja `state` väärtus taaskäivituseks. Lisa handler enne käivitamist, muidu annab `notify` vea.
+
+??? tip "Vihje"
+    Kopeeri `content` alla osa 2 faili read nii, nagu need on, ja lisa igale reale sama taane. Handler'i nimi peab olema täpselt sama mis `notify` väärtus.
+
+??? example "Näidislahendus: unit-fail ja handler"
     ```yaml
         - name: Unit-fail, sama sisu mis osas 2
           ansible.builtin.copy:
@@ -357,9 +382,6 @@ Unit-faili sisu peab olema täpselt sama, mis osas 2 käsitsi loodud failis. Kui
           notify: node_exporter uuesti
     ```
 
-Handler'id on play lõpus eraldi plokis `handlers:`, samal tasemel kui `tasks:`. Handler peab enne taaskäivitamist laskma systemd'l unit-faili uuesti lugeda, nagu tegid osas 2 käsuga `daemon-reload`. Seda teeb `daemon_reload: true`.
-
-??? example "Plokk: handler'id (faili lõppu)"
     ```yaml
       handlers:
         - name: node_exporter uuesti
@@ -369,11 +391,27 @@ Handler'id on play lõpus eraldi plokis `handlers:`, samal tasemel kui `tasks:`.
             daemon_reload: true
     ```
 
+??? question "Ennusta"
+    Kas unit-faili ülesanne on `proxmox2`-s `changed` või `ok`? Kas handler käivitub `proxmox2`-s ja `proxmox3`-s?
+
+Käivita playbook.
+
+??? success "Oodatav tulemus"
+    `proxmox3`-s on unit-fail `changed` ja play lõpus käivitub handler. `proxmox2`-s on unit-fail `ok` ja handler ei käivitu, kui sisu on täpselt sama mis osas 2. Kui see on `changed`, erines sisu millegi poolest: võrdle `ssh proxmox2 cat /etc/systemd/system/node_exporter.service` oma playbook'iga.
+
 ### 4.5 Teenus ja tulemüür
 
-Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewall-cmd`. Teenuse ülesanne nõuab soovitud olekut (`started`, `enabled`), mitte taaskäivitust: kui teenus juba töötab, ei tee see midagi. Tulemüüri reegel peab kehtima kohe (`immediate`) ja jääma alles pärast taaskäivitust (`permanent`). Need ülesanded lähevad `tasks:` loendi lõppu, enne plokki `handlers:`.
+Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewall-cmd`. Need lähevad `tasks:` loendi lõppu, enne plokki `handlers:`.
 
-???+ example "Ülesanne: teenus"
+- Teenus: moodul `ansible.builtin.systemd_service`. Teenus `node_exporter` töötab ja käivitub koos masinaga. Ülesanne kirjeldab soovitud olekut, mitte taaskäivitust: kui teenus juba töötab, ei tee see midagi.
+- Tulemüür: moodul `ansible.posix.firewalld`. Port `9100/tcp` on lubatud, seadistus kehtib kohe ja jääb alles pärast taaskäivitust.
+
+Leia `ansible-doc ansible.posix.firewalld` väljundist, mis juhtub, kui on ainult `permanent: true` ilma `immediate`-ita. Kirjuta vastus README jaotisse **Osa 4**.
+
+??? tip "Vihje"
+    Teenuse jaoks vaata N4 praktikumi teenuse ülesannet: parameetrid on samad, moodul on teine. Tulemüüri jaoks otsi väljundist `/immediate` ja võrdle osa 2 käsku: miks oli seal pärast `--permanent` vaja ka `--reload`-i?
+
+??? example "Näidislahendus: teenus ja tulemüür"
     ```yaml
         - name: Teenus töötab ja käivitub koos masinaga
           ansible.builtin.systemd_service:
@@ -381,10 +419,7 @@ Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewa
             state: started
             enabled: true
             daemon_reload: true
-    ```
 
-???+ example "Ülesanne: port tulemüüris"
-    ```yaml
         - name: Port 9100 tulemüüris
           ansible.posix.firewalld:
             port: 9100/tcp
@@ -392,11 +427,6 @@ Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewa
             immediate: true
             state: enabled
     ```
-
-Leia `ansible-doc ansible.posix.firewalld` väljundist, mis juhtub, kui on ainult `permanent: true` ilma `immediate`-ita. Kirjuta vastus README jaotisse **Osa 4**.
-
-??? tip "Vihje"
-    Otsi väljundist `/immediate`. Võrdle osa 2 käsitsi käsku: miks oli seal pärast `--permanent` vaja ka `--reload`-i?
 
 ### 4.6 Kaks käivitust
 
@@ -408,7 +438,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml | tee logid/n5-tei
 ```
 
 ??? success "Oodatav tulemus"
-    Esimesel käivitusel on `proxmox3` all mitu `changed` ülesannet. `proxmox2`-s tegid osa samme käsitsi, seal on muudatusi vähem. Kui unit-faili sisu erineb käsitsi failist kas või ühe tühiku poolest, on ka `proxmox2`-s unit-fail `changed`. Teisel käivitusel on mõlemal real `changed=0` ja `failed=0`.
+    Esimeses käivituses on `changed` ainult need ülesanded, mis lisasid 4.5-s ja mis sellel masinal veel tegemata olid. `proxmox2`-s tegid teenuse ja tulemüüri osas 2 käsitsi, seal võivad need olla `ok`. Teisel käivitusel on mõlemal real `changed=0` ja `failed=0`.
 
 ??? warning "Kui teisel käivitusel on `changed=1`"
     Tavaliselt on põhjus `command` või `shell` ülesanne, mis käivitub iga kord. Kasuta mooduleid tabelist 5.5. Kui muutub unit-faili ülesanne, kontrolli, et `content:` ei sõltu ajast ega muutujast, mis iga kord muutub.
@@ -441,9 +471,12 @@ Teine osa on `scrape_configs`: loend job'e. Igal job'il on nimi (`job_name`, sel
           - targets: ["localhost:9090"]
     ```
 
-Teine job küsib mõlemat node_exporterit. Kasuta osas 1 kirja pandud IP-aadresse, mitte SSH aliaseid: Prometheus konteineris ei tunne nimesid `proxmox2` ja `proxmox3`. Job läheb samasse `scrape_configs` loendisse.
+Teise job'i kirjuta ise samasse `scrape_configs` loendisse. Nõuded: `job_name` on `node` ja `targets` loendis on mõlemad node_exporterid pordiga 9100. Kasuta osas 1 kirja pandud IP-aadresse, mitte SSH aliaseid: Prometheus konteineris ei tunne nimesid `proxmox2` ja `proxmox3`.
 
-???+ example "Failiosa: job node"
+??? tip "Vihje"
+    Job `node` on samal taandel ja samal kujul nagu job `prometheus`, ainult nimi ja aadressid on teised. Aadresse eraldab loendis koma.
+
+??? example "Näidislahendus: job node"
     ```yaml
       - job_name: node
         static_configs:
@@ -462,18 +495,24 @@ Teine job küsib mõlemat node_exporterit. Kasuta osas 1 kirja pandud IP-aadress
         restart: unless-stopped
     ```
 
-`volumes` ühendab konteinerisse kaks asja. Kaust `./config` läheb konteineris kausta `/etc/prometheus`, ainult lugemiseks (`:ro`). Kaust, mitte üksik fail: kui fail hiljem uuega asendatakse, näeb konteiner kausta kaudu uut faili, üksiku faili ühendus võib jääda vana faili külge. Nimega andmeköide `prometheus-data` hoiab Prometheuse andmeid kaustas `/prometheus`, nii et need jäävad alles ka siis, kui konteiner luuakse uuesti. Võti `volumes` läheb teenuse alla, sama taandega kui `ports`.
+Ühendused (`volumes`) kirjuta ise. Nõuded:
 
-???+ example "Failiosa: ühendused teenuse all"
+- kaust `./config` on konteineris kaustas `/etc/prometheus`, ainult lugemiseks (`:ro`). Kaust, mitte üksik fail: kui fail hiljem uuega asendatakse, näeb konteiner kausta kaudu uut faili, üksiku faili ühendus võib jääda vana faili külge;
+- nimega andmeköide `prometheus-data` on konteineris kaustas `/prometheus`, nii et andmed jäävad alles ka siis, kui konteiner luuakse uuesti;
+- nimega andmeköide on kirjeldatud ka faili lõpus, ilma taandeta.
+
+Kuju leiad lehelt [Installation, Using Docker](https://prometheus.io/docs/prometheus/latest/installation/#using-docker) ja Compose'i dokumentatsioonist [volumes](https://docs.docker.com/reference/compose-file/services/#volumes).
+
+??? tip "Vihje"
+    Võti `volumes` läheb teenuse alla, sama taandega kui `ports`. Iga ühendus on kujul `<kust>:<kuhu>` või `<kust>:<kuhu>:ro`.
+
+??? example "Näidislahendus: ühendused ja andmeköide"
     ```yaml
         volumes:
           - ./config:/etc/prometheus:ro
           - prometheus-data:/prometheus
     ```
 
-Nimega andmeköide tuleb kirjeldada ka faili lõpus, ilma taandeta.
-
-???+ example "Failiosa: andmeköide faili lõppu"
     ```yaml
     volumes:
       prometheus-data:
