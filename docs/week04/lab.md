@@ -94,7 +94,7 @@ ssh proxmox3 "sudo firewall-cmd --state"
 
 ## Osa 2 · Agent playbook'iga kahes masinas
 
-Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teeb selle playbook. Starteris on fail `konf/agent.yml`, kus kõik ülesanded on olemas ja mõnes kohas on `<TÄIDA>`. Ava fail VS Code'is ja loe see läbi, enne kui midagi muudad.
+Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teeb selle playbook. Ehitad playbook'i `konf/agent.yml` üles ülesanne haaval: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Kommentaarid näitavad, kuhu lisad järgmised.
 
 Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=) käsitsi teeb: impordib allkirjavõtme, lisab Zabbix 7.0 hoidla, välistab EPEL-ist Zabbixi vanemad paketid, paigaldab `zabbix-agent2`, muudab seadeid, avab tulemüüris pordi ja käivitab teenuse. Uued moodulid on tabelis 4.5.
 
@@ -115,41 +115,101 @@ Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](h
   <figcaption>Joonis 4.9. Playbook'i käik. Seadete muutus teavitab handler'it, mis käivitub play lõpus (Talvik, 2026).</figcaption>
 </figure>
 
-### 2.1 Täida playbook
+### 2.1 Play algus ja allkirjavõti
 
-Täida failis neli kohta:
+Ava `konf/agent.yml` VS Code'is. Faili alguses on play: `hosts: all` tähendab kõiki masinaid, mille annad käsus `-i`, ja `become: true` käivitab ülesanded `sudo` kaudu. Muutuja `zabbix_server` sisse kirjuta `proxmox1` laborivõrgu IP-aadress osast 1. Seda kasutavad hiljem agendi seaded.
 
-1. `zabbix_server`: `proxmox1` IP-aadress osast 1.
-2. Ülesanne *Agendi seaded*: lisa loendisse read `ServerActive` ja `Hostname` jaoks. `Hostname` peab olema sama mis veebiliideses **Host name**. Masina nime annab Ansible muutujas `inventory_hostname`, see on nimi, mille kirjutad käsus `-i` järel. Samas ülesandes lisa `notify`, mis käivitab handler'i *Taaskäivita agent*.
-3. Ülesanne *Passiivse agendi port tulemüüris*: port kujul `<number>/tcp`.
-4. Handler: millises olekus peab teenus olema, et see taaskäivituks? Leia vastus `ansible-doc ansible.builtin.service` väljundist, parameetri `state` juurest.
+Esimene ülesanne impordib Zabbixi allkirjavõtme. Ilma selleta keeldub `dnf` Zabbixi hoidla pakette paigaldamast, sest ei saa kontrollida, et need tulevad Zabbixilt. Iga ülesanne on samal kujul: `name` ütleb inimesele, mida see teeb, järgmine rida on mooduli nimi ja selle all mooduli parameetrid.
 
-Moodul `ansible.posix.firewalld` on kollektsioonis `ansible.posix`, mis ei kuulu `ansible-core` koosseisu. Kontrolli, kas see on olemas, ja paigalda vajadusel:
+```yaml
+    - name: Zabbixi pakettide allkirjavõti
+      ansible.builtin.rpm_key:
+        key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-B5333005
+        state: present
+```
+
+`state: present` tähendab soovitud olekut: võti peab olemas olema. Kui see juba on, ei tee Ansible midagi.
+
+Moodul `ansible.posix.firewalld`, mida vajad hiljem, on kollektsioonis `ansible.posix`, mis ei kuulu `ansible-core` koosseisu. Kontrolli, kas see on olemas, ja paigalda vajadusel:
 
 ```bash
 ansible-galaxy collection list ansible.posix
 ansible-galaxy collection install ansible.posix
 ```
 
-Seejärel uuri moodulit:
+**Ennusta:** Zabbixi agenti pole kummaski masinas. Mis olekus on esimene ülesanne mõlemas masinas, `ok` või `changed`?
+
+```bash
+ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
+```
+
+??? success "Oodatav tulemus"
+    Ülesanne on mõlemas masinas `changed`, sest võtit polnud. Käivita uuesti: nüüd on see `ok`.
+
+### 2.2 Zabbixi hoidla
+
+Agent ei ole AlmaLinuxi enda hoidlates, see tuleb Zabbixi hoidlast. Hoidla kirjelduse lisab masinasse pakett `zabbix-release`. Zabbixi juhend [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=) (Zabbix 7.0, Alma Linux 9, Agent 2) näitab selle paigaldamist käsuga `rpm -Uvh <aadress>`.
+
+Lisa ülesanne, mis paigaldab selle paketi mooduliga `ansible.builtin.dnf`. Moodul oskab paketi paigaldada ka veebiaadressilt. Leia `ansible-doc ansible.builtin.dnf` väljundist, millise parameetriga annad paketi nime või aadressi ja millise parameetriga soovitud oleku.
+
+??? tip "Vihje"
+    Aadress on juhendi esimeses käsus `rpm -Uvh` järel. Parameetrid on samad mis allkirjavõtme ülesandes: üks ütleb, mida, teine, mis olekus.
+
+Käivita playbook ja kontrolli, et uus ülesanne on `changed`.
+
+### 2.3 EPEL ilma Zabbixita
+
+Kui masinas on ka EPEL-i hoidla, pakub see Zabbixi vanemat versiooni ja `dnf` võib selle valida. Zabbixi juhend soovitab EPEL-i kirjeldusse lisada rea `excludepkgs=zabbix*`. Need kaks ülesannet on starteris olemas, sest need ei ole agendi paigalduse põhiosa. Loe need läbi: `stat` uurib, kas fail on olemas, `register` salvestab tulemuse muutujasse `epel` ja `when` jätab teise ülesande vahele, kui EPEL-i pole.
+
+### 2.4 Agendi pakett
+
+Lisa ülesanne, mis paigaldab agendi paketi. Paketi nime leiad samast Zabbixi juhendist, käsu `dnf install` juurest. Kasuta sama moodulit nagu hoidla jaoks.
+
+Käivita playbook ja kontrolli masinas, et agent on paigaldatud:
+
+```bash
+ssh proxmox2 "rpm -q zabbix-agent2"
+```
+
+??? success "Oodatav tulemus"
+    `zabbix-agent2-7.0.…` Kui versioon algab `6.`, tuli pakett EPEL-ist: kontrolli osa 2.3 ülesandeid.
+
+### 2.5 Agendi seaded ja handler
+
+Agendi konfiguratsioonifailis on vaikimisi `Server=127.0.0.1`, `ServerActive=127.0.0.1` ja `Hostname=Zabbix server`. Kolm rida tuleb muuta (loengu [tabel 4.1](lecture.md#2-agendi-paigaldus-ja-kolm-seadet)). Moodul `ansible.builtin.lineinfile` tagab, et failis on üks kindel rida: `regexp` leiab olemasoleva rea ja `line` on selle uus sisu. Kolme rea jaoks ei kirjuta kolme ülesannet, vaid ühe ülesande `loop`-iga, mis kordub iga loendi elemendi jaoks:
+
+```yaml
+    - name: Agendi seaded
+      ansible.builtin.lineinfile:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: "^{{ item.key }}="
+        line: "{{ item.key }}={{ item.value }}"
+      loop:
+        - { key: Server, value: "{{ zabbix_server }}" }
+```
+
+Lisa loendisse veel kaks rida: aktiivse kontrolli seade ja masina nimi. `Hostname` peab olema sama mis veebiliideses **Host name**. Masina nime annab Ansible muutujas `inventory_hostname`: see on nimi, mille kirjutad käsus `-i` järel.
+
+Agent loeb seaded ainult käivitumisel, seega pärast muudatust tuleb see taaskäivitada. Taaskäivitus on vaja ainult siis, kui fail muutus. Selleks on **handler**: ülesanne, mis käivitub ainult siis, kui mõni teine ülesanne teda võtmesõnaga `notify` teavitab. Lisa seadete ülesandele `notify` ja faili lõppu handler nimega `Taaskäivita agent`. Millises olekus peab teenus olema, et see taaskäivituks? Leia vastus `ansible-doc ansible.builtin.service` väljundist, parameetri `state` juurest.
+
+??? tip "Vihje"
+    `regexp: "^Server="` ei leia rida `ServerActive=`, sest pärast sõna `Server` peab kohe tulema `=`. Handler'id on play lõpus eraldi plokis `handlers:`, samal tasemel kui `tasks:`.
+
+### 2.6 Tulemüür ja teenus
+
+Passiivse kontrolli jaoks peab jälgitavas masinas olema port 10050 lahti. Uuri moodulit:
 
 ```bash
 ansible-doc ansible.posix.firewalld
 ```
 
-Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirjuta vastus README jaotisse **Osa 2**.
+Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirjuta vastus README jaotisse **Osa 2**. Lisa ülesanne, mis avab pordi kujul `10050/tcp` nii, et see kehtib kohe ja ka pärast taaskäivitust.
 
-??? tip "Vihje: agendi seadete loend"
-    ```yaml
-          loop:
-            - { key: Server, value: "{{ zabbix_server }}" }
-            - { key: ServerActive, value: "{{ zabbix_server }}" }
-            - { key: Hostname, value: "{{ inventory_hostname }}" }
-          notify: Taaskäivita agent
-    ```
-    `regexp: "^Server="` ei leia rida `ServerActive=`, sest pärast sõna `Server` peab kohe tulema `=`.
+Viimane ülesanne tagab, et agent töötab ja käivitub koos masinaga. Leia `ansible-doc ansible.builtin.service` väljundist kaks parameetrit, mis seda ütlevad.
 
-Kontrolli süntaksit enne käivitamist:
+### 2.7 Kogu playbook
+
+Kontrolli süntaksit ja seda, et `<TÄIDA>` kohti pole alles:
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, --syntax-check konf/agent.yml
@@ -157,18 +217,16 @@ grep -n "TÄIDA" konf/agent.yml
 ```
 
 ??? success "Oodatav tulemus"
-    Esimene käsk väljastab `playbook: konf/agent.yml`. `grep` ei leia midagi: kõik kohad on täidetud.
+    Esimene käsk väljastab `playbook: konf/agent.yml`. `grep` ei leia midagi.
 
-### 2.2 Käivita playbook
-
-**Ennusta:** Zabbixi agenti pole kummaski masinas veel paigaldatud. Millised ülesanded muudavad masina olekut? Millest võib sõltuda, kas kahe masina `changed` arv on sama? Kas handler käivitub?
+**Ennusta:** lisasid seadete, tulemüüri ja teenuse ülesanded. Millised ülesanded on nüüd `changed`? Kas handler käivitub?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
 ```
 
 ??? success "Oodatav tulemus"
-    Mõlemas masinas on enamik ülesandeid `changed` ja lõpus käivitus handler *Taaskäivita agent*, sest seadete fail muutus. `failed=0`. `changed` arv võib masinati erineda, näiteks siis, kui EPEL on ainult ühes masinas.
+    Seadete, tulemüüri ja teenuse ülesanded on `changed` ja lõpus käivitus handler *Taaskäivita agent*, sest seadete fail muutus. Varem lisatud ülesanded on `ok`. `failed=0`.
 
 ??? warning "Kui näed `Failed to validate GPG signature for zabbix-release`"
     Ansible kontrollib ka URL-ist paigaldatava paketi allkirja. Ülesanne `rpm_key` peab olema enne hoidla paketi ülesannet.
