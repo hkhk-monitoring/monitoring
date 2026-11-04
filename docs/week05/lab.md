@@ -182,7 +182,7 @@ curl -s localhost:9100/metrics | grep '^node_memory_MemAvailable_bytes'
     systemd ei saa programmi käivitada. Kontrolli SELinuxi silti: `ls -Z /usr/local/bin/node_exporter`. Kui seal on `user_tmp_t`, paranda: `sudo restorecon -v /usr/local/bin/node_exporter`.
 
 ??? question "Ennusta"
-    kas `proxmox1` saab praegu `proxmox2` pordist 9100 mõõdikuid lugeda? Kirjuta ennustus README jaotisse **Osa 2** ja kontrolli `proxmox1`-st. Bash avab TCP-ühenduse aadressile `/dev/tcp/<IP>/<port>`:
+    Kas `proxmox1` saab praegu `proxmox2` pordist 9100 mõõdikuid lugeda? Kirjuta ennustus README jaotisse **Osa 2** ja kontrolli `proxmox1`-st. Bash avab TCP-ühenduse aadressile `/dev/tcp/<IP>/<port>`:
 
 ```bash
 exit
@@ -214,7 +214,7 @@ cat logid/n5-metrics.txt
 ```
 
 ??? question "Ennusta"
-    mitu rida on failis mõõdikul `node_cpu_seconds_total`? Vihje: `ssh proxmox2 nproc`.
+    Mitu rida on failis mõõdikul `node_cpu_seconds_total`? Vihje: `ssh proxmox2 nproc`.
 
 ```bash
 grep -c '^node_cpu_seconds_total' logid/n5-metrics.txt
@@ -239,7 +239,7 @@ Kirjuta README jaotisse **Osa 3** kummagi nimi, tüüp ja ühik. Kuidas tunned c
 `proxmox3` vajab samu samme. Käsitsi tehtud paigaldus ei kordu teises masinas täpselt samamoodi, playbook kordub. Ehitad playbook'i `konf/node_exporter.yml` üles ülesanne haaval: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Iga ülesanne vastab ühele osa 2 sammule.
 
 ??? question "Ennusta"
-    milline osa seadistusest on mõlemas masinas sama ja mis võib masinati erineda? Kirjuta vastus README jaotisse **Osa 4**.
+    Milline osa seadistusest on mõlemas masinas sama ja mis võib masinati erineda? Kirjuta vastus README jaotisse **Osa 4**.
 
 ??? note "Tabel 5.5. Playbook'i moodulid"
     | Moodul | Mida teeb | Osa 2 samm |
@@ -514,7 +514,7 @@ grep -o '"health":"[a-z]*"' logid/n5-targets.json
 Nüüd tekitad kogumisvea meelega ja leiad selle Prometheusest.
 
 ??? question "Ennusta"
-    mis olek, **Error** ja `up` väärtus on `proxmox3` target'il, kui peatad seal node_exporteri? Kirjuta ennustus README jaotisse **Osa 5**.
+    Mis olek, **Error** ja `up` väärtus on `proxmox3` target'il, kui peatad seal node_exporteri? Kirjuta ennustus README jaotisse **Osa 5**.
 
 Peata `proxmox3`-s node_exporter:
 
@@ -565,7 +565,7 @@ node_memory_MemAvailable_bytes{instance="<proxmox2-IP>:9100"}
 Kontrolli ühikut. Mis ühikus on väärtus ja kui palju on see gigabaitides?
 
 ??? question "Ennusta"
-    masinas on ka mõõdik `node_memory_MemFree_bytes`. Kas `MemAvailable` on suurem või väiksem kui `MemFree`? Kontrolli mõlemat ja kirjuta README jaotisse **Osa 6**, mida nende erinevus näitab.
+    Masinas on ka mõõdik `node_memory_MemFree_bytes`. Kas `MemAvailable` on suurem või väiksem kui `MemFree`? Kontrolli mõlemat ja kirjuta README jaotisse **Osa 6**, mida nende erinevus näitab.
 
 Arvuta osakaal. Muuda päringut nii, et see näitab iga masina kohta saadaval mälu protsentides kogu mälust (`node_memory_MemTotal_bytes`). Kirjuta päring ja tulemus iga masina kohta README jaotisse **Osa 6**.
 

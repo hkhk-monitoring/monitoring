@@ -7,7 +7,7 @@ tags:
 
 # Praktikum: agent suhtleb serveriga
 
-Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse masinasse, seod hostid valmis template'iga, kontrollid, et mõõteväärtused uuenevad, ja lood oma trigger'i, mille tingimuse täitumisel tekib probleem: vaba kettaruumi on alla 20%.
+Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse masinasse. Seod hostid valmis template'itega, kontrollid mõõteväärtuste uuenemist ning lood oma trigger'i vaba kettaruumi jälgimiseks.
 
 **Edenemine:** laboritahvel <http://192.168.125.187:8092/> (VPN-iga).
 
@@ -24,7 +24,7 @@ Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse m
   <figcaption>Joonis 4.8. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
 </figure>
 
-Praktikum läheb lihtsamast keerulisemani ja iga sammu saad teha iseseisvalt. Loe enne käsku selgitus, mõtle läbi plokk **Ennusta**, tee samm ja võrdle tulemust plokiga **Oodatav tulemus**. Kui jääd kinni, ava **Vihje**. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
+Lisad playbook'i ülesanded ükshaaval. Enne käivitamist ennusta tulemust, seejärel vaata väljundit ja põhjenda, mis muutus. Kui tulemus erineb oodatust, uuri erinevust enne järgmise sammu lisamist. Esimesed ülesanded on näidatud tervikuna, järgmised koostad ise sama mustri järgi. Näidislahendus on kokkuvolditud plokis, ava see, kui jääd kinni või tahad oma lahendust kontrollida. Kirjuta ennustused ja tulemuste võrdlus README vastava osa alla. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
 
 ## Osa 1 · Repositoorium ja Zabbix
 
@@ -69,10 +69,15 @@ ssh proxmox3 "sudo firewall-cmd --state"
     ```bash
     ssh proxmox1 "mkdir -p ~/zabbix"
     scp zabbix/compose.yaml proxmox1:zabbix/
-    ssh proxmox1 'cd ~/zabbix && test -f .env || echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env; docker compose up -d'
+    ssh proxmox1
+    cd ~/zabbix
+    test -e .env || echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env
+    docker compose up -d
+    docker compose ps
+    exit
     ```
 
-    `test -f .env ||` loob parooli ainult siis, kui faili `.env` veel pole.
+    `test -e .env ||` loob parooli ainult siis, kui faili `.env` veel pole. Käsud `cd` kuni `docker compose ps` käivitad `proxmox1`-s, `exit` viib tagasi oma arvutisse.
 
     Esimesel käivitusel loob server andmebaasi tabelid, see võtab 1–3 minutit. Oota, kuni `ssh proxmox1 "cd ~/zabbix && docker compose logs zabbix-server" | grep "server #0 started"` annab rea. Seejärel ava `http://<proxmox1-IP>:8080`, kasutaja on **Admin** ja parool **zabbix**.
 
@@ -90,11 +95,11 @@ ssh proxmox3 "sudo firewall-cmd --state"
     sudo firewall-cmd --list-services
     ```
 
-    Teenuste hulgas peab olema `ssh`. Seejärel ava teine terminal ja kontrolli `ssh proxmox2 hostname`. Kui uus ühendus ei õnnestu, eemalda tulemüür avatud seansis (`sudo systemctl disable --now firewalld`) ja anna õpetajale teada.
+    Teenuste hulgas peab olema `ssh`. Seejärel ava teine terminal ja kontrolli `ssh proxmox2 hostname`. Kui uus ühendus ei õnnestu, peata tulemüür avatud seansis (`sudo systemctl disable --now firewalld`) ja anna õpetajale teada.
 
 ## Osa 2 · Agent playbook'iga kahes masinas
 
-Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teeb selle playbook. Ehitad playbook'i `konf/agent.yml` üles ülesanne haaval: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Iga järgmise ülesande juures on selgitus ja kood kokkuvolditud plokis: loe selgitus, kopeeri ülesanne faili kommentaariga märgitud kohta ja käivita playbook. Nii näed iga ülesande mõju eraldi.
+Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teeb selle playbook. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Iga järgmise ülesande juures on selgitus ja kood kokkuvolditud plokis: loe selgitus, kopeeri ülesanne faili kommentaariga märgitud kohta ja käivita playbook. Nii näed iga ülesande mõju eraldi.
 
 Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=) käsitsi teeb: impordib allkirjavõtme, lisab Zabbix 7.0 hoidla, välistab EPEL-ist Zabbixi vanemad paketid, paigaldab `zabbix-agent2`, muudab seadeid, avab tulemüüris pordi ja käivitab teenuse. Uued moodulid on tabelis 4.5.
 
@@ -117,7 +122,7 @@ Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](h
 
 ### 2.1 Play algus ja allkirjavõti
 
-Ava `konf/agent.yml` VS Code'is. Faili alguses on play: `hosts: all` tähendab kõiki masinaid, mille annad käsus `-i`, ja `become: true` käivitab ülesanded `sudo` kaudu. Muutuja `zabbix_server` sisse kirjuta `proxmox1` laborivõrgu IP-aadress osast 1. Seda kasutavad hiljem agendi seaded.
+Ava `konf/agent.yml` VS Code'is. Faili alguses on play: `hosts: all` tähendab kõiki masinaid, mille annad käsus `-i`, ja `become: true` kasutab ülesannete täitmiseks õiguste tõstmist, selles laboris `sudo` kaudu. Määra muutuja `zabbix_server` väärtuseks `proxmox1` laborivõrgu IP-aadress osast 1. Seda kasutavad hiljem agendi seaded.
 
 Esimene ülesanne impordib Zabbixi allkirjavõtme. Ilma selleta keeldub `dnf` Zabbixi hoidla pakette paigaldamast, sest ei saa kontrollida, et need tulevad Zabbixilt. Iga ülesanne on samal kujul: `name` ütleb inimesele, mida see teeb, järgmine rida on mooduli nimi ja selle all mooduli parameetrid.
 
@@ -144,14 +149,14 @@ ansible-galaxy collection install ansible.posix
 ```
 
 ??? question "Ennusta"
-    Zabbixi agenti pole kummaski masinas. Mis olekus on esimene ülesanne mõlemas masinas, `ok` või `changed`?
+    Kas agendi puudumisest piisab, et ennustada allkirjavõtme ülesande olekuks `changed`? Millest tulemus tegelikult sõltub?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
 ```
 
 ??? success "Oodatav tulemus"
-    Ülesanne on mõlemas masinas `changed`, sest võtit polnud. Käivita uuesti: nüüd on see `ok`.
+    Kui võtit masinas polnud, on ülesanne `changed`, kui see oli juba olemas (näiteks varasemast katsest), on see `ok`. Käivita uuesti: nüüd on see kindlasti `ok`.
 
 ### 2.2 Zabbixi hoidla
 
@@ -181,9 +186,14 @@ Kui masinas on ka EPEL-i hoidla, pakub see Zabbixi vanemat versiooni ja `dnf` v�
 
 ### 2.4 Agendi pakett
 
-Agendi pakett tuleb nüüd Zabbixi hoidlast. Ülesanne on sama kujuga nagu hoidla oma, ainult `name` on paketi nimi, mitte aadress. Paketi nimi on Zabbixi juhendi käsus `dnf install`. Kopeeri ülesanne EPEL-i ülesannete järele (kommentaari `# Osa 2.4–2.6` alla):
+Eelmises osas kasutasid moodulit `ansible.builtin.dnf` hoidla paketi paigaldamiseks veebiaadressilt. Sama mooduliga saad paigaldada paketi ka nime järgi.
 
-???+ example "Ülesanne: agendi pakett"
+Lisa EPEL-i ülesannete järele (kommentaari `# Osa 2.4–2.6` alla) ülesanne, mis tagab paketi olemasolu. Paketi nime leiad Zabbixi juhendi käsust `dnf install`. Anna ülesande nimeks `Agendi pakett`.
+
+??? tip "Vihje"
+    Kasuta parameetreid `name` ja `state`. Erinevalt hoidla ülesandest on `name` väärtus paketi nimi, mitte veebiaadress.
+
+??? example "Näidislahendus"
     ```yaml
         - name: Agendi pakett
           ansible.builtin.dnf:
@@ -198,7 +208,7 @@ ssh proxmox2 "rpm -q zabbix-agent2"
 ```
 
 ??? success "Oodatav tulemus"
-    `zabbix-agent2-7.0.…` Kui versioon algab `6.`, tuli pakett EPEL-ist: kontrolli osa 2.3 ülesandeid.
+    `zabbix-agent2-7.0.…` Kui Ansible paigaldas paketi selles käivituses, oli ülesanne `changed`, kui see oli juba olemas, `ok`. Kui versioon algab `6.`, tuli pakett EPEL-ist: kontrolli osa 2.3 ülesandeid.
 
 ??? tip "Vihje"
     Kui `rpm -q` ütleb `package zabbix-agent2 is not installed`, vaata playbook'i väljundist, kas ülesanne *Agendi pakett* oli `ok`, `changed` või `failed`. `failed` puhul on veateade kohe ülesande all.
@@ -217,13 +227,21 @@ Agendi konfiguratsioonifailis on vaikimisi `Server=127.0.0.1`, `ServerActive=127
         - { key: Server, value: "{{ zabbix_server }}" }
 ```
 
-Loendis on veel kaks rida: aktiivse kontrolli seade `ServerActive` (sama aadress) ja masina nimi `Hostname`. `Hostname` peab olema sama mis veebiliideses **Host name**. Masina nime annab Ansible muutujas `inventory_hostname`: see on nimi, mille kirjutad käsus `-i` järel. `regexp: "^Server="` ei leia rida `ServerActive=`, sest pärast sõna `Server` peab kohe tulema `=`.
+See fragment muudab praegu ainult seadet `Server`. Kopeeri see paketi ülesande järele ja lisa loendisse ise:
 
-Agent loeb seaded ainult käivitumisel, seega pärast muudatust tuleb see taaskäivitada, aga ainult siis, kui fail muutus. Selleks on **handler**: ülesanne, mis käivitub ainult siis, kui mõni teine ülesanne teda võtmesõnaga `notify` teavitab. Teavitatud handler käivitub play lõpus. `state: restarted` taaskäivitab teenuse (vaata `ansible-doc ansible.builtin.service`, parameeter `state`).
+- `ServerActive`, mille väärtus on samuti `zabbix_server`;
+- `Hostname`, mille väärtus tuleb muutujast `inventory_hostname`. See on nimi, mille kirjutad käsus `-i` järel, ja see peab olema sama mis veebiliideses **Host name**.
 
-Kopeeri seadete ülesanne paketi ülesande järele:
+`regexp: "^Server="` ei leia rida `ServerActive=`, sest pärast sõna `Server` peab kohe tulema `=`.
 
-???+ example "Ülesanne: agendi seaded"
+Agent loeb seaded ainult käivitumisel, seega pärast muudatust tuleb see taaskäivitada, aga ainult siis, kui fail muutus. Selleks on **handler**: ülesanne, mis käivitub ainult siis, kui mõni teine ülesanne teda võtmesõnaga `notify` teavitab. Teavitatud handler käivitub play lõpus.
+
+Lisa seadete ülesandele `notify: Taaskäivita agent`. Seejärel lisa faili lõppu (kommentaari `# Osa 2.5` asemele) plokk `handlers:` ühe handler'iga nimega `Taaskäivita agent`. See kasutab moodulit `ansible.builtin.service` teenusega `zabbix-agent2`. Millise `state` väärtusega teenus taaskäivitub? Leia see `ansible-doc ansible.builtin.service` väljundist. Lisa handler enne käivitamist, muidu annab `notify` vea.
+
+??? tip "Vihje"
+    `handlers:` on samal taandel kui `tasks:`, mitte ülesannete sees. Handler'i nimi peab olema täpselt sama mis `notify` väärtus, ka suur- ja väiketähed.
+
+??? example "Näidislahendus: seaded ja handler"
     ```yaml
         - name: Agendi seaded
           ansible.builtin.lineinfile:
@@ -237,9 +255,6 @@ Kopeeri seadete ülesanne paketi ülesande järele:
           notify: Taaskäivita agent
     ```
 
-Handler'id on play lõpus eraldi plokis `handlers:`, samal taandel kui `tasks:`. Kopeeri see kommentaari `# Osa 2.5` asemele:
-
-???+ example "Handler: taaskäivita agent"
     ```yaml
       handlers:
         - name: Taaskäivita agent
@@ -250,9 +265,6 @@ Handler'id on play lõpus eraldi plokis `handlers:`, samal taandel kui `tasks:`.
 
 Käivita playbook ja kontrolli masinas, et seaded muutusid: `ssh proxmox2 "sudo grep -E '^(Server|ServerActive|Hostname)=' /etc/zabbix/zabbix_agent2.conf"`.
 
-??? tip "Vihje"
-    `handlers:` on samal taandel kui `tasks:`, mitte ülesannete sees. Handler'i nimi peab olema täpselt sama mis `notify` väärtus, ka suur- ja väiketähed. Kui handler ei käivitu, võrdle neid kahte rida.
-
 ### 2.6 Tulemüür ja teenus
 
 Passiivse kontrolli jaoks peab jälgitavas masinas olema port 10050 lahti. Uuri moodulit:
@@ -261,12 +273,16 @@ Passiivse kontrolli jaoks peab jälgitavas masinas olema port 10050 lahti. Uuri 
 ansible-doc ansible.posix.firewalld
 ```
 
-Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirjuta vastus README jaotisse **Osa 2**. Ülesandes on mõlemad: `permanent: true` jätab pordi alles ka pärast taaskäivitust ja `immediate: true` avab selle kohe. Kopeeri ülesanne seadete ülesande järele:
+Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirjuta vastus README jaotisse **Osa 2**.
 
-??? tip "Vihje"
-    Kirjuta `ansible-doc` väljundis `/immediate` ja vajuta **Enter**, nii leiad parameetri kirjelduse. Loe ka `permanent` kirjeldust: kumb muudab seadistust kohe, kumb alles pärast tulemüüri uuesti laadimist või taaskäivitust?
+??? tip "Vihje: dokumentatsioon"
+    Kirjuta `ansible-doc` väljundis `/immediate` ja vajuta **Enter**. Loe ka `permanent` kirjeldust: kumb muudab seadistust kohe, kumb alles pärast tulemüüri uuesti laadimist või taaskäivitust?
 
-???+ example "Ülesanne: passiivse agendi port tulemüüris"
+Lisa seadete ülesande järele ülesanne nimega `Passiivse agendi port tulemüüris`, mis kasutab moodulit `ansible.posix.firewalld`. Nõuded: port `10050/tcp` on lubatud, seadistus kehtib kohe ja jääb alles ka pärast taaskäivitust.
+
+Viimane ülesanne nimega `Agent töötab ja käivitub koos masinaga` kasutab moodulit `ansible.builtin.service`. Nõuded: teenus `zabbix-agent2` töötab ja käivitub koos masinaga. Leia `ansible-doc ansible.builtin.service` väljundist kaks parameetrit, mis seda ütlevad.
+
+??? example "Näidislahendus: tulemüür ja teenus"
     ```yaml
         - name: Passiivse agendi port tulemüüris
           ansible.posix.firewalld:
@@ -274,12 +290,7 @@ Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirj
             permanent: true
             immediate: true
             state: enabled
-    ```
 
-Viimane ülesanne tagab, et agent töötab (`state: started`) ja käivitub koos masinaga (`enabled: true`):
-
-???+ example "Ülesanne: agent töötab"
-    ```yaml
         - name: Agent töötab ja käivitub koos masinaga
           ansible.builtin.service:
             name: zabbix-agent2
@@ -287,8 +298,8 @@ Viimane ülesanne tagab, et agent töötab (`state: started`) ja käivitub koos 
             enabled: true
     ```
 
-??? tip "Vihje"
-    Kui ülesanne *Passiivse agendi port tulemüüris* annab vea `couldn't resolve module/action 'ansible.posix.firewalld'`, puudub kollektsioon: paigalda see osa 2.1 käsuga. Kui viga on `firewalld is not running`, vaata osa 1 hoiatust tulemüüri kohta.
+??? warning "Kui näed `couldn't resolve module/action 'ansible.posix.firewalld'`"
+    Kollektsioon puudub: paigalda see osa 2.1 käsuga. Kui viga on `firewalld is not running`, vaata osa 1 hoiatust tulemüüri kohta.
 
 ### 2.7 Kogu playbook
 
@@ -303,14 +314,14 @@ grep -n "TÄIDA" konf/agent.yml
     Esimene käsk väljastab `playbook: konf/agent.yml`. `grep` ei leia midagi.
 
 ??? question "Ennusta"
-    lisasid seadete, tulemüüri ja teenuse ülesanded. Millised ülesanded on nüüd `changed`? Kas handler käivitub?
+    Osa 2.5 lõpus käivitasid playbook'i juba koos seadete ja handler'iga. Nüüd lisasid tulemüüri ja teenuse ülesande. Millised ülesanded võiksid selles käivituses midagi muuta? Kas handler peab käivituma?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
 ```
 
 ??? success "Oodatav tulemus"
-    Seadete, tulemüüri ja teenuse ülesanded on `changed` ja lõpus käivitus handler *Taaskäivita agent*, sest seadete fail muutus. Varem lisatud ülesanded on `ok`. `failed=0`.
+    Varem edukalt rakendatud ülesanded on `ok`. Äsja lisatud tulemüüri või teenuse ülesanne võib olla `changed`. Handler käivitub ainult siis, kui selles käivituses muutus seda teavitav ülesanne: kui agendi seaded on juba õiged, ei käivitu see uuesti. Mõlema masina kohta on `failed=0`.
 
 ??? warning "Kui näed `Failed to validate GPG signature for zabbix-release`"
     Ansible kontrollib ka URL-ist paigaldatava paketi allkirja. Ülesanne `rpm_key` peab olema enne hoidla paketi ülesannet.
@@ -319,7 +330,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
     Pakett tuli EPEL-ist. Kontrolli `ssh proxmox2 "grep excludepkgs /etc/yum.repos.d/epel.repo"`: rida peab olema sektsioonis `[epel]`.
 
 ??? question "Ennusta"
-    esimene käivitus lõppes edukalt ja masinaid pole vahepeal muudetud. Mida näitab `PLAY RECAP` teisel käivitusel? Kas handler käivitub uuesti?
+    Esimene käivitus lõppes edukalt ja masinaid pole vahepeal muudetud. Mida näitab `PLAY RECAP` teisel käivitusel? Kas handler käivitub uuesti?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml | tee logid/a2-teine-kaivitus.txt
@@ -353,7 +364,7 @@ ssh proxmox1 "timeout 3 bash -c '</dev/tcp/<proxmox2-IP>/10050' && echo lahti ||
 **Küsimus (README):** mis juhtuks, kui playbook'is poleks tulemüüri ülesannet? Kumma hosti andmed jääksid tulemata?
 
 ??? tip "Vihje"
-    Mõtle, kumb kontroll vajab sissetulevat ühendust jälgitavasse masinasse ja kumb mitte (loengu joonis 4.3). Ilma tulemüüri ülesandeta oleks port 10050 kinni.
+    Joonista mõlema kontrolliviisi ühenduse suund (loengu joonis 4.3). Märgi ühenduse sihtport ja masin, mille tulemüür seda ühendust mõjutab.
 
 ## Osa 3 · Template'id: passiivne ja aktiivne
 
@@ -376,7 +387,7 @@ Oota 1-2 minutit ja ava **Monitoring → Latest data**, filtris **Hosts:** `prox
 
 Ava **Data collection → Hosts → proxmox2 → Items** ja sama `proxmox3` kohta. Vaata veergu **Type**.
 
-Kui mõni host jääb andmeteta, alusta agendi logist `/var/log/zabbix/zabbix_agent2.log` (`sudo tail -20 /var/log/zabbix/zabbix_agent2.log`).
+Kui mõne hosti mõõteväärtused ei uuene, alusta agendi logist `/var/log/zabbix/zabbix_agent2.log` (`sudo tail -20 /var/log/zabbix/zabbix_agent2.log`).
 
 ??? warning "Kui `proxmox2` ZBX on punane, kuigi port on lahti"
     Otsi agendi logist sõna `rejected`. Seal on aadress, kust päring tuli, ja aadressid, mis on seades `Server`. Need peavad klappima. Pärast seadete muutmist taaskäivita agent (playbook teeb seda handleriga).
@@ -387,7 +398,7 @@ Kui mõni host jääb andmeteta, alusta agendi logist `/var/log/zabbix/zabbix_ag
 **Küsimus (README):** mis on veerus **Type** `proxmox2` ja `proxmox3` item'ite erinevus ja mida see tähendab selle kohta, kes ühenduse avab?
 
 ??? tip "Vihje"
-    Võrdle ühe ja sama item'i (näiteks *Load average (1m avg)*) rida mõlemal hostil. Üks tüüp on *Zabbix agent*, teine *Zabbix agent (active)*. Loengu tabel 4.2 seob tüübi sellega, kes ühenduse avab.
+    Leia ühe ja sama item'i (näiteks *Load average (1m avg)*) rida mõlemal hostil ja kirjuta üles veeru **Type** väärtused. Seejärel vaata loengu tabelit 4.2: mida need tüübid ütlevad selle kohta, kes ühenduse avab?
 
 ### 3.1 Kas väärtused uuenevad
 
@@ -414,16 +425,16 @@ ssh proxmox2 "sudo zabbix_agent2 -t 'vm.memory.size[available]'"
 
 ## Osa 4 · Kes avab ühenduse
 
-Passiivne agent vajab avatud porti 10050, aktiivne ei vaja. Kontrolli seda katsega. Järgmine käsk eemaldab tulemüüri vaiketsoonist pordi 10050 lubava kirje, mille playbook lisas. Muudatus kehtib ainult praeguseks, `--permanent` seadet see ei muuda.
+Passiivne agent vajab avatud porti 10050, aktiivne ei vaja. Kontrolli seda katsega. Järgmine käsk eemaldab tulemüüri vaiketsoonist pordi 10050 lubava kirje, mille playbook lisas. Muudatus kehtib ainult praeguseks, püsiseadistust see ei muuda.
 
 ??? question "Ennusta"
-    kumma hosti item'ite väärtused lakkavad uuenemast?
+    Kumma hosti item'ite väärtused lakkavad uuenemast?
 
 ```bash
 ansible all -i proxmox2,proxmox3, -b -m ansible.builtin.command -a "firewall-cmd --remove-port=10050/tcp"
 ```
 
-Oota 4–5 minutit. Vahepeal võid alustada osa 5 esimese sammuga. Siis vaata **Data collection → Hosts** ja **Monitoring → Problems**.
+Oota 4–5 minutit. Ootamise ajal kirjuta README-sse oma ennustus ja vaata loengust üle ühendussuunad. Osa 5 alusta alles siis, kui oled pordi playbook'iga taastanud ja näed, et `proxmox2` väärtused uuenevad jälle. Siis vaata **Data collection → Hosts** ja **Monitoring → Problems**.
 
 ??? success "Oodatav tulemus"
 
@@ -437,7 +448,7 @@ Masina tegelik olek erineb nüüd sellest, mida playbook kirjeldab. **Triiv** (c
 </figure>
 
 ??? question "Ennusta"
-    mida teeb playbook, kui käivitad selle nüüd uuesti?
+    Mida teeb playbook, kui käivitad selle nüüd uuesti?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
@@ -532,7 +543,7 @@ df -h /
     `df` näitab veerus `Use%` umbes 85%. Kirjuta `date` kellaaeg README-sse, seda on vaja osa 5 küsimuse jaoks.
 
 ??? question "Ennusta"
-    item'i intervall on 30 sekundit. Millal ilmub probleem **Monitoring → Problems** alla?
+    Item'i intervall on 30 sekundit. Millal ilmub probleem **Monitoring → Problems** alla?
 
 Ava **Monitoring → Problems** ja oota.
 
@@ -575,6 +586,15 @@ cat logid/a5-andmebaas.txt
 ??? tip "Vihje"
     Viivitus koosneb kahest osast: millal item toob järgmise väärtuse (**Update interval**) ja millal trigger seda hindab. Võrdle oma kellaaegu joonisega 4.14.
 
+??? note "Kontrollnimekiri"
+    - [ ] Mõlema masina agenditeenus töötab.
+    - [ ] Mõlema hosti mõõteväärtused uuenevad.
+    - [ ] Tulemüüri katse muudatus on playbook'iga taastatud.
+    - [ ] Katsefail `/ketas-tais` on eemaldatud.
+    - [ ] Sinu kettaruumi trigger ei ole probleemi olekus.
+    - [ ] Kolm tõendifaili on olemas ja nende sisu on kontrollitud.
+    - [ ] README-s on ennustused, tulemuste võrdlused ja vastused.
+
 ## Töö esitamine
 
 Repositooriumis on README vastused, täidetud playbook `konf/agent.yml` ja kolm tõendifaili. Oma arvutis repositooriumi kaustas:
@@ -597,7 +617,7 @@ Kodutöö: [Kas varundus töötas?](homework.md)
 ??? example "1 · Hüsterees"
     Kui vaba ruum kõigub 20% ümber, võib probleem iga uue väärtusega kord tekkida ja kord laheneda. Ava oma trigger, vali **OK event generation: Recovery expression** ja kirjuta `last(/proxmox2/vfs.fs.size[/,pfree])>25` ([hüsterees](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/expression#hysteresis)).
 
-    Täida ketas nagu osas 5.3, nii et vaba jääb 15%, ja oota probleemi. Seejärel vähenda sama faili nii, et vaba jääb 22%. `truncate` muudab olemasoleva faili väiksemaks, nii et vahepeal ei ole vaba ruumi üle 25%:
+    Täida ketas nagu osas 5.3, nii et vaba jääb 15%, ja oota probleemi. Seejärel vähenda sama faili nii, et vaba jääb 22%. Käivita järgmised käsud `proxmox2` SSH-seansis. `truncate` muudab olemasoleva faili väiksemaks, nii et vahepeal ei ole vaba ruumi üle 25%:
 
     ```bash
     kokku=$(df --output=size -B1 / | tail -1); vaba=$(df --output=avail -B1 / | tail -1)
@@ -609,7 +629,7 @@ Kodutöö: [Kas varundus töötas?](homework.md)
     Mis olekus on probleem ja miks? Lõpus kustuta fail (`sudo rm /ketas-tais`) ja kontrolli, et probleem lahenes.
 
 ??? example "2 · Template'i piir hosti makroga"
-    Template'i ketta trigger kasutab makrot `{$VFS.FS.PUSED.MAX.WARN}` (vaikimisi 80). Ava **Data collection → Hosts → proxmox3 → Macros → Inherited and host macros** ja muuda see `proxmox3` jaoks 50 peale. Kas `proxmox3` juures tekib probleem? Miks on makro parem kui template'i muutmine?
+    Template'i ketta trigger kasutab makrot `{$VFS.FS.PUSED.MAX.WARN}` (vaikimisi 80). Ava **Data collection → Hosts → proxmox3 → Macros → Inherited and host macros** ja muuda see `proxmox3` jaoks 50 peale. Kas `proxmox3` juures tekib probleem? Miks on makro parem kui template'i muutmine? Lõpus kustuta makro `proxmox3` juurest, et template'i vaikeväärtus kehtiks jälle.
 
 ??? example "3 · Agent ka proxmox1-sse"
     Host **Zabbix server** on N2-st saati punane, sest seal pole agenti. Lisa `proxmox1` playbook'i käsule (`-i proxmox1,proxmox2,proxmox3,`) ja muuda hosti **Zabbix server** liidese IP `proxmox1` IP-ks. Kas ZBX läheb roheliseks? Vaata `proxmox1`-s `sudo tail /var/log/zabbix/zabbix_agent2.log`. Server töötab konteineris ja ühendus konteinerist sama masina IP-le ei läbi Dockeri aadressi asendust. Millise aadressi pead lisama seadesse `Server` (vihje: `docker network inspect zabbix_default`)?
