@@ -144,7 +144,7 @@ systemd käivitab programmi teenusena, kui sellel on **unit-fail**. Unit-failis 
 
 node_exporteri repositooriumis on ametlik näidis kaustas [examples/systemd](https://github.com/prometheus/node_exporter/tree/master/examples/systemd). See on tehtud teistsuguse paigalduse jaoks (socket-fail ja keskkonnafail), sinu fail on lihtsam.
 
-Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` (`sudo nano`). Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu. Esimene sektsioon on antud: `Description` on teenuse kirjeldus ja `After=network-online.target` käivitab teenuse alles siis, kui võrk on üleval.
+Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` (`sudo nano`). Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu. Esimene sektsioon on antud: `Description` on teenuse kirjeldus ja `After=network-online.target` paneb teenuse käivitusjärjekorras pärast võrgu sihtmärki.
 
 ???+ example "Failiosa: [Unit]"
     ```ini
@@ -214,7 +214,7 @@ ssh proxmox1 "timeout 3 bash -c '</dev/tcp/<proxmox2-IP>/9100' && echo lahti || 
     ssh proxmox2 "sudo firewall-cmd --permanent --add-port=9100/tcp && sudo firewall-cmd --reload"
     ```
 
-    Nüüd annab kontroll `lahti`. Kui kontroll andis `lahti` juba enne pordi avamist, ei tööta `proxmox2`-s tulemüür.
+    Nüüd annab kontroll `lahti`. Kui kontroll andis `lahti` juba enne pordi avamist, kontrolli `sudo firewall-cmd --state`, aktiivset tsooni ja olemasolevaid reegleid (`--list-all`). Ühenduse õnnestumisest üksi ei saa järeldada, et tulemüür ei tööta.
 
 ## Osa 3 · Mida /metrics sisaldab
 
@@ -248,7 +248,7 @@ Kirjuta README jaotisse **Osa 3** kummagi nimi, tüüp ja ühik. Kuidas tunned c
 
 ## Osa 4 · Sama playbook'iga kahes masinas
 
-`proxmox3` vajab samu samme. Käsitsi tehtud paigaldus ei kordu teises masinas täpselt samamoodi, playbook kordub. Ehitad playbook'i `konf/node_exporter.yml` üles ülesanne haaval: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Iga ülesanne vastab ühele osa 2 sammule.
+`proxmox3` vajab samu samme. Käsitsi tehtud paigaldus ei kordu teises masinas täpselt samamoodi, playbook kordub. Koostad playbook'i `konf/node_exporter.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Iga ülesanne vastab ühele osa 2 sammule.
 
 ??? question "Ennusta"
     Milline osa seadistusest on mõlemas masinas sama ja mis võib masinati erineda? Kirjuta vastus README jaotisse **Osa 4**.
@@ -355,9 +355,9 @@ Käivita playbook.
 
 ### 4.4 Unit-fail ja handler
 
-Unit-faili sisu peab olema täpselt sama, mis osas 2 käsitsi loodud failis. Kui sisu erineb kas või ühe tühiku võrra, kirjutab playbook `proxmox2`-s faili üle. Moodul `ansible.builtin.copy` kirjutab faili ka ilma lähtefailita: sisu on siis parameetris `content`. Märk `|` tähendab mitmerealist teksti, read on selle all ühe taandega.
+Unit-failis peavad olema samad seaded, mis osas 2 käsitsi loodud failis. Kui sisu erineb kas või ühe tühiku võrra, kirjutab playbook `proxmox2`-s faili esimesel käivitusel üle ja ülesanne on `changed`. See on lubatud, oluline on, et järgmine käivitus on muutusteta. Moodul `ansible.builtin.copy` kirjutab faili ka ilma lähtefailita: sisu on siis parameetris `content`. Märk `|` tähendab mitmerealist teksti, read on selle all ühe taandega.
 
-Lisa ülesanne, mis kirjutab faili `/etc/systemd/system/node_exporter.service` õigustega `0644` ja sisuga osast 2. Lisa ülesandele `notify` handler'i jaoks nimega `node_exporter uuesti`.
+Lisa ülesanne, mis kirjutab faili `/etc/systemd/system/node_exporter.service` õigustega `0644` ja sisuga osast 2. Lisa ülesandele `notify` handler'i jaoks nimega `node_exporter uuesti`. Praktikumis paigaldad node_exporteri esimest korda. Kui hiljem vahetad versiooni, peab ka programmi kopeerimise ülesanne teavitama sama handler'it, muidu töötab edasi vana programm.
 
 Handler'id on play lõpus eraldi plokis `handlers:`, samal tasemel kui `tasks:`. Handler kasutab moodulit `ansible.builtin.systemd_service`: see taaskäivitab teenuse, aga enne peab systemd unit-faili uuesti lugema, nagu tegid osas 2 käsuga `daemon-reload`. Leia `ansible-doc ansible.builtin.systemd_service` väljundist parameeter, mis teeb `daemon-reload`-i, ja `state` väärtus taaskäivituseks. Lisa handler enne käivitamist, muidu annab `notify` vea.
 

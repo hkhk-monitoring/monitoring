@@ -13,7 +13,7 @@ Selle kursuse materjalid on litsentseeritud **Creative Commons Attribution-Share
 
 ## Mida tohib
 
-- **Jagada** - kopeerida ja levitada mis tahes kandjal või formaadis.
+- **Jagada** - kopeerida ja levitada mis tahes kandjal või vormingus.
 - **Kohandada** - remiksida, teisendada ja materjali edasi arendada, mis tahes eesmärgil.
 
 Autor ei saa neid õigusi tühistada, kui järgid litsentsi tingimusi.

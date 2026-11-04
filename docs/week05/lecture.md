@@ -53,7 +53,7 @@ Zabbixi passiivne kontroll ja Prometheus on seega sarnased: mõlemal juhul küsi
 
 ## 2. Exporter ja /metrics
 
-**Exporter** on programm, mis loeb mõõdikud ja avaldab need HTTP aadressil `/metrics`. Masina näitude jaoks on [node_exporter](https://github.com/prometheus/node_exporter). See loeb samu faile kaustast `/proc` ja `/sys`, mida N3 loengus nägid.
+**Exporter** on programm, mis loeb mõõdikud ja avaldab need HTTP-aadressil `/metrics`. Masina näitude jaoks on [node_exporter](https://github.com/prometheus/node_exporter). See loeb samu faile kaustast `/proc` ja `/sys`, mida N3 loengus nägid.
 
 Exporter'i väljund on tekst. Väike väljavõte node_exporterist:
 

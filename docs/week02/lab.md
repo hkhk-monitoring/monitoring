@@ -176,7 +176,7 @@ Need seaded erinevad manuaali näitest:
 
 Pärast seda osa töötavad kõik kolm konteinerit. Enne seda tekitad vea, mis tuleb sageli ette siis, kui masinas töötab juba mõni teine teenus.
 
-Kui automatiseerimise kursuse N6 konteinerid töötavad `proxmox1`-s, kasutavad need porti 8080. Tekita sama olukord ajutise konteineriga `ankur`. Käivita käsud `proxmox1`-s kaustas `~/zabbix`:
+Kui automatiseerimise kursuse N6 konteinerid töötavad `proxmox1`-s, kasutavad need porti 8080. Kontrolli kõigepealt, kas port on juba hõivatud: `docker ps --filter publish=8080`. Kui seal on konteiner, on konflikt juba olemas: jäta `docker run` vahele ja tee ainult `docker compose` käsud. Kui port on vaba, tekita sama olukord ajutise konteineriga `ankur`. Käivita käsud `proxmox1`-s kaustas `~/zabbix`:
 
 ```bash
 docker run -d --name ankur -p 8080:80 nginx:1.27

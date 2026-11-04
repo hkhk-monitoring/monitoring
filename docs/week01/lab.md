@@ -194,7 +194,7 @@ sudo -u praktikant cat /var/log/secure
 
 ??? success "Oodatav tulemus"
 
-    Praktikant näeb nüüd journalit, aga `cat /var/log/secure` annab ikka `Permission denied`. See on vähima õiguse põhimõte: kasutaja saab veaotsinguks journali ilma `sudo`-ta ja ilma turvalogita.
+    Praktikant näeb nüüd journalit, aga `cat /var/log/secure` annab ikka `Permission denied`. Kasutaja saab journalit lugeda ilma `sudo`-ta, aga rootile mõeldud tekstilogifaili mitte. Journalis võivad olla samad autentimissündmused, nii et rühm `systemd-journal` annab laia lugemisõiguse: anna see ainult neile, kes seda tööks vajavad.
 
 Kirjuta `README.md`-sse, miks on parem lisada kasutaja gruppi kui anda talle `sudo`. Pärast seda korista: `sudo userdel -r praktikant`.
 

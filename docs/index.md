@@ -82,7 +82,7 @@ AI võib aidata sul selgitust leida. Oma lahendust pead oskama ise põhjendada: 
 
 **Lubatud**
 
-- küsida AI-lt, mida käsk, konfiguratsiooni võti või veateade tähendab;
+- küsida AI-lt, mida käsk, konfiguratsioonivõti või veateade tähendab;
 - kasutada juhendi käsuplokke.
 
 **Pole lubatud**

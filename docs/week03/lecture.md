@@ -126,7 +126,7 @@ Seda arvutust nimetatakse **kiiruseks** (rate). Täpselt nii töötab ka `top`: 
 
 Counteril on üks lõks: kui masin taaskäivitub, algab loendur nullist. Hea monitooringusüsteem tunneb selle ära ega joonista graafikule tohutut negatiivset hüpet.
 
-On ka kolmas tüüp, **histogramm** (histogram), mis jagab mõõtmised korvidesse, näiteks „mitu päringut vastas alla 100 ms, mitu alla 1 s“. Sellega kohtud N5-s Prometheuses.
+On ka kolmas tüüp, **histogramm** (histogram), mis jagab mõõtmised korvidesse, näiteks „mitu päringut vastas alla 100 ms, mitu alla 1 s“. Histogramme kasutatakse teenuse vastamisaegade uurimisel.
 
 ??? question "Kontrolli ennast"
     1. Kumb on gauge ja kumb counter: ketta täituvus protsentides, sisse loginud kasutajate arv, kokku saadetud e-kirjade arv, protsessori temperatuur?
@@ -249,7 +249,7 @@ Järgmisena võrdleme kahte kursusel kasutatavat kogumisviisi:
 ??? note "Tabel 3.7. Kursuse N2 ja N4 kogumisviiside võrdlus"
     | | N2 pingikontroll | N4 Zabbixi agent |
     |---|---|---|
-    | Kuidas | server mõõdab väljast: ping, kas port on lahti, kas veebileht vastab | masinas töötab väike programm (agent), mis loeb `/proc`-i ja annab numbrid serverile |
+    | Kuidas | server pingib masinat väljast (ICMP) | masinas töötab väike programm (agent), mis loeb `/proc`-i ja annab numbrid serverile |
     | Mida näeb | kas masin või teenus vastab, vastuse aeg | protsessor, mälu, ketas, protsessid, logid |
     | Eelis | masinasse pole vaja midagi paigaldada | näeb sisse |
     | Näide | N2 *ICMP Ping* | Zabbix agent (N4), node_exporter (N5) |

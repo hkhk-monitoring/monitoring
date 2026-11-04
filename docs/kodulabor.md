@@ -6,7 +6,7 @@ tags:
 
 # Töökeskkond ja eelkontroll
 
-Kursusel kasutad automatiseerimise kursusest tuttavaid laborimasinaid `proxmox1`, `proxmox2` ja `proxmox3`. Enne esimest praktikumi kontrolli, et pääsed neisse SSH-ga ja saad käivitada Ansible'i ülesandeid. See leht kontrollib olemasoleva keskkonna valmisolekut, monitooringuteenused paigaldad vastavates praktikumides.
+Kursusel kasutad automatiseerimise kursusest tuttavaid laborimasinaid `proxmox1`, `proxmox2` ja `proxmox3`. Enne esimest praktikumi kontrolli, et pääsed neisse SSH-ga ja saad käivitada Ansible'i ülesandeid. Selle lehe abil kontrollid olemasoleva keskkonna valmisolekut. Monitooringuteenused paigaldad vastavates praktikumides.
 
 ## 1. Masinad ja nende rollid
 
@@ -84,7 +84,7 @@ Kõik pordid ei ole veebiliideste jaoks: agentide ja serverite vahelisi ühendus
 
 `proxmox1` ressursid on piiratud. Iga praktikumi alguses on kirjas, millised varasemad teenused peavad töötama ja millised peatada. Ära peata teenust, mida järgmine ülesanne vajab.
 
-Enne uue seirekomplekti käivitamist kontrolli saadaval mälu:
+Enne uue seirekomplekti käivitamist kontrolli saadaval olevat mälu:
 
 ```bash
 ssh proxmox1 "free -h"

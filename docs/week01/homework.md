@@ -24,7 +24,7 @@ for u in admin oracle guest; do
 done
 ```
 
-Iga kasutaja puhul küsitakse parooli. Ära sisesta midagi, vajuta **Ctrl+C**. Logisse jääb rida `Invalid user`.
+Kui masin lubab paroolisisselogimist, küsitakse iga kasutaja puhul parooli: ära sisesta midagi, vajuta **Ctrl+C**. Kui paroolisisselogimine on keelatud, lõpeb ühendus kohe veaga `Permission denied`. Mõlemal juhul jääb logisse rida `Invalid user`, kui sellist kasutajat masinas pole.
 
 ## 2. Skript tükkhaaval
 
@@ -65,7 +65,7 @@ grep -h "Invalid user" "$KAUST"/*/*.log \
 
 Raportis on ka IP `192.168.125.187` (kasutaja `kontroll`). See on õpetaja kontrollserver (laboritahvel), mis loeb masinate seisu iga minut. Need read ei ole rünnak.
 
-Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skripti, mida see teeb. Kui mõnest aru ei saa, käivita torujuhe järk-järgult (kõigepealt ainult `grep`, siis lisa järgmine osa).
+Loe torujuhet vasakult paremale ja lisa iga etapi ette kommentaar, mis selgitab, mida see etapp teeb. Kui mõnest aru ei saa, käivita torujuhe järk-järgult (kõigepealt ainult `grep`, siis lisa järgmine osa).
 
 **5. samm:** iga masina viis viimast veateadet. Keskserveri failides ei ole tõsidus reas kirjas (loeng, joonis 1.2), seega ei saa seda `grep`-iga otsida. Kasuta sõnu: otsi ridu, kus on `error`, `fail` või `ebaõnnestus` (tõstutundetult, `grep -i -E`). Read on eri failides, seega järjesta need enne viie viimase valimist aja järgi: `sort -k1,1M -k2,2n -k3,3`.
 
@@ -75,7 +75,7 @@ Loe torud vasakult paremale ja kirjuta iga `|` järel olev osa kommentaarina skr
 
 Vastused lähevad praktikumi 1 repositooriumi `README.md` lõppu, osasse **Kodutöö** (küsimused on seal juba olemas). Kirjuta vastus iga `_kodutöö_` asemele:
 
-1. Kopeeri raporti väljund ``` plokki.
+1. Lisa raporti väljund koodiplokki (```` ```text ````).
 2. Mis IP-aadressilt tulid tundmatu kasutajanimega sisselogimised ja miks on see aadress sinu laboris just see?
 3. Kui sul oleks 50 masinat ja iga masin kirjutaks 1 GB logisid päevas, mis läheks sinu skriptiga katki? Nimeta kaks asja.
 4. Raport näitab, mis oli. Mida ta ei tee, mida tahaksid, et seiresüsteem teeks? (See on järgmiste kohtumiste teema.)
@@ -83,7 +83,7 @@ Vastused lähevad praktikumi 1 repositooriumi `README.md` lõppu, osasse **Kodut
 
 ## Esitamine
 
-Skript ja vastused lähevad praktikumi 1 repositooriumisse. Oma arvutis, repositooriumi juurkaustas:
+Skript ja vastused lähevad praktikumi 1 repositooriumisse. Kui oled veel `proxmox1`-s, välju käsuga `exit`. Seejärel oma arvutis, repositooriumi juurkaustas:
 
 ```bash
 scp proxmox1:logiraport.sh kodutoo/
@@ -97,7 +97,7 @@ Tulemuse näed Classroom 50-s.
 
 ## Lisaülesanded
 
-**A. Iga hommik kell 7.** Käivita raport systemd taimeriga iga päev kell 07:00 ja kirjutama tulemuse faili `/var/log/logiraport.log`. Kontrolli `systemctl list-timers`-iga, millal see järgmine kord käivitub.
+**A. Iga hommik kell 7.** Seadista raport käivituma systemd taimeriga iga päev kell 07:00 ja kirjutama tulemuse faili `/var/log/logiraport.log`. Kontrolli `systemctl list-timers`-iga, millal see järgmine kord käivitub.
 
 **B. Ainult eilne ja tänane päev.** Praegu loeb skript kõiki ridu. Muuda nii, et raportis on ainult eilse ja tänase päeva read. Vihje: logirea algus on kuupäev; `date -d yesterday '+%b %e'` annab eilse kuupäeva samas vormingus.
 

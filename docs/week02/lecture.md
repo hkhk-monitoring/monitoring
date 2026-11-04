@@ -119,7 +119,7 @@ Item'i **võti** (key) määrab, mida küsitakse. `icmpping` küsib, kas host va
 
 Template *ICMP Ping* ootab kolme järjestikust nurjunud pingi. Üks kadunud pakett võib olla juhuslik. Kui trigger reageeriks igale nurjumisele, tuleks palju valehäireid ja teavitusi hakataks eirama. Häirete hulgast räägib N6.
 
-Kui masin hakkab uuesti vastama, läheb trigger tagasi olekusse OK ja probleem saab märke **RESOLVED**. Ajalukku jääb probleemi algus ja kestus. Nende järgi saad hiljem öelda, et e-pood oli maas 40 minutit.
+Kui masin hakkab uuesti vastama, läheb trigger tagasi olekusse OK ja probleem saab märke **RESOLVED**. Ajalukku jääb probleemi algus ja kestus: millal probleemitingimus tuvastati ja millal see lahenes. Teenuse tegeliku katkestuse hindamiseks pead teadma ka seda, mida kontroll mõõtis ja millise viivitusega probleem tekkis.
 
 ??? question "Kontrolli ennast"
     1. Mis vahe on Zabbixi serveril ja veebiliidesel? Kumb peab töötama, et teavitus tuleks?

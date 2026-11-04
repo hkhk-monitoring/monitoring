@@ -363,7 +363,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/agent.yml | tee logid/a2-teine-kaivi
 ```
 
 ??? success "Oodatav tulemus"
-    `PLAY RECAP` all kaks rida, mõlemas `changed=0` ja `failed=0`. Handler ei käivitunud, sest seadete fail ei muutunud. Kui kuskil on `changed=1`, vaata, mis ülesanne muutis midagi ka teisel korral, ja paranda see.
+    `PLAY RECAP` all on kaks rida, mõlemas `changed=0` ja `failed=0`. Handler ei käivitunud, sest seadete fail ei muutunud. Kui kuskil on `changed=1`, vaata, mis ülesanne muutis midagi ka teisel korral, ja paranda see.
 
 Salvesta mõlema masina agendi olek tõendiks:
 
@@ -405,7 +405,7 @@ Agent töötab mõlemas masinas, kuid Linuxi mõõdikute kogumine pole veel temp
 
 **Data collection → Hosts → proxmox3**, vali **Linux by Zabbix agent active**. **Update**.
 
-Oota 1-2 minutit ja ava **Monitoring → Latest data**, filtris **Hosts:** `proxmox2` ja `proxmox3`.
+Oota 1–2 minutit ja ava **Monitoring → Latest data**, filtris **Hosts:** `proxmox2` ja `proxmox3`.
 
 ??? success "Oodatav tulemus"
 
