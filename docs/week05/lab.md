@@ -102,14 +102,20 @@ ssh proxmox2 "sudo dnf install -y epel-release && sudo dnf install -y stress-ng 
 
 ## Osa 2 · node_exporter käsitsi proxmox2-s
 
-Enne playbook'i teed paigalduse ühes masinas käsitsi, et näha iga sammu tulemust. node_exporter on üks programmifail. Selle ametlikud väljalasked on GitHubis lehel [node_exporter releases](https://github.com/prometheus/node_exporter/releases). Laadi alla versioon 1.12.1 ja kontrolli kontrollsummat:
+Enne playbook'i teed paigalduse ühes masinas käsitsi, et näha iga sammu tulemust. Hiljem kirjutad samad sammud playbook'iks ja siis tead, mida iga ülesanne teeb.
+
+node_exporter on üks programmifail. Selle ametlikud väljalasked on GitHubis lehel [node_exporter releases](https://github.com/prometheus/node_exporter/releases). Ava versioon **1.12.1** ja leia jaotisest **Assets** kaks faili: Linuxi 64-bitise arhiivi (nimes on `linux-amd64`) ja faili `sha256sums.txt`. Kopeeri nende allalaadimise aadressid (paremklõps, **Copy link address**) ja laadi mõlemad `proxmox2`-s kausta `/tmp`:
 
 ```bash
 ssh proxmox2
 cd /tmp
-V=1.12.1
-curl -LO https://github.com/prometheus/node_exporter/releases/download/v$V/node_exporter-$V.linux-amd64.tar.gz
-curl -LO https://github.com/prometheus/node_exporter/releases/download/v$V/sha256sums.txt
+curl -LO <arhiivi aadress>
+curl -LO <sha256sums.txt aadress>
+```
+
+Fail `sha256sums.txt` sisaldab iga väljalaske faili SHA-256 kontrollsummat. Käsk `sha256sum --check` arvutab allalaaditud faili summa ja võrdleb seda nimekirjaga. Võti `--ignore-missing` jätab vahele failid, mida sa alla ei laadinud:
+
+```bash
 sha256sum --check --ignore-missing sha256sums.txt
 ```
 
@@ -127,23 +133,40 @@ node_exporter --version
 
 `install` loob uue faili, seega saab see kausta `/usr/local/bin` SELinuxi sildi. Kui teisaldad faili käsuga `mv`, jääb alles kausta `/tmp` silt ja systemd ei saa programmi käivitada.
 
-systemd käivitab programmi teenusena, kui sellel on unit-fail. Loo fail `/etc/systemd/system/node_exporter.service` (`sudo nano`):
+systemd käivitab programmi teenusena, kui sellel on **unit-fail**. Unit-failis on kolm sektsiooni:
 
-```ini
-[Unit]
-Description=Prometheus node_exporter
-After=network-online.target
+- `[Unit]`: teenuse kirjeldus ja millal see käivitub teiste teenuste suhtes;
+- `[Service]`: millise kasutajana ja millise käsuga programm käivitub ning mida teha, kui see seiskub;
+- `[Install]`: millise süsteemi oleku osana teenus koos masinaga käivitub.
 
-[Service]
-User=node_exporter
-ExecStart=/usr/local/bin/node_exporter
-Restart=on-failure
+node_exporteri repositooriumis on ametlik näidis kaustas [examples/systemd](https://github.com/prometheus/node_exporter/tree/master/examples/systemd). See on tehtud teistsuguse paigalduse jaoks (socket-fail ja keskkonnafail), sinu paigalduses on see lihtsam. Võrdle allolevat faili näidisega ja vaata, mis on erinev:
 
-[Install]
-WantedBy=multi-user.target
-```
+- `After=network-online.target` käivitab teenuse alles siis, kui võrk on üleval;
+- `User=node_exporter` käivitab programmi kasutajana, mille just lõid, mitte `root`-ina;
+- `ExecStart` on programmi täielik tee sinu paigalduses;
+- `Restart=on-failure` käivitab teenuse uuesti, kui see vea tõttu seiskub;
+- `WantedBy=multi-user.target` paneb teenuse käivituma koos masinaga, kui see on lubatud (`enable`).
 
-Käivita teenus ja kontrolli, et see vastab:
+Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` (`sudo nano`). Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu.
+
+??? example "Fail: /etc/systemd/system/node_exporter.service"
+    ```ini
+    [Unit]
+    Description=Prometheus node_exporter
+    After=network-online.target
+
+    [Service]
+    User=node_exporter
+    ExecStart=/usr/local/bin/node_exporter
+    Restart=on-failure
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+Kontrolli faili enne käivitamist: `sudo systemd-analyze verify /etc/systemd/system/node_exporter.service`. Kui väljund on tühi, leidis systemd failist kõik vajaliku.
+
+Pärast unit-faili loomist või muutmist peab systemd selle uuesti lugema (`daemon-reload`), muidu kasutab ta vana versiooni. Käivita teenus ja kontrolli, et see vastab:
 
 ```bash
 sudo systemctl daemon-reload
@@ -208,39 +231,25 @@ Kirjuta README jaotisse **Osa 3** kummagi nimi, tüüp ja ühik. Kuidas tunned c
 
 ## Osa 4 · Sama playbook'iga kahes masinas
 
-`proxmox3` vajab samu samme. Kirjuta need playbook'iks `konf/node_exporter.yml`, mis paigaldab node_exporteri mõlemasse masinasse.
+`proxmox3` vajab samu samme. Käsitsi tehtud paigaldus ei kordu teises masinas täpselt samamoodi, playbook kordub. Ehitad playbook'i `konf/node_exporter.yml` üles ülesanne haaval: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Iga ülesanne vastab ühele osa 2 sammule.
 
 **Ennusta:** milline osa seadistusest on mõlemas masinas sama ja mis võib masinati erineda? Kirjuta vastus README jaotisse **Osa 4**.
 
-**Nõuded (`konf/node_exporter.yml`):**
-
-- laadib alla node_exporteri 1.12.1 väljalaske ja kontrollib kontrollsummat;
-- paigaldab programmi `/usr/local/bin/node_exporter`;
-- loob süsteemikasutaja `node_exporter`;
-- kirjutab unit-faili `/etc/systemd/system/node_exporter.service`, mille sisu on täpselt sama mis osas 2 käsitsi loodud failis, ja taaskäivitab teenuse **ainult siis, kui fail muutus** (handler);
-- avab tulemüüri vaiketsoonis pordi `9100/tcp` nii, et see kehtib kohe ja jääb alles ka pärast taaskäivitust (`permanent` ja `immediate`);
-- teenus töötab ja käivitub koos masinaga;
-- teine käivitus annab `changed=0`, kui esimene käivitus õnnestus, failid kaustas `/tmp` on alles ja masinaid pole vahepeal käsitsi muudetud.
-
 ??? note "Tabel 5.5. Playbook'i moodulid"
-    | Moodul | Mida teeb | Parameetrid selles playbook'is |
+    | Moodul | Mida teeb | Osa 2 samm |
     |---|---|---|
-    | [`ansible.builtin.get_url`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html) | laadib faili alla ja kontrollib kontrollsummat | `url`, `dest`, `checksum` |
-    | [`ansible.builtin.unarchive`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html) | pakib arhiivi lahti | `src`, `dest`, `remote_src`, `creates` |
-    | [`ansible.builtin.copy`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html) | kopeerib faili või kirjutab sisu faili | `src`, `dest`, `remote_src`, `mode`, `content` |
-    | [`ansible.builtin.user`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html) | loob kasutaja | `name`, `system`, `shell`, `create_home` |
-    | [`ansible.builtin.systemd_service`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_service_module.html) | käivitab teenuse, loeb unit-failid uuesti | `name`, `state`, `enabled`, `daemon_reload` |
-    | [`ansible.posix.firewalld`](https://docs.ansible.com/ansible/latest/collections/ansible/posix/firewalld_module.html) | avab pordi firewalld-s | `port`, `permanent`, `immediate`, `state` |
+    | [`ansible.builtin.get_url`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html) | laadib faili alla ja kontrollib kontrollsummat | `curl` ja `sha256sum` |
+    | [`ansible.builtin.unarchive`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html) | pakib arhiivi lahti | `tar` |
+    | [`ansible.builtin.copy`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html) | kopeerib faili või kirjutab sisu faili | `install`, unit-fail |
+    | [`ansible.builtin.user`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html) | loob kasutaja | `useradd` |
+    | [`ansible.builtin.systemd_service`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_service_module.html) | käivitab teenuse, loeb unit-failid uuesti | `systemctl` |
+    | [`ansible.posix.firewalld`](https://docs.ansible.com/ansible/latest/collections/ansible/posix/firewalld_module.html) | avab pordi firewalld-s | `firewall-cmd` |
 
-Enne kirjutamist uuri allalaadimise moodulit:
+### 4.1 Play ja allalaadimine
 
-```bash
-ansible-doc ansible.builtin.get_url
-```
+Loo fail `konf/node_exporter.yml`. Play algus ütleb, millistes masinates ülesanded käivituvad (`hosts: all` tähendab kõiki, mille annad käsus `-i`) ja et need käivituvad `sudo` kaudu (`become: true`). Versioon ja aadressid on muutujates, et versiooni vahetamiseks piisaks ühest reast. `{{ ... }}` asendab muutuja väärtusega.
 
-Leia parameetri `checksum` juurest, mis kujul saab kontrollsumma anda ja kas selle võib võtta failist veebiaadressil. Kirjuta vastus README jaotisse **Osa 4**.
-
-??? tip "Vihje: playbook'i ülesehitus"
+??? example "Ülesanne: play algus"
     ```yaml
     - name: node_exporter jälgitavatesse masinatesse
       hosts: all
@@ -250,26 +259,76 @@ Leia parameetri `checksum` juurest, mis kujul saab kontrollsumma anda ja kas sel
         ne_name: "node_exporter-{{ ne_version }}.linux-amd64"
         ne_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ ne_version }}"
       tasks:
+    ```
+
+Esimene ülesanne laadib arhiivi alla ja kontrollib kontrollsummat, nagu tegid osas 2 käskudega `curl` ja `sha256sum`. `dest` on fail sihtmasinas. `checksum` ütleb, et summa võetakse veebiaadressilt `sha256sums.txt`: kui fail ei vasta, ülesanne ebaõnnestub.
+
+??? example "Ülesanne: väljalase alla koos kontrollsummaga"
+    ```yaml
         - name: Väljalase alla koos kontrollsummaga
           ansible.builtin.get_url:
             url: "{{ ne_url }}/{{ ne_name }}.tar.gz"
             dest: "/tmp/{{ ne_name }}.tar.gz"
             checksum: "sha256:{{ ne_url }}/sha256sums.txt"
+    ```
 
+Leia `ansible-doc ansible.builtin.get_url` väljundist parameetri `checksum` kirjeldus ja kirjuta README jaotisse **Osa 4**, mis kujul saab kontrollsumma anda. Käivita playbook:
+
+```bash
+ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml
+```
+
+??? success "Oodatav tulemus"
+    Ülesanne on `proxmox3`-s `changed`. Käivita uuesti: nüüd on see `ok`, sest fail on olemas ja kontrollsumma klapib.
+
+### 4.2 Lahtipakkimine ja programm
+
+Need kaks ülesannet teevad sama, mis osas 2 käsud `tar` ja `install`. Arhiiv ja programm on juba sihtmasinas, mitte sinu arvutis, seda ütleb `remote_src: true`. `creates` jätab lahtipakkimise vahele, kui programm on juba lahti pakitud, muidu oleks ülesanne igal käivitusel `changed`.
+
+??? example "Ülesanne: arhiiv lahti"
+    ```yaml
         - name: Arhiiv lahti
           ansible.builtin.unarchive:
             src: "/tmp/{{ ne_name }}.tar.gz"
             dest: /tmp
             remote_src: true
             creates: "/tmp/{{ ne_name }}/node_exporter"
+    ```
 
+??? example "Ülesanne: programm kausta /usr/local/bin"
+    ```yaml
         - name: Programm kausta /usr/local/bin
           ansible.builtin.copy:
             src: "/tmp/{{ ne_name }}/node_exporter"
             dest: /usr/local/bin/node_exporter
             remote_src: true
             mode: "0755"
+    ```
 
+Käivita playbook ja kontrolli: `ssh proxmox3 "/usr/local/bin/node_exporter --version"`.
+
+### 4.3 Kasutaja
+
+See ülesanne teeb sama, mis osas 2 käsk `useradd`: süsteemikasutaja ilma kodukaustata ja ilma sisselogimisõiguseta. Võrdle parameetreid käsu võtmetega: `system` on `--system`, `shell` on `--shell` ja `create_home: false` on `--no-create-home`.
+
+??? example "Ülesanne: süsteemikasutaja"
+    ```yaml
+        - name: Süsteemikasutaja node_exporter
+          ansible.builtin.user:
+            name: node_exporter
+            system: true
+            shell: /sbin/nologin
+            create_home: false
+    ```
+
+### 4.4 Unit-fail ja handler
+
+Unit-faili sisu peab olema täpselt sama, mis osas 2 käsitsi loodud failis. Kui sisu erineb kas või ühe tühiku võrra, kirjutab playbook `proxmox2`-s faili üle. Moodul `copy` kirjutab faili ka ilma lähtefailita, sisu on siis parameetris `content`. Märk `|` tähendab mitmerealist teksti, read on selle all ühe taandega.
+
+`notify` teavitab handler'it, kui fail muutus. Handler käivitub play lõpus ja ainult siis, kui teda teavitati.
+
+??? example "Ülesanne: unit-fail"
+    ```yaml
         - name: Unit-fail, sama sisu mis osas 2
           ansible.builtin.copy:
             dest: /etc/systemd/system/node_exporter.service
@@ -287,9 +346,12 @@ Leia parameetri `checksum` juurest, mis kujul saab kontrollsumma anda ja kas sel
               [Install]
               WantedBy=multi-user.target
           notify: node_exporter uuesti
+    ```
 
-        # ... kasutaja, teenus, tulemüür
+Handler'id on play lõpus eraldi plokis `handlers:`, samal tasemel kui `tasks:`. Handler peab enne taaskäivitamist laskma systemd'l unit-faili uuesti lugeda, nagu tegid osas 2 käsuga `daemon-reload`. Seda teeb `daemon_reload: true`.
 
+??? example "Plokk: handler'id (faili lõppu)"
+    ```yaml
       handlers:
         - name: node_exporter uuesti
           ansible.builtin.systemd_service:
@@ -298,7 +360,35 @@ Leia parameetri `checksum` juurest, mis kujul saab kontrollsumma anda ja kas sel
             daemon_reload: true
     ```
 
-Käivita playbook oma arvutis kaks korda. Teise käivituse väljund läheb tõendiks:
+### 4.5 Teenus ja tulemüür
+
+Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewall-cmd`. Teenuse ülesanne nõuab soovitud olekut (`started`, `enabled`), mitte taaskäivitust: kui teenus juba töötab, ei tee see midagi. Tulemüüri reegel peab kehtima kohe (`immediate`) ja jääma alles pärast taaskäivitust (`permanent`). Need ülesanded lähevad `tasks:` loendi lõppu, enne plokki `handlers:`.
+
+??? example "Ülesanne: teenus"
+    ```yaml
+        - name: Teenus töötab ja käivitub koos masinaga
+          ansible.builtin.systemd_service:
+            name: node_exporter
+            state: started
+            enabled: true
+            daemon_reload: true
+    ```
+
+??? example "Ülesanne: port tulemüüris"
+    ```yaml
+        - name: Port 9100 tulemüüris
+          ansible.posix.firewalld:
+            port: 9100/tcp
+            permanent: true
+            immediate: true
+            state: enabled
+    ```
+
+Leia `ansible-doc ansible.posix.firewalld` väljundist, mis juhtub, kui on ainult `permanent: true` ilma `immediate`-ita. Kirjuta vastus README jaotisse **Osa 4**.
+
+### 4.6 Kaks käivitust
+
+Kui kõik ülesanded on lisatud, käivita playbook veel kaks korda. Teise käivituse väljund läheb tõendiks:
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml
@@ -319,38 +409,63 @@ for h in proxmox2 proxmox3; do ssh $h "systemctl is-active node_exporter; curl -
 
 ## Osa 5 · Prometheus proxmox1-s
 
-Prometheus töötab `proxmox1`-s konteineris. Seaded on failis `prometheus.yml`: seal on kirjas, kui tihti ja keda küsida. Loo oma arvutis repositooriumis fail `konf/prometheus.yml`. Asenda IP-aadressid oma masinate omadega:
+Prometheus töötab `proxmox1`-s konteineris. Kirjutad kaks faili: Prometheuse seaded ja Compose'i faili, mis konteineri käivitab. Seadete võtmed on kirjeldatud lehel [Configuration](https://prometheus.io/docs/prometheus/latest/configuration/configuration/) ja konteinerina käivitamine lehel [Installation, Using Docker](https://prometheus.io/docs/prometheus/latest/installation/#using-docker).
 
-```yaml
-global:
-  scrape_interval: 15s
+**Seaded, `konf/prometheus.yml`.** Esimene osa on üldseaded: `scrape_interval` ütleb, kui tihti Prometheus kõiki target'eid küsib.
 
-scrape_configs:
-  - job_name: prometheus
-    static_configs:
-      - targets: ["localhost:9090"]
+??? example "Failiosa: global"
+    ```yaml
+    global:
+      scrape_interval: 15s
+    ```
 
-  - job_name: node
-    static_configs:
-      - targets: ["<proxmox2-IP>:9100", "<proxmox3-IP>:9100"]
-```
+Teine osa on `scrape_configs`: loend job'e. Igal job'il on nimi (`job_name`, sellest tuleb silt `job`) ja `static_configs`, mille all `targets` on aadresside loend kujul `"<IP>:<port>"`. Esimene job küsib Prometheust ennast.
 
-Loo samasse kausta `konf/compose.yaml`. Image'i silt on kindel versioon, et sama fail annaks ka hiljem sama tulemuse ([prom/prometheus Docker Hubis](https://hub.docker.com/r/prom/prometheus/tags)). Konteinerisse ühendatakse kaust `config/`, mitte üksik fail: kui fail hiljem uuega asendatakse, näeb konteiner kausta kaudu uut faili, üksiku faili ühendus võib jääda vana faili külge:
+??? example "Failiosa: scrape_configs ja job prometheus"
+    ```yaml
+    scrape_configs:
+      - job_name: prometheus
+        static_configs:
+          - targets: ["localhost:9090"]
+    ```
 
-```yaml
-services:
-  prometheus:
-    image: prom/prometheus:v3.15.1
-    ports:
-      - "9090:9090"
+Teine job küsib mõlemat node_exporterit. Kasuta osas 1 kirja pandud IP-aadresse, mitte SSH aliaseid: Prometheus konteineris ei tunne nimesid `proxmox2` ja `proxmox3`. Job läheb samasse `scrape_configs` loendisse.
+
+??? example "Failiosa: job node"
+    ```yaml
+      - job_name: node
+        static_configs:
+          - targets: ["<proxmox2-IP>:9100", "<proxmox3-IP>:9100"]
+    ```
+
+**Compose'i fail, `konf/compose.yaml`.** Teenus kasutab image'it kindla sildiga ([sildid Docker Hubis](https://hub.docker.com/r/prom/prometheus/tags)), et sama fail annaks ka hiljem sama tulemuse. `ports` avab masinas pordi 9090 ja `restart` käivitab konteineri uuesti, kui see seiskub.
+
+??? example "Failiosa: teenus, image ja port"
+    ```yaml
+    services:
+      prometheus:
+        image: prom/prometheus:v3.15.1
+        ports:
+          - "9090:9090"
+        restart: unless-stopped
+    ```
+
+`volumes` ühendab konteinerisse kaks asja. Kaust `./config` läheb konteineris kausta `/etc/prometheus`, ainult lugemiseks (`:ro`). Kaust, mitte üksik fail: kui fail hiljem uuega asendatakse, näeb konteiner kausta kaudu uut faili, üksiku faili ühendus võib jääda vana faili külge. Nimega andmeköide `prometheus-data` hoiab Prometheuse andmeid kaustas `/prometheus`, nii et need jäävad alles ka siis, kui konteiner luuakse uuesti. Võti `volumes` läheb teenuse alla, sama taandega kui `ports`.
+
+??? example "Failiosa: ühendused teenuse all"
+    ```yaml
+        volumes:
+          - ./config:/etc/prometheus:ro
+          - prometheus-data:/prometheus
+    ```
+
+Nimega andmeköide tuleb kirjeldada ka faili lõpus, ilma taandeta.
+
+??? example "Failiosa: andmeköide faili lõppu"
+    ```yaml
     volumes:
-      - ./config:/etc/prometheus:ro
-      - prometheus-data:/prometheus
-    restart: unless-stopped
-
-volumes:
-  prometheus-data:
-```
+      prometheus-data:
+    ```
 
 Kopeeri failid `proxmox1`-sse ja käivita. `prometheus.yml` läheb kausta `~/prometheus/config/`:
 
@@ -455,22 +570,30 @@ Kirjuta README jaotisse **Osa 6**:
 
 ### 6.3 Kuidas muutub protsessori kasutus koormuskatse ajal?
 
-Protsessori kasutuse päring koosneb neljast osast. Käivita need ükshaaval ja kirjuta README jaotisse **Osa 6**, mida iga osa tulemus näitab ja mis on selle ühik:
+Protsessori kasutuse päring koosneb neljast osast. Kaks esimest on antud. Käivita need ja kirjuta README jaotisse **Osa 6**, mida tulemus näitab ja mis on selle ühik:
 
 ```text
 node_cpu_seconds_total{mode="idle"}
 rate(node_cpu_seconds_total{mode="idle"}[1m])
-avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m]))
-100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])))
 ```
+
+Kolmanda ja neljanda osa koostad ise:
+
+3. teine päring annab rea iga loogilise protsessori kohta. Muuda see nii, et tulemuses on üks rida masina kohta: protsessorite keskmine;
+4. tulemus on jõudeaja osa vahemikus 0 kuni 1. Muuda see protsessori kasutuseks protsentides.
+
+Kirjuta mõlemad päringud ja nende tulemuse tähendus README jaotisse **Osa 6**.
+
+??? tip "Vihje"
+    Keskmise silti `instance` kaupa annab koondamisoperaator `avg` koos võtmesõnaga `by` ([Aggregation operators](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators)). Kasutus on see osa ajast, mis ei olnud jõudeaeg. Aritmeetika (`*`, `-`) töötab PromQL-is ka arvu ja päringu vahel ([Arithmetic binary operators](https://prometheus.io/docs/prometheus/latest/querying/operators/#arithmetic-binary-operators)).
 
 ??? success "Oodatav tulemus"
     1. Counter: iga loogilise protsessori jõudeaeg sekundites alates masina käivitusest, suured kasvavad arvud.
     2. Iga protsessori jõudeaja kasv sekundis viimase minuti aknas, arv 0 ja 1 vahel.
-    3. Sama, aga keskmine üle protsessorite, üks arv masina kohta.
+    3. Üks arv masina kohta, protsessorite keskmine, samuti 0 ja 1 vahel.
     4. Protsent, mis on arvutatud jõudeaja osakaalust: 100 miinus jõudeaja protsent. See kehtib viimase minuti akna kohta, mitte ühe hetke kohta.
 
-Pane viimane päring vahekaardile **Graph** ja tekita `proxmox2`-s 60 sekundiks koormus (`stress-ng` paigaldasid osas 1). `$(nproc)` on masina loogiliste protsessorite arv, igaühele tuleb üks koormav protsess. Käsk näitab katse algus- ja lõpuaega:
+Pane oma neljas päring vahekaardile **Graph** ja tekita `proxmox2`-s 60 sekundiks koormus (`stress-ng` paigaldasid osas 1). `$(nproc)` on masina loogiliste protsessorite arv, igaühele tuleb üks koormav protsess. Käsk näitab katse algus- ja lõpuaega:
 
 ```bash
 date +%T; ssh proxmox2 'stress-ng --cpu $(nproc) --timeout 60s'; date +%T
