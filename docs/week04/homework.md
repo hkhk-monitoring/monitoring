@@ -28,7 +28,7 @@ Käsk lahutab praegusest ajast faili muutmise aja. Tulemus on märguande vanus s
 Agendi konfiguratsioonifaili lõpus on rida `Include=/etc/zabbix/zabbix_agent2.d/*.conf`. Kõik selle kausta `.conf` failid loetakse agendi seadete hulka. Ajastatud töö vajab masinas töötavat cron'i teenust. Kontrolli mõlemat:
 
 ```bash
-ssh proxmox3 "sudo grep '^Include' /etc/zabbix/zabbix_agent2.conf; systemctl is-active crond"
+for h in proxmox2 proxmox3; do echo "== $h"; ssh $h "sudo grep '^Include' /etc/zabbix/zabbix_agent2.conf; systemctl is-active crond"; done
 ```
 
 ??? warning "Kui `crond` ei ole `active`"

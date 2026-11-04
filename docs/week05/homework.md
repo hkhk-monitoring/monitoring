@@ -36,7 +36,7 @@ Kui `du` ebaõnnestub, peab skript lõppema veaga ega tohi viimast korrektset `l
 
 ## Osa 2 · Playbook
 
-Skripti käivitab cron kasutajana `root`, et kõik logikaustad oleksid loetavad. Kontrolli enne, et cron töötab: `ssh proxmox2 "systemctl is-active crond"`. Kui vastus ei ole `active`, lisa playbook'i pakett `cronie` ja teenus `crond`.
+Skripti käivitab cron kasutajana `root`, et kõik logikaustad oleksid loetavad. Kontrolli enne, et cron töötab mõlemas masinas: `for h in proxmox2 proxmox3; do ssh $h systemctl is-active crond; done`. Kui vastus ei ole `active`, lisa playbook'i pakett `cronie` ja teenus `crond`.
 
 Täienda `konf/node_exporter.yml` nii, et see:
 

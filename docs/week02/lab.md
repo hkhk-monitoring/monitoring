@@ -109,10 +109,10 @@ ssh proxmox1
 mkdir -p ~/zabbix && cd ~/zabbix
 ```
 
-Andmebaasi parool läheb faili `.env`, mitte Compose'i faili. See fail on saladus ja reposse seda ei kopeerita:
+Andmebaasi parool läheb faili `.env`, mitte Compose'i faili. See fail on saladus ja reposse seda ei kopeerita. Parool luuakse ainult siis, kui faili veel pole: kui teed seda sammu uuesti, jääb vana parool alles ja olemasolev andmebaas avaneb edasi.
 
 ```bash
-echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env
+test -e .env || echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env
 cat .env
 ```
 

@@ -8,7 +8,7 @@ tags:
 
 # Loeng: mõõdik, aegrida, agent
 
-N2-s seadistasid Zabbixi, mis pingib masinaid ja annab teada, kui mõni ei vasta. Täna vaatad, mida masina sees mõõdetakse, kust need numbrid tulevad ja miks on nende kogumiseks vaja agenti.
+N2-s seadistasid Zabbixi, mis pingib masinaid ja annab teada, kui mõni ei vasta. Täna vaatad, mida masina sees mõõdetakse, kust need numbrid tulevad ja miks on nende kogumiseks vaja agenti. Veebiõppe ülesanne on Tahvlis: lood [Zabbix Cloudi](https://www.zabbix.com/zabbix_cloud) konto ja seadistad seal Browser item'i, mis jälgib üht veebilehte.
 
 ??? abstract "Õpiväljundid"
     Pärast loengut oskad:

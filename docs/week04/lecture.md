@@ -174,7 +174,7 @@ Agendi paigaldus on igas masinas sama: võti, hoidla, pakett, kolm seadet, tulem
 
 Playbook kirjeldab soovitud olekut ja Ansible rakendab vajalikud muudatused. `Hostname` tuleb inventarifailist muutujaga `inventory_hostname`, seega saab sama playbook'iga seadistada mõlemad praktikumi masinad. Teine käivitus annab `changed=0`, kui masinad on juba soovitud olekus. Uue masina lisamiseks paned selle inventarifaili ja käivitad playbook'i uuesti.
 
-Praktikumis on playbook pooleli: ülesanded on olemas ja sina täidad seaded, pordi ja handler'i. Siis käivitad selle mõlemas masinas.
+Praktikumis täiendad playbook'i ülesannete kaupa. Esimesed ülesanded on näidatud tervikuna, järgmised koostad sama mustri ja moodulite dokumentatsiooni abil ning käivitad playbook'i pärast iga sammu mõlemas masinas.
 
 ??? question "Kontrolli ennast"
     1. Mida näeb agent, mida ping ei näe? Too kaks näidet.

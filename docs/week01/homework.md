@@ -9,7 +9,7 @@ tags:
 
 Keskserver kogub praktikumi järel kahe masina logisid, kuid neid ei loe keegi rida realt. Kodutöös kirjutad `proxmox1`-s skripti, mis teeb logidest lühikese hommikuse raporti: mis masinad saatsid logisid, kui palju oli veateateid ja millistelt IP-aadressidelt prooviti sisse logida tundmatu kasutajanimega.
 
-Eeldus on praktikumi osa B: `proxmox1` kaustas `/var/log/remote/` on `proxmox2` ja `proxmox3` nimedega kaustad. Tähtaja näed Classroom 50-s.
+Eeldus on praktikumi osad 9–11: `proxmox1` kaustas `/var/log/remote/` on kummagi jälgitava masina kaust. Kaustade nimed on masinate tegelikud hostinimed (`ssh proxmox2 hostname`), mitte SSH aliased. Tähtaja näed Classroom 50-s.
 
 ## 1. Tekita andmeid
 
@@ -30,7 +30,7 @@ Iga kasutaja puhul küsitakse parooli. Ära sisesta midagi, vajuta **Ctrl+C**. L
 
 Logi sisse `proxmox1`-sse (`ssh proxmox1`) ja loo seal skript `nano ~/logiraport.sh`. Testi iga sammu järel: `sudo bash ~/logiraport.sh`.
 
-**1. samm:** päis ja masinad, kes on logisid saatnud. Iga alamkaust `/var/log/remote/` all on üks masin (failid, mis on otse `/var/log/remote/` all, tulevad lisaülesannetest ja jäävad välja):
+**1. samm:** päis ja masinad, kes on logisid saatnud. Iga alamkaust `/var/log/remote/` all on üks masin (failid, mis on otse `/var/log/remote/` all, näiteks osas 9 loodud `turvalogi.log`, ei ole masinate kaustad ja jäävad välja):
 
 ```bash
 #!/bin/bash

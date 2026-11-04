@@ -124,9 +124,12 @@ sha256sum --check --ignore-missing sha256sums.txt
 
 Paki fail lahti, paigalda programm kausta `/usr/local/bin` ja loo talle oma süsteemikasutaja. Teenus ei tööta `root`-ina, sest see ainult loeb masina näite:
 
+Muutuja `V` hoiab versiooni, et seda ei peaks mitu korda kirjutama:
+
 ```bash
-tar xzf node_exporter-$V.linux-amd64.tar.gz
-sudo install -m 0755 node_exporter-$V.linux-amd64/node_exporter /usr/local/bin/
+V=1.12.1
+tar xzf "node_exporter-${V}.linux-amd64.tar.gz"
+sudo install -m 0755 "node_exporter-${V}.linux-amd64/node_exporter" /usr/local/bin/
 sudo useradd --system --no-create-home --shell /sbin/nologin node_exporter
 node_exporter --version
 ```
