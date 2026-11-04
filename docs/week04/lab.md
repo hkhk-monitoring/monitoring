@@ -24,7 +24,7 @@ Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse m
   <figcaption>Joonis 4.8. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
 </figure>
 
-Plokk **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Vastus on kokkuvolditud plokis.
+Praktikum läheb lihtsamast keerulisemani ja iga sammu saad teha iseseisvalt. Loe enne käsku selgitus, mõtle läbi plokk **Ennusta**, tee samm ja võrdle tulemust plokiga **Oodatav tulemus**. Kui jääd kinni, ava **Vihje**. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
 
 ## Osa 1 · Repositoorium ja Zabbix
 
@@ -359,6 +359,11 @@ ssh proxmox1 "timeout 3 bash -c '</dev/tcp/<proxmox2-IP>/10050' && echo lahti ||
 
 Agent töötab mõlemas masinas, kuid Linuxi mõõdikute kogumine pole veel template'itega seadistatud. Template annab hostile item'id ja trigger'id. `proxmox2` saab passiivse agendi template'i ja `proxmox3` aktiivse oma (loengu [tabel 4.2](lecture.md#3-passiivne-ja-aktiivne-agent)).
 
+<figure markdown="span">
+  ![Zabbixi veebiliidese skeem: hosti vormis väli Templates, kuhu lisatakse Linux by Zabbix agent, nupp Update; Latest data filtris host ja nimi, veerg Last check](../images/n04_zabbix_template.svg)
+  <figcaption>Joonis 4.10. Template'i sidumine hostiga ja väärtuste kontroll Latest data lehel (Talvik, 2026).</figcaption>
+</figure>
+
 **Data collection → Hosts → proxmox2**, väljal **Templates** kirjuta `Linux by` ja vali **Linux by Zabbix agent**. *ICMP Ping* jääb alles. **Update**.
 
 **Data collection → Hosts → proxmox3**, vali **Linux by Zabbix agent active**. **Update**.
@@ -428,7 +433,7 @@ Masina tegelik olek erineb nüüd sellest, mida playbook kirjeldab. **Triiv** (c
 
 <figure markdown="span">
   ![Soovitud olekus on port 10050 lahti; pärast käsitsi eemaldamist proxmox2 väärtused ei uuene, proxmox3 omad uuenevad; playbook'i uus käivitus lisab pordi tagasi](../images/n04_triiv.svg)
-  <figcaption>Joonis 4.10. Käsitsi muudatus tekitab triivi, playbook'i uus käivitus parandab ainult erinevuse (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.11. Käsitsi muudatus tekitab triivi, playbook'i uus käivitus parandab ainult erinevuse (Talvik, 2026).</figcaption>
 </figure>
 
 ??? question "Ennusta"
@@ -457,7 +462,7 @@ Template'is on ketta trigger'id juba olemas, aga nende piiri ja raskusastme on v
 
 <figure markdown="span">
   ![Zabbixi veebiliidese skeem: vasakul menüü Data collection ja Hosts, hostide tabelis proxmox2 rea link Items, üleval paremal nupp Create item ja vorm väljadega Name, Type, Key, Type of information, Units, Update interval](../images/n04_zabbix_item.svg)
-  <figcaption>Joonis 4.11. Kust leiad item'i loomise: 1 Hosts, 2 Items, 3 Create item, 4 vorm, 5 Add (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.12. Kust leiad item'i loomise: 1 Hosts, 2 Items, 3 Create item, 4 vorm, 5 Add (Talvik, 2026).</figcaption>
 </figure>
 
 **Data collection → Hosts → proxmox2 → Items → Create item** ([Item'i loomine](https://www.zabbix.com/documentation/7.0/en/manual/config/items/item)):
@@ -477,7 +482,7 @@ Template'is on ketta trigger'id juba olemas, aga nende piiri ja raskusastme on v
 
 <figure markdown="span">
   ![Zabbixi veebiliidese skeem: hostide tabelis proxmox2 rea link Triggers, nupp Create trigger ja vorm väljadega Name, Severity, Expression](../images/n04_zabbix_trigger.svg)
-  <figcaption>Joonis 4.12. Kust leiad trigger'i loomise: Hosts, Triggers, Create trigger ja vorm (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.13. Kust leiad trigger'i loomise: Hosts, Triggers, Create trigger ja vorm (Talvik, 2026).</figcaption>
 </figure>
 
 **Data collection → Hosts → proxmox2 → Triggers → Create trigger** ([Trigger'i loomine](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/trigger)):
@@ -495,7 +500,7 @@ Selleks, et probleem tekiks, peab vaba ruumi olema alla 20%. `fallocate` loob fa
 
 <figure markdown="span">
   ![Ajajoon: date ja fallocate, item toob uue väärtuse, tekib PROBLEM; date ja rm, item toob uue väärtuse, probleem RESOLVED](../images/n04_ketta_katse.svg)
-  <figcaption>Joonis 4.13. Kettakatse ajajoon. Pane kellaajad kirja, et neid hiljem tabeli algus- ja lahenemisajaga võrrelda (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.14. Kettakatse ajajoon. Pane kellaajad kirja, et neid hiljem tabeli algus- ja lahenemisajaga võrrelda (Talvik, 2026).</figcaption>
 </figure>
 
 Enne täitmist kontrolli lähteolekut. Sinu trigger peab olema olekus OK (**Monitoring → Problems** all teda pole) ja katsefaili `/ketas-tais` ei tohi olla. Logi sisse ja arvuta, kui suur fail jätab vabaks umbes 15%:
@@ -568,7 +573,7 @@ cat logid/a5-andmebaas.txt
 **Küsimus (README):** mitu minutit kulus täitmisest probleemini ja kustutamisest lahenemiseni? Võrdle oma `date` kellaaegu tabeli veergudega `algas` ja `lahenes`. Miks see ei juhtunud kohe?
 
 ??? tip "Vihje"
-    Viivitus koosneb kahest osast: millal item toob järgmise väärtuse (**Update interval**) ja millal trigger seda hindab. Võrdle oma kellaaegu joonisega 4.13.
+    Viivitus koosneb kahest osast: millal item toob järgmise väärtuse (**Update interval**) ja millal trigger seda hindab. Võrdle oma kellaaegu joonisega 4.14.
 
 ## Töö esitamine
 

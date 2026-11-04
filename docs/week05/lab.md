@@ -25,7 +25,7 @@ Täna paigaldad node_exporteri kõigepealt käsitsi `proxmox2`-sse ja seejärel 
   <figcaption>Joonis 5.15. Praktikumi topoloogia: masinad, pordid ja ühendused (Talvik, 2026).</figcaption>
 </figure>
 
-Plokk **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Ennustuse kirjutad README-sse. Vastus on kokkuvolditud plokis.
+Praktikum läheb lihtsamast keerulisemani ja iga sammu saad teha iseseisvalt. Loe enne käsku selgitus, mõtle läbi plokk **Ennusta**, tee samm ja võrdle tulemust plokiga **Oodatav tulemus**. Kui jääd kinni, ava **Vihje**. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
 
 ## Osa 1 · Repositoorium ja mälu
 

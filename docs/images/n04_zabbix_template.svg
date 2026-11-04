@@ -1,0 +1,31 @@
+<svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <rect width="900" height="470" fill="#ffffff"/>
+  <text x="450" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#263238">Template'i sidumine ja Latest data (Zabbix 7.0, skeem)</text>
+  <text x="20" y="58" font-size="13" font-weight="700" fill="#263238">A. Template hostile</text>
+  <text x="20" y="80" font-size="12" fill="#263238"><tspan font-weight="700" fill="#c62828">1</tspan> Data collection → Hosts   <tspan font-weight="700" fill="#c62828">2</tspan> klõpsa hosti nimel <tspan font-family="JetBrains Mono, Menlo, monospace">proxmox2</tspan> (avaneb hosti vorm)</text>
+  <rect x="20" y="92" width="860" height="170" rx="6" fill="#fafafa" stroke="#b0bec5"/>
+  <text x="35" y="114" font-size="13" font-weight="700" fill="#263238">Host: proxmox2</text>
+  <g font-size="12">
+    <text x="160" y="146" text-anchor="end" fill="#37474f">* Host name</text><rect x="170" y="132" width="220" height="22" fill="#fff" stroke="#b0bec5"/><text x="178" y="148" fill="#263238">proxmox2</text>
+    <text x="160" y="182" text-anchor="end" fill="#37474f">Templates</text>
+    <rect x="170" y="168" width="420" height="44" fill="#fff" stroke="#c62828" stroke-width="2"/>
+    <rect x="178" y="175" width="90" height="20" rx="10" fill="#eceff1"/><text x="223" y="189" text-anchor="middle" fill="#263238" font-size="11">ICMP Ping ✕</text>
+    <rect x="274" y="175" width="160" height="20" rx="10" fill="#e0f2f1" stroke="#00796b"/><text x="354" y="189" text-anchor="middle" fill="#004d40" font-size="11">Linux by Zabbix agent ✕</text>
+    <text x="440" y="190" fill="#90a4ae" font-size="11">kirjuta „Linux by“…</text>
+    <circle cx="600" cy="175" r="10" fill="#c62828"/><text x="600" y="179" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3</text>
+    <text x="620" y="182" fill="#546e7a" font-size="11">proxmox2: Linux by Zabbix agent</text>
+    <text x="620" y="198" fill="#546e7a" font-size="11">proxmox3: Linux by Zabbix agent active</text>
+    <text x="620" y="214" fill="#546e7a" font-size="11">ICMP Ping jääb alles</text>
+    <rect x="170" y="226" width="70" height="24" rx="3" fill="#1565c0"/><text x="205" y="242" text-anchor="middle" fill="#fff" font-weight="700">Update</text>
+    <circle cx="252" cy="238" r="10" fill="#c62828"/><text x="252" y="242" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">4</text>
+  </g>
+  <text x="20" y="298" font-size="13" font-weight="700" fill="#263238">B. Kas väärtused tulevad</text>
+  <text x="20" y="320" font-size="12" fill="#263238"><tspan font-weight="700" fill="#c62828">5</tspan> Monitoring → Latest data   <tspan font-weight="700" fill="#c62828">6</tspan> filtris Hosts: proxmox2, Name: Available memory   <tspan font-weight="700" fill="#c62828">7</tspan> Apply</text>
+  <rect x="20" y="332" width="860" height="28" fill="#eceff1"/>
+  <g font-size="11" font-weight="700" fill="#37474f"><text x="30" y="350">Host</text><text x="130" y="350">Name</text><text x="400" y="350">Last check</text><text x="530" y="350">Last value</text><text x="660" y="350">Change</text></g>
+  <rect x="20" y="360" width="860" height="28" fill="#ffffff" stroke="#eceff1"/>
+  <g font-size="12"><text x="30" y="379" fill="#263238">proxmox2</text><text x="130" y="379" fill="#263238">Available memory</text><rect x="394" y="364" width="110" height="20" rx="3" fill="#fff3cd" stroke="#c62828" stroke-width="2"/><text x="400" y="379" fill="#263238">12s</text><text x="530" y="379" fill="#263238">1.33 GB</text><text x="660" y="379" fill="#263238">-2.1 MB</text></g>
+  <circle cx="512" cy="364" r="10" fill="#c62828"/><text x="512" y="368" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">8</text>
+  <text x="20" y="415" font-size="12" fill="#263238"><tspan font-weight="700" fill="#c62828">8</tspan> Last check näitab, mitu sekundit tagasi väärtus tuli. Värskenda lehte: kui number kasvab ja siis jälle väheneb, väärtus uueneb.</text>
+  <text x="450" y="458" text-anchor="middle" font-size="11" fill="#546e7a">Skeem, mitte ekraanipilt. Väärtused on illustratiivsed.</text>
+</svg>
