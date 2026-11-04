@@ -42,7 +42,7 @@ ls
     README.md  konf  logid  zabbix
     ```
 
-    `README.md`-sse kirjutad vastused, pealkirjad on juba olemas. Kaustas `konf/` on poolik playbook `agent.yml`, tõendid lähevad kausta `logid/`. Kaustas `zabbix/` on Zabbixi Compose'i fail neile, kellel Zabbix veel puudub.
+    `README.md`-sse kirjutad vastused, pealkirjad on juba olemas. Kaustas `konf/` on Ansible'i playbook'i algus `agent.yml`, tõendid lähevad kausta `logid/`. Kaustas `zabbix/` on Zabbixi Compose'i fail neile, kellel Zabbix veel puudub.
 
 Agent saadab andmed Zabbixi serverile. Seepärast peab Zabbix `proxmox1`-s töötama ja seal peavad olema hostid `proxmox2` ja `proxmox3`. Kontrolli seda ja jälgitavate masinate tulemüüri, sest osade 2 ja 4 katsed sõltuvad sellest:
 
@@ -97,9 +97,9 @@ ssh proxmox3 "sudo firewall-cmd --state"
 
     Teenuste hulgas peab olema `ssh`. Seejärel ava teine terminal ja kontrolli `ssh proxmox2 hostname`. Kui uus ühendus ei õnnestu, peata tulemüür avatud seansis (`sudo systemctl disable --now firewalld`) ja anna õpetajale teada.
 
-## Osa 2 · Agent playbook'iga kahes masinas
+## Osa 2 · Agent Ansible'i playbook'iga kahes masinas
 
-Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teeb selle playbook. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Iga järgmise ülesande juures on selgitus ja kood kokkuvolditud plokis: loe selgitus, kopeeri ülesanne faili kommentaariga märgitud kohta ja käivita playbook. Nii näed iga ülesande mõju eraldi.
+Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teed paigalduse Ansible'i playbook'iga: Ansible teeb samad sammud mõlemas masinas ja masina nimi tuleb muutujast. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Iga järgmise ülesande juures on selgitus ja kood kokkuvolditud plokis: loe selgitus, kopeeri ülesanne faili kommentaariga märgitud kohta ja käivita playbook. Nii näed iga ülesande mõju eraldi.
 
 Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=) käsitsi teeb: impordib allkirjavõtme, lisab Zabbix 7.0 hoidla, välistab EPEL-ist Zabbixi vanemad paketid, paigaldab `zabbix-agent2`, muudab seadeid, avab tulemüüris pordi ja käivitab teenuse. Uued moodulid on tabelis 4.5.
 
