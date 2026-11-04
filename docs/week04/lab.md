@@ -128,6 +128,61 @@ Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](h
   <figcaption>Joonis 4.9. Playbook'i käik. Seadete muutus teavitab handler'it, mis käivitub play lõpus (Talvik, 2026).</figcaption>
 </figure>
 
+### Kuhu mis läheb
+
+Starteri fail `konf/agent.yml` näeb välja nii. Read, mis algavad märgiga `# >>>`, näitavad, kuhu iga osa ülesanne läheb. Kui lisad ülesande, kirjuta see märgiga rea asemele ja jäta taane samaks nagu teistel ülesannetel (neli tühikut enne `- name:`).
+
+???+ example "Starteri fail konf/agent.yml"
+    ```yaml
+    # Zabbix agent 2 jälgitavatesse masinatesse.
+    # Koostad selle playbook'i ülesannete kaupa, juhend: praktikum 4, osa 2.
+    # Read, mis algavad märgiga # >>>, näitavad, kuhu iga osa ülesanne läheb.
+    # Käivitus: ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
+    - name: Zabbix agent 2 jälgitavatesse masinatesse
+      hosts: all
+      become: true
+      vars:
+        zabbix_server: "<TÄIDA: proxmox1 laborivõrgu IP-aadress>"
+      tasks:
+        - name: Zabbixi pakettide allkirjavõti
+          ansible.builtin.rpm_key:
+            key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-B5333005
+            state: present
+
+        # >>> Osa 2.2: lisa siia hoidla ülesanne
+
+        - name: Kas EPEL on olemas
+          ansible.builtin.stat:
+            path: /etc/yum.repos.d/epel.repo
+          register: epel
+
+        - name: EPEL ei paku Zabbixi pakette
+          ansible.builtin.lineinfile:
+            path: /etc/yum.repos.d/epel.repo
+            insertafter: '^\[epel\]'
+            line: excludepkgs=zabbix*
+          when: epel.stat.exists
+
+        # >>> Osa 2.4: lisa siia agendi paketi ülesanne
+
+        # >>> Osa 2.5: lisa siia agendi seadete ülesanne
+
+        # >>> Osa 2.6: lisa siia tulemüüri ja teenuse ülesanded
+
+      # >>> Osa 2.5: lisa siia handlers-plokk (taandega nagu tasks:)
+    ```
+
+| Osa | Mida lisad | Kuhu |
+|---|---|---|
+| 2.1 | `proxmox1` IP-aadress | rida `zabbix_server:` |
+| 2.2 | hoidla ülesanne | `# >>> Osa 2.2` |
+| 2.3 | midagi, loed läbi | EPEL-i ülesanded on olemas |
+| 2.4 | agendi paketi ülesanne | `# >>> Osa 2.4` |
+| 2.5 | seadete ülesanne ja handler | `# >>> Osa 2.5` (kaks kohta) |
+| 2.6 | tulemüüri ja teenuse ülesanded | `# >>> Osa 2.6` |
+
+Igas osas on näidislahendus kokkuvolditud plokis. Proovi kõigepealt ise, siis võrdle.
+
 ### 2.1 Play algus ja allkirjavõti
 
 Selles osas kirjutad faili ühe väärtuse, paigaldad vajadusel Ansible'i kollektsiooni ja käivitad playbook'i esimest korda. Starteri failis on play algus ja esimene ülesanne juba olemas, nii näed enne oma ülesannete kirjutamist, kuidas playbook töötab.
@@ -188,9 +243,11 @@ ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
 
 Agent ei ole AlmaLinuxi enda hoidlates, see tuleb Zabbixi hoidlast. Hoidla kirjelduse lisab masinasse pakett `zabbix-release`. Zabbixi juhend [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=) (Zabbix 7.0, Alma Linux 9, Agent 2) näitab selle paigaldamist käsuga `rpm -Uvh <aadress>`.
 
-Ülesanne kasutab moodulit `ansible.builtin.dnf`, mis oskab paketi paigaldada ka veebiaadressilt. `name` on paketi nimi või aadress, `state: present` tähendab, et pakett peab olema paigaldatud. Aadress on sama, mis juhendi käsus `rpm -Uvh`. Kopeeri ülesanne faili allkirjavõtme ülesande järele (kommentaari `# Osa 2.2` asemele):
+**Kuhu:** rea `# >>> Osa 2.2` asemele, allkirjavõtme ülesande järele.
 
-???+ example "Ülesanne: Zabbix 7.0 hoidla"
+Ülesanne kasutab moodulit `ansible.builtin.dnf`, mis oskab paketi paigaldada ka veebiaadressilt. `name` on paketi nimi või aadress, `state: present` tähendab, et pakett peab olema paigaldatud. Aadress on sama, mis juhendi käsus `rpm -Uvh`. Kirjuta ülesanne ise: nimi `Zabbix 7.0 hoidla`, moodul `ansible.builtin.dnf`, `name` on juhendist leitud aadress, `state: present`.
+
+??? example "Näidislahendus: Zabbix 7.0 hoidla"
     ```yaml
         - name: Zabbix 7.0 hoidla
           ansible.builtin.dnf:
@@ -205,7 +262,22 @@ Võrdle aadressi Zabbixi juhendi omaga ja käivita playbook. Kui hoidla pakett p
 
 ### 2.3 EPEL ilma Zabbixita
 
-Kui masinas on ka EPEL-i hoidla, pakub see Zabbixi vanemat versiooni ja `dnf` võib selle valida. Zabbixi juhend soovitab EPEL-i kirjeldusse lisada rea `excludepkgs=zabbix*`. Need kaks ülesannet on starteris olemas, sest need ei ole agendi paigalduse põhiosa. Loe need läbi: `stat` uurib, kas fail on olemas, `register` salvestab tulemuse muutujasse `epel` ja `when` jätab teise ülesande vahele, kui EPEL-i pole.
+Kui masinas on ka EPEL-i hoidla, pakub see Zabbixi vanemat versiooni ja `dnf` võib selle valida. Zabbixi juhend soovitab EPEL-i kirjeldusse lisada rea `excludepkgs=zabbix*`. Need kaks ülesannet on starteris olemas, sest need ei ole agendi paigalduse põhiosa. Loe need läbi: `stat` uurib, kas fail on olemas, `register` salvestab tulemuse muutujasse `epel` ja `when` jätab teise ülesande vahele, kui EPEL-i pole. Selles osas sa midagi ei lisa.
+
+???+ example "Starteris olemas: EPEL-i ülesanded"
+    ```yaml
+        - name: Kas EPEL on olemas
+          ansible.builtin.stat:
+            path: /etc/yum.repos.d/epel.repo
+          register: epel
+
+        - name: EPEL ei paku Zabbixi pakette
+          ansible.builtin.lineinfile:
+            path: /etc/yum.repos.d/epel.repo
+            insertafter: '^\[epel\]'
+            line: excludepkgs=zabbix*
+          when: epel.stat.exists
+    ```
 
 ??? tip "Vihje"
     `when: epel.stat.exists` kasutab eelmise ülesande tulemust: `register: epel` salvestas selle muutujasse `epel`. Kui masinas EPEL-it pole, on teine ülesanne `skipping`. See on õige.
@@ -214,12 +286,14 @@ Kui masinas on ka EPEL-i hoidla, pakub see Zabbixi vanemat versiooni ja `dnf` v�
 
 Eelmises osas kasutasid moodulit `ansible.builtin.dnf` hoidla paketi paigaldamiseks veebiaadressilt. Sama mooduliga saad paigaldada paketi ka nime järgi.
 
-Lisa EPEL-i ülesannete järele (kommentaari `# Osa 2.4–2.6` alla) ülesanne, mis tagab paketi olemasolu. Paketi nime leiad Zabbixi juhendi käsust `dnf install`. Anna ülesande nimeks `Agendi pakett`.
+**Kuhu:** rea `# >>> Osa 2.4` asemele, EPEL-i ülesannete järele.
+
+Lisa ülesanne, mis tagab paketi olemasolu. Paketi nime leiad Zabbixi juhendi käsust `dnf install`. Anna ülesande nimeks `Agendi pakett`.
 
 ??? tip "Vihje"
     Kasuta parameetreid `name` ja `state`. Erinevalt hoidla ülesandest on `name` väärtus paketi nimi, mitte veebiaadress.
 
-??? example "Näidislahendus"
+??? example "Näidislahendus: agendi pakett"
     ```yaml
         - name: Agendi pakett
           ansible.builtin.dnf:
@@ -253,7 +327,9 @@ Agendi konfiguratsioonifailis on vaikimisi `Server=127.0.0.1`, `ServerActive=127
         - { key: Server, value: "{{ zabbix_server }}" }
 ```
 
-See fragment muudab praegu ainult seadet `Server`. Kopeeri see paketi ülesande järele ja lisa loendisse ise:
+**Kuhu:** seadete ülesanne rea `# >>> Osa 2.5: … seadete ülesanne` asemele, handler faili lõppu rea `# >>> Osa 2.5: … handlers-plokk` asemele.
+
+See fragment muudab praegu ainult seadet `Server`. Kopeeri see ja lisa loendisse ise:
 
 - `ServerActive`, mille väärtus on samuti `zabbix_server`;
 - `Hostname`, mille väärtus tuleb muutujast `inventory_hostname`. See on nimi, mille kirjutad käsus `-i` järel, ja see peab olema sama mis veebiliideses **Host name**.
@@ -262,7 +338,7 @@ See fragment muudab praegu ainult seadet `Server`. Kopeeri see paketi ülesande 
 
 Agent loeb seaded ainult käivitumisel, seega pärast muudatust tuleb see taaskäivitada, aga ainult siis, kui fail muutus. Selleks on **handler**: ülesanne, mis käivitub ainult siis, kui mõni teine ülesanne teda võtmesõnaga `notify` teavitab. Teavitatud handler käivitub play lõpus.
 
-Lisa seadete ülesandele `notify: Taaskäivita agent`. Seejärel lisa faili lõppu (kommentaari `# Osa 2.5` asemele) plokk `handlers:` ühe handler'iga nimega `Taaskäivita agent`. See kasutab moodulit `ansible.builtin.service` teenusega `zabbix-agent2`. Millise `state` väärtusega teenus taaskäivitub? Leia see `ansible-doc ansible.builtin.service` väljundist. Lisa handler enne käivitamist, muidu annab `notify` vea.
+Lisa seadete ülesandele `notify: Taaskäivita agent`. Seejärel lisa faili lõppu plokk `handlers:` ühe handler'iga nimega `Taaskäivita agent`. See kasutab moodulit `ansible.builtin.service` teenusega `zabbix-agent2`. Millise `state` väärtusega teenus taaskäivitub? Leia see `ansible-doc ansible.builtin.service` väljundist. Lisa handler enne käivitamist, muidu annab `notify` vea.
 
 ??? tip "Vihje"
     `handlers:` on samal taandel kui `tasks:`, mitte ülesannete sees. Handler'i nimi peab olema täpselt sama mis `notify` väärtus, ka suur- ja väiketähed.
@@ -304,7 +380,9 @@ Leia, mida teeb `immediate` ja mis juhtub, kui on ainult `permanent: true`. Kirj
 ??? tip "Vihje: dokumentatsioon"
     Kirjuta `ansible-doc` väljundis `/immediate` ja vajuta **Enter**. Loe ka `permanent` kirjeldust: kumb muudab seadistust kohe, kumb alles pärast tulemüüri uuesti laadimist või taaskäivitust?
 
-Lisa seadete ülesande järele ülesanne nimega `Passiivse agendi port tulemüüris`, mis kasutab moodulit `ansible.posix.firewalld`. Nõuded: port `10050/tcp` on lubatud, seadistus kehtib kohe ja jääb alles ka pärast taaskäivitust.
+**Kuhu:** rea `# >>> Osa 2.6` asemele, seadete ülesande järele.
+
+Lisa ülesanne nimega `Passiivse agendi port tulemüüris`, mis kasutab moodulit `ansible.posix.firewalld`. Nõuded: port `10050/tcp` on lubatud, seadistus kehtib kohe ja jääb alles ka pärast taaskäivitust.
 
 Viimane ülesanne nimega `Agent töötab ja käivitub koos masinaga` kasutab moodulit `ansible.builtin.service`. Nõuded: teenus `zabbix-agent2` töötab ja käivitub koos masinaga. Leia `ansible-doc ansible.builtin.service` väljundist kaks parameetrit, mis seda ütlevad.
 
@@ -328,6 +406,74 @@ Viimane ülesanne nimega `Agent töötab ja käivitub koos masinaga` kasutab moo
     Kollektsioon puudub: paigalda see osa 2.1 käsuga. Kui viga on `firewalld is not running`, vaata osa 1 hoiatust tulemüüri kohta.
 
 ### 2.7 Kogu playbook
+
+Võrdle oma faili näidisega. Sinu IP-aadress on teine, muu peab olema sama, ka taane.
+
+??? example "Näidislahendus: kogu fail konf/agent.yml"
+    ```yaml
+    - name: Zabbix agent 2 jälgitavatesse masinatesse
+      hosts: all
+      become: true
+      vars:
+        zabbix_server: "192.168.35.11"   # sinu proxmox1 IP
+      tasks:
+        - name: Zabbixi pakettide allkirjavõti
+          ansible.builtin.rpm_key:
+            key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-B5333005
+            state: present
+
+        - name: Zabbix 7.0 repositoorium
+          ansible.builtin.dnf:
+            name: https://repo.zabbix.com/zabbix/7.0/alma/9/x86_64/zabbix-release-latest-7.0.el9.noarch.rpm
+            state: present
+
+        - name: Kas EPEL on olemas
+          ansible.builtin.stat:
+            path: /etc/yum.repos.d/epel.repo
+          register: epel
+
+        - name: EPEL ei paku Zabbixi pakette
+          ansible.builtin.lineinfile:
+            path: /etc/yum.repos.d/epel.repo
+            insertafter: '^\[epel\]'
+            line: excludepkgs=zabbix*
+          when: epel.stat.exists
+
+        - name: Agendi pakett
+          ansible.builtin.dnf:
+            name: zabbix-agent2
+            state: present
+
+        - name: Agendi seaded
+          ansible.builtin.lineinfile:
+            path: /etc/zabbix/zabbix_agent2.conf
+            regexp: "^{{ item.key }}="
+            line: "{{ item.key }}={{ item.value }}"
+          loop:
+            - { key: Server, value: "{{ zabbix_server }}" }
+            - { key: ServerActive, value: "{{ zabbix_server }}" }
+            - { key: Hostname, value: "{{ inventory_hostname }}" }
+          notify: Taaskäivita agent
+
+        - name: Passiivse agendi port tulemüüris
+          ansible.posix.firewalld:
+            port: 10050/tcp
+            permanent: true
+            immediate: true
+            state: enabled
+
+        - name: Agent töötab ja käivitub koos masinaga
+          ansible.builtin.service:
+            name: zabbix-agent2
+            state: started
+            enabled: true
+
+      handlers:
+        - name: Taaskäivita agent
+          ansible.builtin.service:
+            name: zabbix-agent2
+            state: restarted
+    ```
 
 Kontrolli süntaksit ja seda, et `<TÄIDA>` kohti pole alles:
 
