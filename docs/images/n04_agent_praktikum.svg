@@ -33,7 +33,7 @@
 
   <!-- server asks proxmox2 -->
   <line x1="325" y1="118" x2="555" y2="100" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#a4o)"/>
-  <text x="440" y="96" text-anchor="middle" font-size="12" fill="#e65100">server küsib agendi porti 10050</text>
+  <text x="440" y="96" text-anchor="middle" font-size="12" fill="#e65100">server küsib väärtusi (TCP 10050)</text>
   <!-- proxmox3 sends to server -->
   <line x1="555" y1="225" x2="330" y2="150" stroke="#00796b" stroke-width="2.5" marker-end="url(#a4g)"/>
   <text x="455" y="150" text-anchor="middle" font-size="12" fill="#004d40">agent saadab serveri porti 10051</text>

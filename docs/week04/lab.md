@@ -20,7 +20,7 @@ Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse m
     4. luua oma trigger'i ning tõendada probleemi tekkimist ja lahenemist.
 
 <figure markdown="span">
-  ![proxmox1-s Zabbix server ja veebiliides; server küsib proxmox2 agendilt porti 10050, proxmox3 agent saadab ise serveri porti 10051; sinu arvuti paigaldab agendid Ansible'iga](../images/n04_agent_praktikum.svg)
+  ![proxmox1-s Zabbix server ja veebiliides; server küsib proxmox2 agendilt väärtusi TCP-pordi 10050 kaudu, proxmox3 agent saadab ise serveri porti 10051; sinu arvuti paigaldab agendid Ansible'iga](../images/n04_agent_praktikum.svg)
   <figcaption>Joonis 4.8. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
 </figure>
 
@@ -66,18 +66,26 @@ ssh proxmox3 "sudo firewall-cmd --state"
 
     Kui kaustas on `.env` või volume'ide nimekirjas on `zbx-db`, on Zabbix varem paigaldatud: ära loo uut parooli, sest vana andmebaas ei avane uuega. Otsi üles oma N2 kaust või küsi õpetajalt. Kui mõlemad puuduvad, käivita Zabbix starteri failiga oma arvutist, repositooriumi kaustas:
 
+    **Oma arvutis:**
+
     ```bash
     ssh proxmox1 "mkdir -p ~/zabbix"
     scp zabbix/compose.yaml proxmox1:zabbix/
     ssh proxmox1
+    ```
+
+    **Nüüd töötad `proxmox1` terminalis.** Kui `cd` annab vea, ära käivita järgmisi käske:
+
+    ```bash
     cd ~/zabbix
     test -e .env || echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env
     docker compose up -d
     docker compose ps
-    exit
     ```
 
-    `test -e .env ||` loob parooli ainult siis, kui faili `.env` veel pole. Käsud `cd` kuni `docker compose ps` käivitad `proxmox1`-s, `exit` viib tagasi oma arvutisse.
+    `test -e .env ||` loob parooli ainult siis, kui faili `.env` veel pole.
+
+    **Naase oma arvutisse:** `exit`.
 
     Esimesel käivitusel loob server andmebaasi tabelid, see võtab 1–3 minutit. Oota, kuni `ssh proxmox1 "cd ~/zabbix && docker compose logs zabbix-server" | grep "server #0 started"` annab rea. Seejärel ava `http://<proxmox1-IP>:8080`, kasutaja on **Admin** ja parool **zabbix**.
 
@@ -99,7 +107,7 @@ ssh proxmox3 "sudo firewall-cmd --state"
 
 ## Osa 2 · Agent Ansible'i playbook'iga kahes masinas
 
-Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teed paigalduse Ansible'i playbook'iga: Ansible teeb samad sammud mõlemas masinas ja masina nimi tuleb muutujast. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Iga järgmise ülesande juures on selgitus ja kood kokkuvolditud plokis: loe selgitus, kopeeri ülesanne faili kommentaariga märgitud kohta ja käivita playbook. Nii näed iga ülesande mõju eraldi.
+Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teed paigalduse Ansible'i playbook'iga: Ansible teeb samad sammud mõlemas masinas ja masina nimi tuleb muutujast. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet. Iga sammu juures on selgitus ja ülesanne. Esimesed näited kopeerid faili kommentaariga märgitud kohta, järgmised koostad ise sama mustri järgi. Vajadusel ava näidislahendus. Käivita playbook pärast iga sammu ja uuri, milline ülesanne midagi muutis.
 
 Playbook teeb järjest seda, mida Zabbixi juhend [Download and install Zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=alma_linux&os_version=9&components=agent_2&db=&ws=) käsitsi teeb: impordib allkirjavõtme, lisab Zabbix 7.0 hoidla, välistab EPEL-ist Zabbixi vanemad paketid, paigaldab `zabbix-agent2`, muudab seadeid, avab tulemüüris pordi ja käivitab teenuse. Uued moodulid on tabelis 4.5.
 
@@ -139,7 +147,25 @@ See ülesanne on starteri failis juba olemas. Vaata see läbi:
 `state: present` tähendab soovitud olekut: võti peab olemas olema. Kui see juba on, ei tee Ansible midagi.
 
 ??? tip "Vihje"
-    YAML-is loeb taane: kõik ülesanded algavad sama arvu tühikutega ja `- name:` on täpselt `tasks:` all. Kui `ansible-playbook` annab vea `mapping values are not allowed here`, kontrolli taanet ja koolonit pärast võtit. VS Code näitab taandeid, kui valid **View → Render Whitespace**.
+    YAML-is loeb taane. `tasks:` ja `handlers:` on samal taandel, nende loendite elemendid (`- name:`) algavad ühe taandetaseme võrra sügavamalt. Taande illustratsioon, mitte faili lisatav ülesanne:
+
+    ```yaml
+    - name: Näidisplay
+      hosts: all
+      become: true
+
+      tasks:
+        - name: Näidisülesanne
+          ansible.builtin.debug:
+            msg: "Ülesanne on tasks-loendi sees"
+
+      handlers:
+        - name: Näidishandler
+          ansible.builtin.debug:
+            msg: "Handler on handlers-loendi sees"
+    ```
+
+    Kui `ansible-playbook` annab vea `mapping values are not allowed here`, kontrolli taanet ja koolonit pärast võtit. VS Code näitab taandeid, kui valid **View → Render Whitespace**.
 
 Moodul `ansible.posix.firewalld`, mida vajad hiljem, on kollektsioonis `ansible.posix`, mis ei kuulu `ansible-core` koosseisu. Kontrolli, kas see on olemas, ja paigalda vajadusel:
 
@@ -156,7 +182,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
 ```
 
 ??? success "Oodatav tulemus"
-    Kui võtit masinas polnud, on ülesanne `changed`, kui see oli juba olemas (näiteks varasemast katsest), on see `ok`. Käivita uuesti: nüüd on see kindlasti `ok`.
+    Kui võtit masinas polnud, on ülesanne `changed`, kui see oli juba olemas (näiteks varasemast katsest), on see `ok`. Käivita uuesti: kui võti on alles ja ülesanne õnnestub, on see nüüd `ok`.
 
 ### 2.2 Zabbixi hoidla
 
@@ -172,10 +198,10 @@ Agent ei ole AlmaLinuxi enda hoidlates, see tuleb Zabbixi hoidlast. Hoidla kirje
             state: present
     ```
 
-Võrdle aadressi Zabbixi juhendi omaga ja käivita playbook. Uus ülesanne on `changed`, allkirjavõtme ülesanne `ok`.
+Võrdle aadressi Zabbixi juhendi omaga ja käivita playbook. Kui hoidla pakett puudus, on uus ülesanne `changed`, allkirjavõtme ülesanne `ok`.
 
 ??? tip "Vihje"
-    Ülesanne tuleb allkirjavõtme ülesande järele, sest `dnf` kontrollib hoidla paketi allkirja. Kui näed viga `Failed to validate GPG signature`, on järjekord vale. Kontrolli masinas, et hoidla on lisatud: `ssh proxmox2 "dnf repolist | grep -i zabbix"`.
+    Ülesanne tuleb allkirjavõtme ülesande järele, sest `dnf` kontrollib hoidla paketi allkirja. Kui näed viga `Failed to validate GPG signature`, kontrolli kõigepealt ülesannete järjekorda. Kontrolli masinas, et hoidla on lisatud: `ssh proxmox2 "dnf repolist | grep -i zabbix"`.
 
 ### 2.3 EPEL ilma Zabbixita
 
@@ -434,7 +460,9 @@ Passiivne agent vajab avatud porti 10050, aktiivne ei vaja. Kontrolli seda katse
 ansible all -i proxmox2,proxmox3, -b -m ansible.builtin.command -a "firewall-cmd --remove-port=10050/tcp"
 ```
 
-Oota 4–5 minutit. Ootamise ajal kirjuta README-sse oma ennustus ja vaata loengust üle ühendussuunad. Osa 5 alusta alles siis, kui oled pordi playbook'iga taastanud ja näed, et `proxmox2` väärtused uuenevad jälle. Siis vaata **Data collection → Hosts** ja **Monitoring → Problems**.
+Oota 4–5 minutit. Ootamise ajal vaata loengust üle ühendussuunad. Seejärel kontrolli vaadetes **Data collection → Hosts**, **Monitoring → Problems** ja **Latest data**, kuidas katse mõjutas mõlemat hosti, ja võrdle tulemust oma ennustusega.
+
+Alles pärast vaatlust taasta port allpool oleva playbook'i käsuga. Osa 5 alusta siis, kui `proxmox2` väärtused jälle uuenevad.
 
 ??? success "Oodatav tulemus"
 
@@ -514,7 +542,7 @@ Selleks, et probleem tekiks, peab vaba ruumi olema alla 20%. `fallocate` loob fa
   <figcaption>Joonis 4.14. Kettakatse ajajoon. Pane kellaajad kirja, et neid hiljem tabeli algus- ja lahenemisajaga võrrelda (Talvik, 2026).</figcaption>
 </figure>
 
-Enne täitmist kontrolli lähteolekut. Sinu trigger peab olema olekus OK (**Monitoring → Problems** all teda pole) ja katsefaili `/ketas-tais` ei tohi olla. Logi sisse ja arvuta, kui suur fail jätab vabaks umbes 15%:
+Enne täitmist kontrolli lähteolekut. Sinu item'il peab olema värske väärtus (**Latest data**, veerg **Last check**), vaba ruumi üle 20% ja trigger olekus OK. Probleemi puudumine vaates **Problems** üksi ei ole piisav eelkontroll. Katsefaili `/ketas-tais` ei tohi olla. Logi sisse ja arvuta, kui suur fail jätab vabaks umbes 15%:
 
 ```bash
 ssh proxmox2
@@ -522,14 +550,14 @@ ls -l /ketas-tais
 df -h /
 vaba=$(df --output=avail -B1 / | tail -1); kokku=$(df --output=size -B1 / | tail -1)
 taida=$(( vaba - kokku * 15 / 100 ))
-echo "Täidan $(( taida / 1024 / 1024 )) MB"
+echo "Reserveerin $(( taida / 1024 / 1024 )) MiB"
 ```
 
 ??? success "Oodatav tulemus"
     `ls` ütleb `No such file or directory`. `echo` näitab positiivset arvu, laborimasinas mõni tuhat megabaiti.
 
 !!! warning "Katse vähendab juurfailisüsteemi vaba ruumi"
-    Tee katse ainult oma `proxmox2`-s. Kui vaba ruumi on vähe, ei saa teised programmid selles masinas faile kirjutada. Ära jätka, kui `/ketas-tais` on juba olemas, kui `echo` näitas negatiivset arvu või kui arv on üle 20 000 MB. Kui katse katkeb, kustuta ainult see fail: `sudo rm /ketas-tais`.
+    Tee katse ainult oma `proxmox2`-s. Kui vaba ruumi on vähe, ei saa teised programmid selles masinas faile kirjutada. Ära jätka, kui `/ketas-tais` on juba olemas, kui `echo` näitas nulli või negatiivset arvu või kui arv on üle 20 000 MiB. Kui katse katkeb, kustuta ainult see fail: `sudo rm /ketas-tais`.
 
 Pane kellaaeg kirja ja täida ketas:
 
@@ -589,9 +617,9 @@ cat logid/a5-andmebaas.txt
 ??? note "Kontrollnimekiri"
     - [ ] Mõlema masina agenditeenus töötab.
     - [ ] Mõlema hosti mõõteväärtused uuenevad.
-    - [ ] Tulemüüri katse muudatus on playbook'iga taastatud.
+    - [ ] Tulemüürikatse muudatus on playbook'iga taastatud.
     - [ ] Katsefail `/ketas-tais` on eemaldatud.
-    - [ ] Sinu kettaruumi trigger ei ole probleemi olekus.
+    - [ ] Sinu kettaruumi trigger on olekus OK.
     - [ ] Kolm tõendifaili on olemas ja nende sisu on kontrollitud.
     - [ ] README-s on ennustused, tulemuste võrdlused ja vastused.
 
