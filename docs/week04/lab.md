@@ -24,7 +24,7 @@ Täna paigaldad Zabbix agent 2 Ansible'i playbook'iga mõlemasse jälgitavasse m
   <figcaption>Joonis 4.8. Praktikumi ülesehitus. `proxmox2` on passiivne ja `proxmox3` aktiivne agent (Talvik, 2026).</figcaption>
 </figure>
 
-Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Vastus on kokkuvolditud plokis.
+Plokk **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Vastus on kokkuvolditud plokis.
 
 ## Osa 1 · Repositoorium ja Zabbix
 
@@ -121,14 +121,20 @@ Ava `konf/agent.yml` VS Code'is. Faili alguses on play: `hosts: all` tähendab k
 
 Esimene ülesanne impordib Zabbixi allkirjavõtme. Ilma selleta keeldub `dnf` Zabbixi hoidla pakette paigaldamast, sest ei saa kontrollida, et need tulevad Zabbixilt. Iga ülesanne on samal kujul: `name` ütleb inimesele, mida see teeb, järgmine rida on mooduli nimi ja selle all mooduli parameetrid.
 
-```yaml
-    - name: Zabbixi pakettide allkirjavõti
-      ansible.builtin.rpm_key:
-        key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-B5333005
-        state: present
-```
+See ülesanne on starteri failis juba olemas. Vaata see läbi:
+
+??? example "Ülesanne: Zabbixi pakettide allkirjavõti"
+    ```yaml
+        - name: Zabbixi pakettide allkirjavõti
+          ansible.builtin.rpm_key:
+            key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-B5333005
+            state: present
+    ```
 
 `state: present` tähendab soovitud olekut: võti peab olemas olema. Kui see juba on, ei tee Ansible midagi.
+
+??? tip "Vihje"
+    YAML-is loeb taane: kõik ülesanded algavad sama arvu tühikutega ja `- name:` on täpselt `tasks:` all. Kui `ansible-playbook` annab vea `mapping values are not allowed here`, kontrolli taanet ja koolonit pärast võtit. VS Code näitab taandeid, kui valid **View → Render Whitespace**.
 
 Moodul `ansible.posix.firewalld`, mida vajad hiljem, on kollektsioonis `ansible.posix`, mis ei kuulu `ansible-core` koosseisu. Kontrolli, kas see on olemas, ja paigalda vajadusel:
 
@@ -137,7 +143,8 @@ ansible-galaxy collection list ansible.posix
 ansible-galaxy collection install ansible.posix
 ```
 
-**Ennusta:** Zabbixi agenti pole kummaski masinas. Mis olekus on esimene ülesanne mõlemas masinas, `ok` või `changed`?
+??? question "Ennusta"
+    Zabbixi agenti pole kummaski masinas. Mis olekus on esimene ülesanne mõlemas masinas, `ok` või `changed`?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
@@ -162,9 +169,15 @@ Agent ei ole AlmaLinuxi enda hoidlates, see tuleb Zabbixi hoidlast. Hoidla kirje
 
 Võrdle aadressi Zabbixi juhendi omaga ja käivita playbook. Uus ülesanne on `changed`, allkirjavõtme ülesanne `ok`.
 
+??? tip "Vihje"
+    Ülesanne tuleb allkirjavõtme ülesande järele, sest `dnf` kontrollib hoidla paketi allkirja. Kui näed viga `Failed to validate GPG signature`, on järjekord vale. Kontrolli masinas, et hoidla on lisatud: `ssh proxmox2 "dnf repolist | grep -i zabbix"`.
+
 ### 2.3 EPEL ilma Zabbixita
 
 Kui masinas on ka EPEL-i hoidla, pakub see Zabbixi vanemat versiooni ja `dnf` võib selle valida. Zabbixi juhend soovitab EPEL-i kirjeldusse lisada rea `excludepkgs=zabbix*`. Need kaks ülesannet on starteris olemas, sest need ei ole agendi paigalduse põhiosa. Loe need läbi: `stat` uurib, kas fail on olemas, `register` salvestab tulemuse muutujasse `epel` ja `when` jätab teise ülesande vahele, kui EPEL-i pole.
+
+??? tip "Vihje"
+    `when: epel.stat.exists` kasutab eelmise ülesande tulemust: `register: epel` salvestas selle muutujasse `epel`. Kui masinas EPEL-it pole, on teine ülesanne `skipping`. See on õige.
 
 ### 2.4 Agendi pakett
 
@@ -186,6 +199,9 @@ ssh proxmox2 "rpm -q zabbix-agent2"
 
 ??? success "Oodatav tulemus"
     `zabbix-agent2-7.0.…` Kui versioon algab `6.`, tuli pakett EPEL-ist: kontrolli osa 2.3 ülesandeid.
+
+??? tip "Vihje"
+    Kui `rpm -q` ütleb `package zabbix-agent2 is not installed`, vaata playbook'i väljundist, kas ülesanne *Agendi pakett* oli `ok`, `changed` või `failed`. `failed` puhul on veateade kohe ülesande all.
 
 ### 2.5 Agendi seaded ja handler
 
@@ -234,6 +250,9 @@ Handler'id on play lõpus eraldi plokis `handlers:`, samal taandel kui `tasks:`.
 
 Käivita playbook ja kontrolli masinas, et seaded muutusid: `ssh proxmox2 "sudo grep -E '^(Server|ServerActive|Hostname)=' /etc/zabbix/zabbix_agent2.conf"`.
 
+??? tip "Vihje"
+    `handlers:` on samal taandel kui `tasks:`, mitte ülesannete sees. Handler'i nimi peab olema täpselt sama mis `notify` väärtus, ka suur- ja väiketähed. Kui handler ei käivitu, võrdle neid kahte rida.
+
 ### 2.6 Tulemüür ja teenus
 
 Passiivse kontrolli jaoks peab jälgitavas masinas olema port 10050 lahti. Uuri moodulit:
@@ -268,6 +287,9 @@ Viimane ülesanne tagab, et agent töötab (`state: started`) ja käivitub koos 
             enabled: true
     ```
 
+??? tip "Vihje"
+    Kui ülesanne *Passiivse agendi port tulemüüris* annab vea `couldn't resolve module/action 'ansible.posix.firewalld'`, puudub kollektsioon: paigalda see osa 2.1 käsuga. Kui viga on `firewalld is not running`, vaata osa 1 hoiatust tulemüüri kohta.
+
 ### 2.7 Kogu playbook
 
 Kontrolli süntaksit ja seda, et `<TÄIDA>` kohti pole alles:
@@ -280,7 +302,8 @@ grep -n "TÄIDA" konf/agent.yml
 ??? success "Oodatav tulemus"
     Esimene käsk väljastab `playbook: konf/agent.yml`. `grep` ei leia midagi.
 
-**Ennusta:** lisasid seadete, tulemüüri ja teenuse ülesanded. Millised ülesanded on nüüd `changed`? Kas handler käivitub?
+??? question "Ennusta"
+    lisasid seadete, tulemüüri ja teenuse ülesanded. Millised ülesanded on nüüd `changed`? Kas handler käivitub?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
@@ -295,7 +318,8 @@ ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
 ??? warning "Kui agendi versioon algab `6.`"
     Pakett tuli EPEL-ist. Kontrolli `ssh proxmox2 "grep excludepkgs /etc/yum.repos.d/epel.repo"`: rida peab olema sektsioonis `[epel]`.
 
-**Ennusta:** esimene käivitus lõppes edukalt ja masinaid pole vahepeal muudetud. Mida näitab `PLAY RECAP` teisel käivitusel? Kas handler käivitub uuesti?
+??? question "Ennusta"
+    esimene käivitus lõppes edukalt ja masinaid pole vahepeal muudetud. Mida näitab `PLAY RECAP` teisel käivitusel? Kas handler käivitub uuesti?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml | tee logid/a2-teine-kaivitus.txt
@@ -387,7 +411,8 @@ ssh proxmox2 "sudo zabbix_agent2 -t 'vm.memory.size[available]'"
 
 Passiivne agent vajab avatud porti 10050, aktiivne ei vaja. Kontrolli seda katsega. Järgmine käsk eemaldab tulemüüri vaiketsoonist pordi 10050 lubava kirje, mille playbook lisas. Muudatus kehtib ainult praeguseks, `--permanent` seadet see ei muuda.
 
-**Ennusta:** kumma hosti item'ite väärtused lakkavad uuenemast?
+??? question "Ennusta"
+    kumma hosti item'ite väärtused lakkavad uuenemast?
 
 ```bash
 ansible all -i proxmox2,proxmox3, -b -m ansible.builtin.command -a "firewall-cmd --remove-port=10050/tcp"
@@ -406,7 +431,8 @@ Masina tegelik olek erineb nüüd sellest, mida playbook kirjeldab. **Triiv** (c
   <figcaption>Joonis 4.10. Käsitsi muudatus tekitab triivi, playbook'i uus käivitus parandab ainult erinevuse (Talvik, 2026).</figcaption>
 </figure>
 
-**Ennusta:** mida teeb playbook, kui käivitad selle nüüd uuesti?
+??? question "Ennusta"
+    mida teeb playbook, kui käivitad selle nüüd uuesti?
 
 ```bash
 ansible-playbook -i proxmox2,proxmox3, konf/agent.yml
@@ -429,6 +455,11 @@ Template'is on ketta trigger'id juba olemas, aga nende piiri ja raskusastme on v
 
 Ühel hostil peab item'i võti olema unikaalne. Otsi enne **Data collection → Hosts → proxmox2 → Items** filtris **Key** väärtust `vfs.fs.size[/,pfree]`. Kui see on juba olemas, kasuta seda ja ära loo teist.
 
+<figure markdown="span">
+  ![Zabbixi veebiliidese skeem: vasakul menüü Data collection ja Hosts, hostide tabelis proxmox2 rea link Items, üleval paremal nupp Create item ja vorm väljadega Name, Type, Key, Type of information, Units, Update interval](../images/n04_zabbix_item.svg)
+  <figcaption>Joonis 4.11. Kust leiad item'i loomise: 1 Hosts, 2 Items, 3 Create item, 4 vorm, 5 Add (Talvik, 2026).</figcaption>
+</figure>
+
 **Data collection → Hosts → proxmox2 → Items → Create item** ([Item'i loomine](https://www.zabbix.com/documentation/7.0/en/manual/config/items/item)):
 
 - **Name:** `Vaba kettaruum /`
@@ -443,6 +474,11 @@ Template'is on ketta trigger'id juba olemas, aga nende piiri ja raskusastme on v
     Vii hiir punase ikooni kohale ja loe veateadet. Põhjus võib olla vale võti, aga ka viga väärtuse kogumisel. Kontrolli võtit masina seest: `sudo zabbix_agent2 -t '<võti>'`.
 
 ### 5.2 Trigger
+
+<figure markdown="span">
+  ![Zabbixi veebiliidese skeem: hostide tabelis proxmox2 rea link Triggers, nupp Create trigger ja vorm väljadega Name, Severity, Expression](../images/n04_zabbix_trigger.svg)
+  <figcaption>Joonis 4.12. Kust leiad trigger'i loomise: Hosts, Triggers, Create trigger ja vorm (Talvik, 2026).</figcaption>
+</figure>
 
 **Data collection → Hosts → proxmox2 → Triggers → Create trigger** ([Trigger'i loomine](https://www.zabbix.com/documentation/7.0/en/manual/config/triggers/trigger)):
 
@@ -459,7 +495,7 @@ Selleks, et probleem tekiks, peab vaba ruumi olema alla 20%. `fallocate` loob fa
 
 <figure markdown="span">
   ![Ajajoon: date ja fallocate, item toob uue väärtuse, tekib PROBLEM; date ja rm, item toob uue väärtuse, probleem RESOLVED](../images/n04_ketta_katse.svg)
-  <figcaption>Joonis 4.11. Kettakatse ajajoon. Pane kellaajad kirja, et neid hiljem tabeli algus- ja lahenemisajaga võrrelda (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 4.13. Kettakatse ajajoon. Pane kellaajad kirja, et neid hiljem tabeli algus- ja lahenemisajaga võrrelda (Talvik, 2026).</figcaption>
 </figure>
 
 Enne täitmist kontrolli lähteolekut. Sinu trigger peab olema olekus OK (**Monitoring → Problems** all teda pole) ja katsefaili `/ketas-tais` ei tohi olla. Logi sisse ja arvuta, kui suur fail jätab vabaks umbes 15%:
@@ -490,7 +526,8 @@ df -h /
 ??? success "Oodatav tulemus"
     `df` näitab veerus `Use%` umbes 85%. Kirjuta `date` kellaaeg README-sse, seda on vaja osa 5 küsimuse jaoks.
 
-**Ennusta:** item'i intervall on 30 sekundit. Millal ilmub probleem **Monitoring → Problems** alla?
+??? question "Ennusta"
+    item'i intervall on 30 sekundit. Millal ilmub probleem **Monitoring → Problems** alla?
 
 Ava **Monitoring → Problems** ja oota.
 
@@ -531,7 +568,7 @@ cat logid/a5-andmebaas.txt
 **Küsimus (README):** mitu minutit kulus täitmisest probleemini ja kustutamisest lahenemiseni? Võrdle oma `date` kellaaegu tabeli veergudega `algas` ja `lahenes`. Miks see ei juhtunud kohe?
 
 ??? tip "Vihje"
-    Viivitus koosneb kahest osast: millal item toob järgmise väärtuse (**Update interval**) ja millal trigger seda hindab. Võrdle oma kellaaegu joonisega 4.11.
+    Viivitus koosneb kahest osast: millal item toob järgmise väärtuse (**Update interval**) ja millal trigger seda hindab. Võrdle oma kellaaegu joonisega 4.13.
 
 ## Töö esitamine
 

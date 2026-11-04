@@ -1,0 +1,41 @@
+<svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs><marker id="k1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#c62828"/></marker></defs>
+  <rect width="900" height="520" fill="#ffffff"/>
+  <text x="450" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#263238">Kust leiad item'i loomise (Zabbix 7.0 veebiliides, skeem)</text>
+  <rect x="10" y="40" width="170" height="460" fill="#1f2c33"/>
+  <text x="25" y="68" font-size="15" font-weight="700" fill="#ffffff">ZABBIX</text>
+  <g font-size="12" fill="#c5d0d5"><text x="25" y="102">Dashboards</text><text x="25" y="126">Monitoring</text><text x="25" y="150">Services</text><text x="25" y="174">Inventory</text><text x="25" y="198">Reports</text></g>
+  <rect x="15" y="210" width="160" height="26" rx="3" fill="#2f4550"/><text x="25" y="228" font-size="12" font-weight="700" fill="#ffffff">Data collection</text>
+  <text x="38" y="254" font-size="12" fill="#c5d0d5">Template groups</text>
+  <text x="38" y="276" font-size="12" fill="#c5d0d5">Host groups</text>
+  <text x="38" y="298" font-size="12" fill="#c5d0d5">Templates</text>
+  <rect x="30" y="306" width="140" height="22" rx="3" fill="#ffebee" stroke="#c62828" stroke-width="2"/><text x="38" y="322" font-size="12" font-weight="700" fill="#c62828">Hosts</text>
+  <circle cx="160" cy="317" r="10" fill="#c62828"/><text x="160" y="321" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">1</text>
+  <text x="200" y="68" font-size="15" font-weight="700" fill="#263238">Hosts</text>
+  <rect x="200" y="80" width="680" height="28" fill="#eceff1"/>
+  <g font-size="11" font-weight="700" fill="#37474f"><text x="210" y="98">Name</text><text x="330" y="98">Items</text><text x="400" y="98">Triggers</text><text x="480" y="98">Graphs</text><text x="560" y="98">Interface</text><text x="700" y="98">Templates</text></g>
+  <rect x="200" y="108" width="680" height="28" fill="#ffffff" stroke="#eceff1"/>
+  <g font-size="12"><text x="210" y="127" fill="#1565c0">proxmox2</text><rect x="324" y="113" width="52" height="20" rx="3" fill="#ffebee" stroke="#c62828" stroke-width="2"/><text x="330" y="127" fill="#1565c0">Items 72</text><text x="400" y="127" fill="#1565c0">Triggers 30</text><text x="480" y="127" fill="#1565c0">Graphs</text><text x="560" y="127" fill="#263238">192.168.35.12:10050</text><text x="700" y="127" fill="#263238">Linux by Zabbix agent</text></g>
+  <circle cx="386" cy="113" r="10" fill="#c62828"/><text x="386" y="117" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">2</text>
+  <rect x="200" y="136" width="680" height="28" fill="#ffffff" stroke="#eceff1"/>
+  <g font-size="12"><text x="210" y="155" fill="#1565c0">proxmox3</text><text x="330" y="155" fill="#1565c0">Items 72</text><text x="400" y="155" fill="#1565c0">Triggers 30</text></g>
+  <text x="200" y="196" font-size="15" font-weight="700" fill="#263238">Items · proxmox2</text>
+  <rect x="770" y="180" width="110" height="28" rx="4" fill="#ffebee" stroke="#c62828" stroke-width="2"/><text x="825" y="199" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">Create item</text>
+  <circle cx="770" cy="180" r="10" fill="#c62828"/><text x="770" y="184" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3</text>
+  <text x="200" y="222" font-size="11" fill="#546e7a">Filtri väljal Key otsi enne vfs.fs.size: kui item on juba olemas, ära loo teist.</text>
+  <rect x="200" y="235" width="680" height="245" rx="6" fill="#fafafa" stroke="#b0bec5"/>
+  <text x="215" y="258" font-size="13" font-weight="700" fill="#263238">Item (vorm)</text>
+  <circle cx="860" cy="250" r="10" fill="#c62828"/><text x="860" y="254" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">4</text>
+  <g font-size="12">
+    <text x="300" y="288" text-anchor="end" fill="#37474f">* Name</text><rect x="310" y="274" width="300" height="22" fill="#fff" stroke="#b0bec5"/><text x="318" y="290" fill="#263238">Vaba kettaruum /</text>
+    <text x="300" y="318" text-anchor="end" fill="#37474f">Type</text><rect x="310" y="304" width="200" height="22" fill="#fff" stroke="#b0bec5"/><text x="318" y="320" fill="#263238">Zabbix agent ▾</text>
+    <text x="300" y="348" text-anchor="end" fill="#37474f">* Key</text><rect x="310" y="334" width="300" height="22" fill="#fff" stroke="#b0bec5"/><text x="318" y="350" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">vfs.fs.size[/,pfree]</text><rect x="616" y="334" width="60" height="22" fill="#eceff1" stroke="#b0bec5"/><text x="646" y="350" text-anchor="middle" fill="#37474f">Select</text>
+    <text x="300" y="378" text-anchor="end" fill="#37474f">Type of information</text><rect x="310" y="364" width="200" height="22" fill="#fff" stroke="#b0bec5"/><text x="318" y="380" fill="#263238">Numeric (float) ▾</text>
+    <text x="300" y="408" text-anchor="end" fill="#37474f">Units</text><rect x="310" y="394" width="100" height="22" fill="#fff" stroke="#b0bec5"/><text x="318" y="410" fill="#263238">%</text>
+    <text x="300" y="438" text-anchor="end" fill="#37474f">Update interval</text><rect x="310" y="424" width="100" height="22" fill="#fff" stroke="#b0bec5"/><text x="318" y="440" fill="#263238">30s</text>
+    <rect x="310" y="452" width="60" height="22" rx="3" fill="#1565c0"/><text x="340" y="467" text-anchor="middle" fill="#fff" font-weight="700">Add</text>
+    <circle cx="384" cy="463" r="10" fill="#c62828"/><text x="384" y="467" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">5</text>
+  </g>
+  <text x="700" y="320" font-size="11" fill="#546e7a">Ülejäänud väljad</text><text x="700" y="336" font-size="11" fill="#546e7a">jäävad vaikimisi.</text>
+  <text x="450" y="512" text-anchor="middle" font-size="11" fill="#546e7a">Skeem, mitte ekraanipilt: veebiliides võib välja näha veidi teisiti, nupud ja väljad on samade nimedega.</text>
+</svg>
