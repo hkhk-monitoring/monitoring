@@ -16,7 +16,7 @@
   <rect x="45" y="100" width="250" height="80" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
   <text x="170" y="130" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Prometheus</text>
   <text x="170" y="152" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">veebiliides 9090/tcp</text>
-  <text x="170" y="168" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">~/prometheus/prometheus.yml</text>
+  <text x="170" y="168" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">~/prometheus/config/prometheus.yml</text>
   <text x="170" y="210" text-anchor="middle" font-size="11" fill="#5d4037">Zabbix on peatatud (docker compose stop)</text>
   <rect x="590" y="60" width="290" height="100" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
   <text x="735" y="86" text-anchor="middle" font-size="15" font-weight="700" fill="#004d40">proxmox2</text>
