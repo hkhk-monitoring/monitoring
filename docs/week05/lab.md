@@ -36,7 +36,7 @@ Töötad neljas kohas. Kasutatavad versioonid on node_exporter 1.12.1 ja Prometh
     |---|---|---|---|
     | Sinu arvuti | repositoorium, Ansible | kirjutad playbook'i ja seaded, käivitad `ansible-playbook`, salvestad tõendid | Ansible ja kollektsioon `ansible.posix` |
     | `proxmox1` | Prometheus (Docker Compose) | käivitad Prometheuse | Docker ja Docker Compose töötavad |
-    | `proxmox2`, `proxmox3` | node_exporter (systemd teenus) | paigaldad node_exporteri, `proxmox2`-s esmalt käsitsi | AlmaLinux 9, tulemüür `firewalld` töötab |
+    | `proxmox2`, `proxmox3` | node_exporter (systemd teenus) | paigaldad node_exporteri, `proxmox2`-s esmalt käsitsi | AlmaLinux 9 |
     | Brauser | Prometheuse veebiliides | vaatad Targets-lehte ja kirjutad päringuid | koolis laborivõrk, kodust VPN |
 
 Kontrolli eeltingimusi oma arvutist:
@@ -44,11 +44,10 @@ Kontrolli eeltingimusi oma arvutist:
 ```bash
 ansible-galaxy collection list ansible.posix
 ssh proxmox1 "docker compose version"
-for h in proxmox2 proxmox3; do ssh $h "sudo firewall-cmd --state; sudo firewall-cmd --get-default-zone"; done
 ```
 
 ??? success "Oodatav tulemus"
-    Kollektsiooni `ansible.posix` rida, Docker Compose'i versioon ning mõlema masina kohta `running` ja vaiketsoon (tavaliselt `public`). Kui kollektsioon puudub, paigalda see: `ansible-galaxy collection install ansible.posix`.
+    Kollektsiooni `ansible.posix` rida ja Docker Compose'i versioon. Kui kollektsioon puudub, paigalda see: `ansible-galaxy collection install ansible.posix`.
 
 Prometheuse veebiliides ja API on autentimiseta: igaüks, kes pordini 9090 jõuab, näeb kõiki andmeid. Ära ava neid internetti. Praktikumis kasutad neid ainult laborivõrgus, kodust VPN-iga.
 
@@ -193,28 +192,12 @@ curl -s localhost:9100/metrics | grep '^node_memory_MemAvailable_bytes'
 ??? warning "Kui `systemctl status node_exporter` näitab `status=203/EXEC`"
     systemd ei saa programmi käivitada. Kontrolli SELinuxi silti: `ls -Z /usr/local/bin/node_exporter`. Kui seal on `user_tmp_t`, paranda: `sudo restorecon -v /usr/local/bin/node_exporter`.
 
-??? question "Ennusta"
-    Kas `proxmox1` saab praegu `proxmox2` pordist 9100 mõõdikuid lugeda? Kirjuta ennustus README jaotisse **Osa 2** ja kontrolli `proxmox1`-st. Bash avab TCP-ühenduse aadressile `/dev/tcp/<IP>/<port>`:
+Prometheus küsib mõõdikuid `proxmox1`-st, seega peab port 9100 jälgitavas masinas lahti olema. Ava see tulemüüris:
 
 ```bash
 exit
-ssh proxmox1 "timeout 3 bash -c '</dev/tcp/<proxmox2-IP>/9100' && echo lahti || echo kinni"
+ssh proxmox2 "sudo firewall-cmd --permanent --add-port=9100/tcp && sudo firewall-cmd --reload"
 ```
-
-??? success "Oodatav tulemus"
-    `kinni`: `proxmox1`-st ei õnnestunud TCP-ühendus. Põhjus võib olla tulemüür, vale IP-aadress või teenus, mis ei kuula. node_exporter kuulab (`curl localhost:9100` töötas), seega kontrolli tulemüüri:
-
-    ```bash
-    ssh proxmox2 "sudo firewall-cmd --state; sudo firewall-cmd --list-ports"
-    ```
-
-    `running` ja port 9100 nimekirjas puudub: tulemüür ei luba seda. Pull-mudelis alustab ühendust server, seega peab port olema lahti jälgitavas masinas. Ava port vaiketsoonis ja kontrolli uuesti:
-
-    ```bash
-    ssh proxmox2 "sudo firewall-cmd --permanent --add-port=9100/tcp && sudo firewall-cmd --reload"
-    ```
-
-    Nüüd annab kontroll `lahti`. Kui kontroll andis `lahti` juba enne pordi avamist, kontrolli `sudo firewall-cmd --state`, aktiivset tsooni ja olemasolevaid reegleid (`--list-all`). Ühenduse õnnestumisest üksi ei saa järeldada, et tulemüür ei tööta.
 
 ## Osa 3 · Mida /metrics sisaldab
 
@@ -402,19 +385,17 @@ Käivita playbook.
 ??? success "Oodatav tulemus"
     `proxmox3`-s on unit-fail `changed` ja play lõpus käivitub handler. `proxmox2`-s on unit-fail `ok` ja handler ei käivitu, kui sisu on täpselt sama mis osas 2. Kui see on `changed`, erines sisu millegi poolest: võrdle `ssh proxmox2 cat /etc/systemd/system/node_exporter.service` oma playbook'iga.
 
-### 4.5 Teenus ja tulemüür
+### 4.5 Teenus ja port
 
 Need kaks ülesannet teevad sama, mis osas 2 `systemctl enable --now` ja `firewall-cmd`. Need lähevad `tasks:` loendi lõppu, enne plokki `handlers:`.
 
 - Teenus: moodul `ansible.builtin.systemd_service`. Teenus `node_exporter` töötab ja käivitub koos masinaga. Ülesanne kirjeldab soovitud olekut, mitte taaskäivitust: kui teenus juba töötab, ei tee see midagi.
-- Tulemüür: moodul `ansible.posix.firewalld`. Port `9100/tcp` on lubatud, seadistus kehtib kohe ja jääb alles pärast taaskäivitust.
-
-Leia `ansible-doc ansible.posix.firewalld` väljundist, mis juhtub, kui on ainult `permanent: true` ilma `immediate`-ita. Kirjuta vastus README jaotisse **Osa 4**.
+- Port: moodul `ansible.posix.firewalld`. Port `9100/tcp` on lubatud kohe (`immediate: true`) ja jääb alles pärast taaskäivitust (`permanent: true`), sest Prometheus küsib mõõdikuid väljast.
 
 ??? tip "Vihje"
-    Teenuse jaoks vaata N4 praktikumi teenuse ülesannet: parameetrid on samad, moodul on teine. Tulemüüri jaoks otsi väljundist `/immediate` ja võrdle osa 2 käsku: miks oli seal pärast `--permanent` vaja ka `--reload`-i?
+    Teenuse jaoks vaata N4 praktikumi teenuse ülesannet: parameetrid on samad, moodul on teine. Pordi ülesanne on sama mis N4-s, ainult port on teine.
 
-??? example "Näidislahendus: teenus ja tulemüür"
+??? example "Näidislahendus: teenus ja port"
     ```yaml
         - name: Teenus töötab ja käivitub koos masinaga
           ansible.builtin.systemd_service:
@@ -441,7 +422,7 @@ ansible-playbook -i proxmox2,proxmox3, konf/node_exporter.yml | tee logid/n5-tei
 ```
 
 ??? success "Oodatav tulemus"
-    Esimeses käivituses on `changed` ainult need ülesanded, mis lisasid 4.5-s ja mis sellel masinal veel tegemata olid. `proxmox2`-s tegid teenuse ja tulemüüri osas 2 käsitsi, seal võivad need olla `ok`. Teisel käivitusel on mõlemal real `changed=0` ja `failed=0`.
+    Esimeses käivituses on `changed` ainult need ülesanded, mis lisasid 4.5-s ja mis sellel masinal veel tegemata olid. `proxmox2`-s tegid teenuse ja pordi osas 2 käsitsi, seal võivad need olla `ok`. Teisel käivitusel on mõlemal real `changed=0` ja `failed=0`.
 
 ??? warning "Kui teisel käivitusel on `changed=1`"
     Tavaliselt on põhjus `command` või `shell` ülesanne, mis käivitub iga kord. Kasuta mooduleid tabelist 5.5. Kui muutub unit-faili ülesanne, kontrolli, et `content:` ei sõltu ajast ega muutujast, mis iga kord muutub.
@@ -691,7 +672,7 @@ Prometheus `proxmox1`-s ja node_exporter `proxmox2`-s ning `proxmox3`-s jäävad
     - [ ] Playbook'i teine käivitus annab mõlemas masinas `changed=0`.
     - [ ] Prometheus töötab `proxmox1`-s ja Targets-lehel on mõlemad node_exporterid olekus `UP`.
     - [ ] Kogumisvea katse on tehtud, tõend on failis `logid/n5-viga.json` ja node_exporter on uuesti käivitatud.
-    - [ ] README-s on osade 2, 3, 5 ja 6 ennustused ja vastused, osa 6 kolme küsimuse päringud koos ühiku ja selgitusega ning vastus küsimusele, millises masinas on ressursse kõige vähem alles.
+    - [ ] README-s on osade 3, 5 ja 6 ennustused ja vastused, osa 6 kolme küsimuse päringud koos ühiku ja selgitusega ning vastus küsimusele, millises masinas on ressursse kõige vähem alles.
     - [ ] Prometheus ja node_exporterid jäävad N6 jaoks tööle.
 
 ## Töö esitamine
