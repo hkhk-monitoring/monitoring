@@ -159,7 +159,7 @@ grep -c '^node_cpu_seconds_total' logid/n5-metrics.txt
 ```
 
 ??? success "Oodatav tulemus"
-    Protsessorite arv korda 8. Iga protsessori kohta on 8 olekut (`idle`, `user`, `system`, `iowait`, `irq`, `softirq`, `nice`, `steal`). Mõõdiku nimi koos labelite väärtustega määrab ühe aegrea.
+    Protsessorite arv korda 8. Iga protsessori kohta on 8 olekut (`idle`, `user`, `system`, `iowait`, `irq`, `softirq`, `nice`, `steal`). Mõõdiku nimi koos siltide väärtustega määrab ühe aegrea.
 
 Leia `proxmox2` väljundist üks gauge ja üks counter koos nende `# TYPE` reaga:
 
@@ -376,7 +376,7 @@ Kontrolli ühikut. Mis ühikus on väärtus ja kui palju on see gigabaitides? Ma
 Arvuta osakaal. Muuda päringut nii, et see näitab iga masina kohta saadaval mälu protsentides kogu mälust (`node_memory_MemTotal_bytes`). Kirjuta päring ja tulemus iga masina kohta README-sse.
 
 ??? success "Oodatav tulemus"
-    Mõõdiku nimi annab rea iga target'i kohta, sest `instance` label on erinev. Väärtus on baitides, näiteks `1.47e+09` on umbes 1,4 GiB. `MemFree` jätab välja puhvri- ja vahemälu, mille tuum vajadusel vabastab, seega näitab see vähem, kui programmid tegelikult saavad. Osakaalu päring annab iga masina kohta arvu 0 ja 100 vahel.
+    Mõõdiku nimi annab rea iga target'i kohta, sest silt `instance` on erinev. Väärtus on baitides, näiteks `1.47e+09` on umbes 1,4 GiB. `MemFree` jätab välja puhvri- ja vahemälu, mille tuum vajadusel vabastab, seega näitab see vähem, kui programmid tegelikult saavad. Osakaalu päring annab iga masina kohta arvu 0 ja 100 vahel.
 
 ### 6.2 Millises masinas on juurfailisüsteemis kõige vähem vaba ruumi?
 
@@ -389,7 +389,7 @@ Kirjuta README-sse:
 3. mida sellest järeldad ja mida peaksid veel teadma, enne kui ütled, et see on probleem.
 
 ??? tip "Vihje"
-    Iga failisüsteemi kohta on eraldi rida, label `mountpoint` ütleb, mis failisüsteem see on. Labelifilter käib mõlema mõõdiku juurde.
+    Iga failisüsteemi kohta on eraldi rida, silt `mountpoint` ütleb, mis failisüsteem see on. Sildifilter käib mõlema mõõdiku juurde.
 
 ### 6.3 Kuidas muutub protsessori kasutus koormuskatse ajal?
 
@@ -457,8 +457,8 @@ Tulemuse näed Classroom 50-s.
 
 ## Lisaülesanded
 
-??? example "1 · Oma label"
-    Lisa `prometheus.yml`-is target'itele label `roll`: `proxmox2` on `veeb`, `proxmox3` on `andmebaas` (vaata `static_configs` võtit `labels` dokumentatsioonist [static_config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#static_config)). Kopeeri fail uuesti `proxmox1`-sse ja loe seaded uuesti ilma taaskäivituseta: `ssh proxmox1 "cd ~/prometheus && docker compose kill -s HUP prometheus"`. Kirjuta päring, mis näitab ainult rolli `veeb` vaba mälu.
+??? example "1 · Oma silt"
+    Lisa `prometheus.yml`-is target'itele silt `roll`: `proxmox2` on `veeb`, `proxmox3` on `andmebaas` (vaata `static_configs` võtit `labels` dokumentatsioonist [static_config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#static_config)). Kopeeri fail uuesti `proxmox1`-sse ja loe seaded uuesti ilma taaskäivituseta: `ssh proxmox1 "cd ~/prometheus && docker compose kill -s HUP prometheus"`. Kirjuta päring, mis näitab ainult rolli `veeb` vaba mälu.
 
 ??? example "2 · Kas target vastab"
     Kirjuta päring, mis tagastab ainult target'id, mis ei vasta (`up == 0`). Peata `proxmox2`-s node_exporter ja kontrolli. Kui kaua läheb, enne kui päring midagi tagastab? Miks?
