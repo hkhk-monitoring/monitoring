@@ -76,7 +76,7 @@ ssh proxmox1 "hostname -I"
 
     ```bash
     cd ~/zabbix
-    test -e .env || echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env
+    test -e .env || (umask 077; echo "ZBX_DB_PASSWORD=$(openssl rand -hex 12)" > .env)
     docker compose up -d
     docker compose ps
     ```
@@ -394,7 +394,7 @@ Võrdle oma faili näidisega. Sinu IP-aadress on teine, muu peab olema sama, ka 
             key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-B5333005
             state: present
 
-        - name: Zabbix 7.0 repositoorium
+        - name: Zabbix 7.0 hoidla
           ansible.builtin.dnf:
             name: https://repo.zabbix.com/zabbix/7.0/alma/9/x86_64/zabbix-release-latest-7.0.el9.noarch.rpm
             state: present
@@ -546,7 +546,7 @@ ssh proxmox2 "sudo zabbix_agent2 -t 'vm.memory.size[available]'"
 ```
 
 ??? success "Oodatav tulemus"
-    Rida `vm.memory.size[available]  [u|1432551424]`. Väärtus on baitides, veebiliides näitab sama arvu ümardatuna (näiteks `1.33 GB`). Väike erinevus tuleb sellest, et mõõtmised tehti eri hetkel.
+    Rida `vm.memory.size[available]  [s|2288136192]`. Väärtus on baitides, veebiliides näitab sama arvu ümardatuna (näiteks `1.33 GB`). Väike erinevus tuleb sellest, et mõõtmised tehti eri hetkel.
 
 **Küsimus (README):** kas käsu ja veebiliidese väärtus klapivad? Kui ei, siis miks?
 
@@ -616,10 +616,10 @@ echo "Reserveerin $(( taida / 1024 / 1024 )) MiB"
 ```
 
 ??? success "Oodatav tulemus"
-    `ls` ütleb `No such file or directory`. `echo` näitab positiivset arvu, laborimasinas mõni tuhat megabaiti.
+    `ls` ütleb `No such file or directory`. `echo` näitab positiivset arvu, laborimasinas kümneid tuhandeid megabaite (näiteks `Reserveerin 42025 MiB`).
 
 !!! warning "Katse vähendab juurfailisüsteemi vaba ruumi"
-    Tee katse ainult oma `proxmox2`-s. Kui vaba ruumi on vähe, ei saa teised programmid selles masinas faile kirjutada. Ära jätka, kui `/ketas-tais` on juba olemas, kui `echo` näitas nulli või negatiivset arvu või kui arv on üle 20 000 MiB. Kui katse katkeb, kustuta ainult see fail: `sudo rm /ketas-tais`.
+    Tee katse ainult oma `proxmox2`-s. Kui vaba ruumi on vähe, ei saa teised programmid selles masinas faile kirjutada. Ära jätka, kui `/ketas-tais` on juba olemas, kui `echo` näitas nulli või negatiivset arvu `fallocate` ei kirjuta andmeid, seega võtab ka suure faili loomine sekundi. Kui katse katkeb, kustuta ainult see fail: `sudo rm /ketas-tais`.
 
 Pane kellaaeg kirja ja täida ketas:
 

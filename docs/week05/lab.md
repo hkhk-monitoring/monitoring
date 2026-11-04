@@ -312,7 +312,7 @@ Need kaks ülesannet teevad sama, mis osas 2 käsud `tar` ja `install`. Arhiiv j
 Käivita playbook ja kontrolli: `ssh proxmox3 "/usr/local/bin/node_exporter --version"`.
 
 ??? success "Oodatav tulemus"
-    Kaks uut ülesannet on `proxmox3`-s `changed`, allalaadimine on `ok`. `proxmox2`-s on programm osast 2 juba olemas, seal võib programmi ülesanne olla `ok`. `--version` näitab `node_exporter, version 1.12.1`.
+    Kaks uut ülesannet on `proxmox3`-s `changed`, allalaadimine on `ok`. `proxmox2`-s on arhiiv osas 2 juba lahti pakitud, seal on lahtipakkimine `skipping` ja programmi ülesanne `ok`. `--version` näitab `node_exporter, version 1.12.1`.
 
 ### 4.3 Kasutaja
 
@@ -652,10 +652,10 @@ Kirjuta README jaotisse **Osa 6** protsessori kasutus enne katset, katse ajal ja
 
 ### 6.4 Võrdlus
 
-Kirjuta päring, mis tagastab ainult masinad, kus juurfailisüsteemis on vaba ruumi alla 90%. Kirjuta päring README jaotisse **Osa 6**. N6-s saab sellisest päringust alarmireegel.
+Kirjuta päring, mis tagastab ainult masinad, kus juurfailisüsteemis on vaba ruumi alla 99%. Seejärel muuda piiri nii, et tulemusse jääb ainult üks masin. Kirjuta mõlemad päringud README jaotisse **Osa 6**. N6-s saab sellisest päringust alarmireegel.
 
 ??? tip "Vihje"
-    Võta oma 6.2 päring ja lisa selle lõppu võrdlus. Võrdlus jätab alles ainult read, mille kohta tingimus kehtib (loengu joonis 5.13).
+    Võta oma 6.2 päring ja lisa selle lõppu võrdlus. Võrdlus jätab alles ainult read, mille kohta tingimus kehtib (loengu joonis 5.13). Tühi tulemus tähendab, et tingimus ei kehti ühegi masina kohta.
 
 ## Osa 7 · Kokkuvõte
 
