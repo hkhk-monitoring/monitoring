@@ -118,10 +118,17 @@ Selle osa lõpuks oskad sama sündmuse leida failist ja journalist ning tead, mi
 
 **Ennusta:** kui käivitad `logger`-i, kas rida jõuab journalisse, faili `/var/log/messages` või mõlemasse?
 
+**Terminal 1** jälgib faili `/var/log/messages`. Käsk jääb tööle, jäta see terminal lahti:
+
 ```bash
-sudo tail -f /var/log/messages                 # terminal 1
-logger -t n01test "tere logi"                  # terminal 2
-journalctl -t n01test -o verbose -n 1          # terminal 2
+sudo tail -f /var/log/messages
+```
+
+**Terminal 2** kirjutab logisse rea ja otsib selle journalist:
+
+```bash
+logger -t n01test "tere logi"
+journalctl -t n01test -o verbose -n 1
 ```
 
 ??? success "Oodatav tulemus"
@@ -399,12 +406,24 @@ Loo `/etc/logrotate.d/pood`:
 }
 ```
 
+**Terminal 2** teeb proovikäigu, kirjutab logisse 300 rida ja pöörab logi:
+
 ```bash
-sudo logrotate -d /etc/logrotate.d/pood                                       # proovikäik
+sudo logrotate -d /etc/logrotate.d/pood
 for i in $(seq 300); do logger -p local0.info -t pood "tellimus $i"; done
 sudo logrotate -v /etc/logrotate.d/pood
-sudo tail -f /var/log/pood.log.1                                              # terminal 1
-logger -p local0.info -t pood "pärast pööramist"                              # terminal 2
+```
+
+**Terminal 1** jälgib pööratud faili. Käsk jääb tööle:
+
+```bash
+sudo tail -f /var/log/pood.log.1
+```
+
+**Terminal 2** kirjutab uue rea ja vaatab, kas see jõudis uude faili:
+
+```bash
+logger -p local0.info -t pood "pärast pööramist"
 sudo tail -1 /var/log/pood.log
 ```
 
@@ -461,6 +480,8 @@ sudo zgrep -c "tellimus 150" /var/log/pood.log.*.gz
 
 Selle osa lõpuks jälgib audit rsyslogi konfiguratsiooni, turvalogi ja ajastatud töid püsivalt ning sa leiad, kes muudatuse tegi.
 
+**Terminal 2** lisab auditi reeglid:
+
 ```bash
 sudo auditctl -w /etc/rsyslog.d/ -p wa -k logikonf      # (1)!
 sudo auditctl -w /var/log/secure -p wa -k turvalogi
@@ -470,19 +491,33 @@ sudo auditctl -l
 
 1. `-w` jälgi faili või kausta, `-p wa` kirjutamine ja atribuutide muutmine, `-k` otsinguvõti. Hoiatus `Old style watch rules are slower` on normaalne.
 
-Terminal 1 vaatab, terminal 2 teeb seda, mida ründaja teeks.
+Järgmisena teeb terminal 2 seda, mida ründaja teeks, ja terminal 1 näitab, mida audit sellest kirja paneb.
+
+**Terminal 1** jälgib auditi logi. Käsk jääb tööle, jäta see terminal lahti:
+
+```bash
+sudo tail -f /var/log/audit/audit.log | grep --line-buffered -E 'logikonf|turvalogi'
+```
 
 !!! warning "Käsk `truncate` tühjendab turvalogi"
     Allpool olev `truncate` kustutab `/var/log/secure` kogu sisu ja seda ei saa taastada. Käivita see ainult `proxmox2`-s pärast seda, kui `auditctl -l` näitab reeglit `turvalogi`. Mujal seda käsku ei kasutata.
 
+**Terminal 2** loob rsyslogi kausta võõra faili ja tühjendab turvalogi. Pärast iga käsku vaata terminal 1-te:
+
 ```bash
-sudo tail -f /var/log/audit/audit.log | grep --line-buffered -E 'logikonf|turvalogi'   # terminal 1
-sudo touch /etc/rsyslog.d/99-tagauks.conf                                               # terminal 2
+sudo touch /etc/rsyslog.d/99-tagauks.conf
 sudo truncate -s 0 /var/log/secure
+```
+
+**Terminal 2** otsib auditist, kes seda tegi, ja kustutab võõra faili:
+
+```bash
 sudo ausearch -k turvalogi -i | tail -6
 sudo aureport -f -i | tail -5
 sudo rm /etc/rsyslog.d/99-tagauks.conf
 ```
+
+Terminal 1-s peata `tail` klahvidega ++ctrl+c++.
 
 ??? success "Oodatav tulemus"
 
