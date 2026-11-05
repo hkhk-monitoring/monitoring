@@ -527,13 +527,15 @@ Terminal 1-s peata `tail` klahvidega ++ctrl+c++.
     ```
     `uid=root`, sest käsk käivitus `sudo`-ga. `auid` näitab, kes sisse logis, ja seda `sudo` ei muuda.
 
-`auditctl` reeglid kaovad taaskäivitusel. Tee need püsivaks failis `/etc/audit/rules.d/logid.rules`:
+`auditctl` reeglid kaovad taaskäivitusel. **Terminal 2** teeb need püsivaks: loo fail `/etc/audit/rules.d/logid.rules` (näiteks `sudo nano /etc/audit/rules.d/logid.rules`) ja kirjuta sinna:
 
 ```text
 -w /etc/rsyslog.d/ -p wa -k logikonf
 -w /var/log/secure -p wa -k turvalogi
 -w /etc/cron.d/ -p wa -k ajastus
 ```
+
+Laadi reeglid failist ja kontrolli:
 
 ```bash
 sudo augenrules --load
@@ -545,11 +547,12 @@ Oma arvutis repositooriumi kaustas:
 ```bash
 ssh proxmox2 "sudo cat /etc/audit/rules.d/logid.rules" > konf/logid.rules
 ssh proxmox2 "sudo ausearch --input-logs -k turvalogi -i" > logid/a7-audit.txt
+grep -c comm=truncate logid/a7-audit.txt
 ```
 
 ??? success "Oodatav tulemus"
 
-    `auditctl -l` näitab kolme reeglit, `konf/logid.rules`-is on kolm rida ja `logid/a7-audit.txt`-is on `comm=truncate` ja sinu kasutaja `auid`-ina.
+    `auditctl -l` näitab kolme reeglit, `konf/logid.rules`-is on kolm rida ja `logid/a7-audit.txt`-is on `comm=truncate` ja sinu kasutaja `auid`-ina. Viimane käsk näitab arvu, mis on suurem kui 0. Kui see on 0, on fail tühi: kontrolli, et käsus on `--input-logs`.
 
 ??? warning "Kui `ausearch` ütleb `<no matches>`"
     Võti on teistsugune või sündmust ei olnud. Kontrolli reegleid käsuga `sudo auditctl -l` ja korda katset.
