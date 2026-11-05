@@ -30,6 +30,8 @@ Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Ennustuse 
 
 ## Osa 1 · Compose'i fail manuaali põhjal
 
+**Masin:** sinu arvuti, Compose'i fail tuleb `proxmox1`-sse.
+
 Pärast seda osa on `proxmox1`-s Compose'i fail, mille image'id ja seaded leidsid Zabbixi manuaalist.
 
 ### 1.1 Repositoorium ja IP-aadressid
@@ -174,6 +176,8 @@ Need seaded erinevad manuaali näitest:
 
 ## Osa 2 · Port on kinni
 
+**Masin:** `proxmox1`. Tõendi salvestad oma arvutis repositooriumi kaustas.
+
 Pärast seda osa töötavad kõik kolm konteinerit. Enne seda tekitad vea, mis tuleb sageli ette siis, kui masinas töötab juba mõni teine teenus.
 
 Kui automatiseerimise kursuse N6 konteinerid töötavad `proxmox1`-s, kasutavad need porti 8080. Kontrolli kõigepealt, kas port on juba hõivatud: `docker ps --filter publish=8080`. Kui seal on konteiner, on konflikt juba olemas: jäta `docker run` vahele ja tee ainult `docker compose` käsud. Kui port on vaba, tekita sama olukord ajutise konteineriga `ankur`. Käivita käsud `proxmox1`-s kaustas `~/zabbix`:
@@ -219,6 +223,8 @@ Faili `.env` reposse ei kopeeri.
 
 ## Osa 3 · Esimene sisselogimine
 
+**Masin:** brauser sinu arvutis, Zabbix töötab `proxmox1`-s.
+
 Pärast seda osa oled veebiliideses sisse loginud ja vaikimisi parooli vahetanud.
 
 Ava brauseris `http://<proxmox1-IP>:8080`. Kasutaja on **Admin**, parool **zabbix**.
@@ -240,6 +246,8 @@ Ava **Monitoring → Latest data** ja vali host **Zabbix server**.
     Osal item'itel on väärtus olemas, näiteks `Zabbix server: Utilization of configuration syncer internal processes`. Need on serveri [sisemised item'id](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/internal), mis ei vaja agenti. Teised read on tühjad, sest need ootavad agenti, mille paigaldad N4-s.
 
 ## Osa 4 · Esimene host: proxmox2
+
+**Masin:** brauser ja `proxmox1`.
 
 Pärast seda osa kontrollib Zabbix iga minut pingiga, kas `proxmox2` vastab, ja näitab vastuse aega. Hosti lisamine on manuaalis [Configuring a host](https://www.zabbix.com/documentation/7.0/en/manual/config/hosts/host), template'id lehel [Templates](https://www.zabbix.com/documentation/7.0/en/manual/config/templates).
 
@@ -280,6 +288,8 @@ Ava **Monitoring → Latest data** ([Latest data](https://www.zabbix.com/documen
     Liidese tüüp on **Agent**, kuid `proxmox2`-s agenti ei ole. Miks ping ikkagi töötab? Mida see ütleb selle kohta, kust Zabbix pingi saadab? Kirjuta vastus README jaotisse **A4**.
 
 ## Osa 5 · Probleem tekib ja laheneb
+
+**Masin:** brauser ja `proxmox1`. Tõendi salvestad oma arvutis repositooriumi kaustas.
 
 Pärast seda osa oled näinud probleemi elutsüklit: probleem tekib, on veebiliideses näha ja laheneb.
 

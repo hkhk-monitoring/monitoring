@@ -45,6 +45,8 @@ Rida **Ennusta** tähendab, et enne käsku mõtled läbi, mis juhtub. Kirjuta va
 
 ## Osa 1 · Ettevalmistus
 
+**Masin:** sinu arvuti. Siit ühendud kõigi kolme masinaga.
+
 Kontrolli, et `ssh proxmox1`, `ssh proxmox2` ja `ssh proxmox3` töötavad ilma paroolita ja Ansible töötab sinu arvutis (Linux, macOS või WSL). Kui mõni neist ei tööta, järgi lehte [Töökeskkond](../kodulabor.md).
 
 Ava õpetaja jagatud Classroom 50 link ja klooni oma repositoorium:
@@ -108,7 +110,9 @@ ssh proxmox1 "hostname -I"
 
 ## Osa 2 · Üks rida, kolm logi
 
-Osades 2–8 töötad sõlmes `proxmox2` kahes terminalis. Ava VS Code'is teine terminal kõrvale (menüü **Terminal → Split Terminal**) ja logi mõlemas sisse: `ssh proxmox2`. Terminal 1 näitab logi (`tail -f`), terminal 2 käivitab käske. Pärast rsyslogi konfiguratsiooni muutmist kontrolli seda käsuga `sudo rsyslogd -N1` ja alles siis taaskäivita rsyslog.
+**Masin:** `proxmox2`, kaks terminali.
+
+Ava VS Code'is teine terminal kõrvale (menüü **Terminal → Split Terminal**) ja logi mõlemas sisse: `ssh proxmox2`. Terminal 1 näitab logi (`tail -f`), terminal 2 käivitab käske. Pärast rsyslogi konfiguratsiooni muutmist kontrolli seda käsuga `sudo rsyslogd -N1` ja alles siis taaskäivita rsyslog.
 
 Selle osa lõpuks oskad sama sündmuse leida failist ja journalist ning tead, mille poolest auditi logi neist erineb.
 
@@ -160,6 +164,8 @@ sudo ausearch -m USER_CMD -i --start recent | tail -1
 
 ## Osa 3 · Kes tohib lugeda
 
+**Masin:** `proxmox2`.
+
 Selle osa lõpuks on proovikasutajal ligipääs journalile, aga mitte turvalogile.
 
 **Ennusta:** kas tavakasutaja saab lugeda `/var/log/secure`-t? Aga journalit?
@@ -199,6 +205,8 @@ sudo -u praktikant cat /var/log/secure
 Kirjuta `README.md`-sse, miks on parem lisada kasutaja gruppi kui anda talle `sudo`. Pärast seda korista: `sudo userdel -r praktikant`.
 
 ## Osa 4 · Journal, mis ei unusta
+
+**Masin:** `proxmox2`. Tõendi salvestad oma arvutis repositooriumi kaustas.
 
 Selle osa lõpuks säilib `proxmox2` journal taaskäivitusel ja sul on selle kohta tõend.
 
@@ -248,6 +256,8 @@ cat logid/a3-boots.txt
 
 ## Osa 5 · Keegi koputab uksele
 
+**Masin:** terminal 1 `proxmox2`-s, terminal 2 sinu arvutis.
+
 Selle osa lõpuks leiad ebaõnnestunud sisselogimise mitmest kohast ja tead, miks see ühes kohas puudub.
 
 Terminal 1 (`proxmox2`): `sudo tail -f /var/log/secure`. Terminal 2 **sinu arvutis**:
@@ -287,6 +297,8 @@ sudo grep "Invalid user" /var/log/messages
 Kirjuta `README.md`-sse vigade arv sellest käivitusest ja programm, mis neid kõige rohkem kirjutas (`journalctl -p err -b`).
 
 ## Osa 6 · E-poe enda logi
+
+**Masin:** `proxmox2`, kaks terminali.
 
 Selle osa lõpuks on e-poe logid eraldi failides, hoiatused omaette ja SSH-read programmi järgi oma failis.
 
@@ -373,6 +385,8 @@ Kontrolli, taaskäivita, korda osa 5 sissetungija katset ja vaata `sudo tail /va
 
 ## Osa 7 · Logi, mis ei täida ketast
 
+**Masin:** `proxmox2`, kaks terminali.
+
 Selle osa lõpuks pöörab logrotate poe logi, vanad failid on pakitud ja rsyslog kirjutab uude faili.
 
 Loo `/etc/logrotate.d/pood`:
@@ -443,6 +457,8 @@ sudo zgrep -c "tellimus 150" /var/log/pood.log.*.gz
 
 ## Osa 8 · Kes seda tegi
 
+**Masin:** `proxmox2`, kaks terminali. Tõendid salvestad oma arvutis repositooriumi kaustas.
+
 Selle osa lõpuks jälgib audit rsyslogi konfiguratsiooni, turvalogi ja ajastatud töid püsivalt ning sa leiad, kes muudatuse tegi.
 
 ```bash
@@ -493,12 +509,12 @@ Oma arvutis repositooriumi kaustas:
 
 ```bash
 ssh proxmox2 "sudo cat /etc/audit/rules.d/logid.rules" > konf/logid.rules
-ssh proxmox2 "sudo ausearch -k turvalogi -i" > logid/a7-audit.txt
+ssh proxmox2 "sudo ausearch --input-logs -k turvalogi -i" > logid/a7-audit.txt
 ```
 
 ??? success "Oodatav tulemus"
 
-    `auditctl -l` näitab kolme reeglit, `konf/logid.rules`-is on kolm rida ja `logid/a7-audit.txt`-is on `comm=truncate` ja sinu kasutaja `auid`-ina. Kui `ausearch` skriptis midagi ei leia, lisa `--input-logs` (ilma terminalita loeb ta stdin-i).
+    `auditctl -l` näitab kolme reeglit, `konf/logid.rules`-is on kolm rida ja `logid/a7-audit.txt`-is on `comm=truncate` ja sinu kasutaja `auid`-ina.
 
 ??? warning "Kui `ausearch` ütleb `<no matches>`"
     Võti on teistsugune või sündmust ei olnud. Kontrolli reegleid käsuga `sudo auditctl -l` ja korda katset.
@@ -506,6 +522,8 @@ ssh proxmox2 "sudo ausearch -k turvalogi -i" > logid/a7-audit.txt
 Kirjuta `README.md`-sse: mis vahe on `uid` ja `auid` väljal ja mis teeb ründaja töö raskemaks, kui ta on root ja saab ka auditi logi kustutada.
 
 ## Osa 9 · Keskserver
+
+**Masin:** `proxmox1` (keskserver).
 
 Osadest 9–14 on juhiseid vähem. Iga osa ütleb, mis peab olema tehtud ja kuidas seda kontrollida. Kasuta loengut (peatükid 6 ja 11), [rsyslogi dokumentatsiooni](https://docs.rsyslog.com/doc/) ja osade 2–8 näiteid.
 
@@ -544,6 +562,8 @@ Osadest 9–14 on juhiseid vähem. Iga osa ütleb, mis peab olema tehtud ja kuid
 **Ennusta:** kui `proxmox2` hakkab saatma ja tulemüüri sa veel ei puuduta, mis juhtub? Kirjuta `README.md`-sse.
 
 ## Osa 10 · proxmox2 saadab
+
+**Masin:** `proxmox2`.
 
 **Nõuded (`proxmox2`, fail `/etc/rsyslog.d/90-keskserver.conf`):**
 
@@ -585,6 +605,8 @@ Osadest 9–14 on juhiseid vähem. Iga osa ütleb, mis peab olema tehtud ja kuid
     `logger -p local0.info -t pood "tellimus 2001"` ei jõua keskserverisse. `10-pood.conf` teeb `& stop` enne, kui rsyslog jõuab faili `90-keskserver.conf`-ini (failid loetakse tähestiku järjekorras). Parandus on lisaülesanne 2.
 
 ## Osa 11 · proxmox3 playbook'iga
+
+**Masin:** sinu arvuti. Playbook seadistab `proxmox3`.
 
 `proxmox3` vajab sama saatmisreeglit ja samu auditi reegleid. Seadista see playbook'iga. Playbook on Gitis ja sobib ka järgmise masina seadistamiseks.
 
@@ -638,6 +660,8 @@ ansible-playbook -i proxmox3, konf/keskserver.yml
 
 ## Osa 12 · Mis juhtus öösel
 
+**Masin:** logi teeb `proxmox2`, otsing käib `proxmox1`-s.
+
 Rakendus kirjutas öösel 3 GB logi ja tekstiredaktor keeldub seda avamast. Sellisest logist otsitakse vastuseid käskudega `grep`, `sort` ja `uniq`.
 
 Saada keskserverisse e-poe veebilogi ühe öö kohta (01:00–05:00, 50 000 rida). Oma arvutist:
@@ -685,6 +709,8 @@ Kirjuta `README.md`-sse: kas `grep 500` oleks sama hea kui `grep 'staatus=500'`?
 
 ## Osa 13 · Öine külaline
 
+**Masin:** külastus on `proxmox3`-s, uurimine `proxmox1`-s ja `proxmox3`-s.
+
 Eeldus: osad 9–11 on tehtud ehk `proxmox3` saadab logid keskserverisse ja auditi reeglid on peal. Muidu ei ole sul pärast külastust midagi uurida.
 
 Öövahetuse ajal võib õpetaja korraldada sinu `proxmox3`-le "külastuse". Sa ei tea, millal, kust ega mida tehakse. Kui õpetaja ütleb "nüüd" või tahvel näitab muutust, alusta uurimist.
@@ -715,7 +741,7 @@ Kasutaja `kontroll` aadressilt `192.168.125.187` on õpetaja kontrollserver (lab
 ```bash
 P3=$(ssh proxmox3 hostname)
 ssh proxmox1 "sudo grep -rh 'Invalid user' /var/log/remote/$P3/" > logid/b5-intsident.txt
-ssh proxmox3 "sudo ausearch -k turvalogi -i; sudo ausearch -k ajastus -i" > logid/b5-audit.txt
+ssh proxmox3 "sudo ausearch --input-logs -k turvalogi -i; sudo ausearch --input-logs -k ajastus -i" > logid/b5-audit.txt
 ```
 
 ??? tip "Vihje"
@@ -725,6 +751,8 @@ ssh proxmox3 "sudo ausearch -k turvalogi -i; sudo ausearch -k ajastus -i" > logi
 Kirjuta `README.md`-sse intsidendiraport: mis juhtus, millal, kust, kes kattis jäljed, mis jäeti maha ja kuidas sa selle leidsid.
 
 ## Osa 14 · Keskserveri logide pööramine
+
+**Masin:** `proxmox1` (keskserver).
 
 **Nõuded (`proxmox1`, `/etc/logrotate.d/remote`):** failid `/var/log/remote/*/*.log` ja `/var/log/remote/turvalogi.log`, iga päev, 30 vana faili, pakitud, nimes kuupäev (`dateext`), pärast pööramist avab rsyslog failid uuesti.
 

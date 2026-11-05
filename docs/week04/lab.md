@@ -28,6 +28,8 @@ Lisad playbook'i ülesanded ükshaaval. Enne käivitamist ennusta tulemust, seej
 
 ## Osa 1 · Repositoorium ja Zabbix
 
+**Masin:** sinu arvuti, käsud lähevad `ssh proxmox1` kaudu.
+
 Ava Classroom 50 link ([Praktikum 4 - Agent suhtleb serveriga](https://classroom50.org/hkhk-monitoring/it24-monitooring/assignments)) ja klooni oma repositoorium:
 
 ```bash
@@ -93,6 +95,8 @@ ssh proxmox1 "hostname -I"
     Vaata kõigepealt, miks see ei käivitunud: `ssh proxmox1 "cd ~/zabbix && docker compose logs zabbix-web | tail -20"`. Kui veateade on `port is already allocated`, hoiab porti 8080 mõni teine konteiner. Leia see käsuga `ssh proxmox1 "docker ps"` ja peata ainult see projekt tema kaustas käsuga `docker compose stop`.
 
 ## Osa 2 · Agent Ansible'i playbook'iga kahes masinas
+
+**Masin:** sinu arvuti. Playbook seadistab `proxmox2` ja `proxmox3`.
 
 Paigalduse põhiosa on mõlemas masinas sama ja agendi seadetes erineb ainult masina nimi. Seepärast teed paigalduse Ansible'i playbook'iga: Ansible teeb samad sammud mõlemas masinas ja masina nimi tuleb muutujast. Koostad playbook'i `konf/agent.yml` ülesannete kaupa: lisad ülesande, käivitad playbook'i ja vaatad tulemust. Starteri failis on play algus, allkirjavõtme ülesanne ja kaks EPEL-i ülesannet.
 
@@ -498,6 +502,8 @@ cat logid/a2-agendid.txt
 
 ## Osa 3 · Template'id: passiivne ja aktiivne
 
+**Masin:** brauser sinu arvutis.
+
 Agent töötab mõlemas masinas, kuid Linuxi mõõdikute kogumine pole veel template'itega seadistatud. Template annab hostile item'id ja trigger'id. `proxmox2` saab passiivse agendi template'i ja `proxmox3` aktiivse oma (loengu [tabel 4.2](lecture.md#3-passiivne-ja-aktiivne-agent)).
 
 <figure markdown="span">
@@ -554,6 +560,8 @@ ssh proxmox2 "sudo zabbix_agent2 -t 'vm.memory.size[available]'"
     Vaata ühikuid: käsk annab baidid, veebiliides ümardab gigabaitideks. Vaata ka aega: millal tehti käsu mõõtmine ja millal veebiliidese **Last check**?
 
 ## Osa 4 · Oma trigger: vaba kettaruum alla 20%
+
+**Masin:** brauser sinu arvutis, kontroll `proxmox2`-s.
 
 Template'is on ketta trigger'id juba olemas, aga nende piiri ja raskusastme on valinud Zabbix. Selles osas teed oma item'i ja trigger'i, tekitad probleemi ja vaatad, kuidas see laheneb.
 
