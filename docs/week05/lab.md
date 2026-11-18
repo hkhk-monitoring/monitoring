@@ -143,7 +143,7 @@ systemd käivitab programmi teenusena, kui sellel on **unit-fail**. Unit-failis 
 
 node_exporteri repositooriumis on ametlik näidis kaustas [examples/systemd](https://github.com/prometheus/node_exporter/tree/master/examples/systemd). See on tehtud teistsuguse paigalduse jaoks (socket-fail ja keskkonnafail), sinu fail on lihtsam.
 
-Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` (`sudo nano`). Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu. Esimene sektsioon on antud: `Description` on teenuse kirjeldus ja `After=network-online.target` paneb teenuse käivitusjärjekorras pärast võrgu sihtmärki.
+Loo `proxmox2`-s fail `/etc/systemd/system/node_exporter.service` käsuga `sudo vi`. Kui eelistad redaktorit nano, paigalda see enne käsuga `sudo dnf install -y nano`, sest AlmaLinuxi minimaalses paigalduses seda ei ole. Fail jääb alles: osas 4 kirjutab playbook täpselt sama sisu. Esimene sektsioon on antud: `Description` on teenuse kirjeldus ja `After=network-online.target` paneb teenuse käivitusjärjekorras pärast võrgu sihtmärki.
 
 ???+ example "Failiosa: [Unit]"
     ```ini
@@ -636,10 +636,10 @@ Kirjuta mõlemad päringud ja nende tulemuse tähendus README jaotisse **Osa 6**
     3. Üks arv masina kohta, protsessorite keskmine, samuti 0 ja 1 vahel.
     4. Protsent, mis on arvutatud jõudeaja osakaalust: 100 miinus jõudeaja protsent. See kehtib viimase minuti akna kohta, mitte ühe hetke kohta.
 
-Pane oma neljas päring vahekaardile **Graph** ja tekita `proxmox2`-s 60 sekundiks koormus (`stress-ng` paigaldasid osas 1). `$(nproc)` on masina loogiliste protsessorite arv, igaühele tuleb üks koormav protsess. Käsk näitab katse algus- ja lõpuaega:
+Pane oma neljas päring vahekaardile **Graph** ja tekita `proxmox2`-s 60 sekundiks koormus (`stress-ng` paigaldasid osas 1). `$(nproc)` on masina loogiliste protsessorite arv, igaühele tuleb üks koormav protsess. Prometheuse graafiku ajatelg on UTC ajas, seepärast näitab `date -u` katse algus- ja lõpuaega samuti UTC-s:
 
 ```bash
-date +%T; ssh proxmox2 'stress-ng --cpu $(nproc) --timeout 60s'; date +%T
+date -u +%T; ssh proxmox2 'stress-ng --cpu $(nproc) --timeout 60s'; date -u +%T
 ```
 
 Kirjuta README jaotisse **Osa 6** protsessori kasutus enne katset, katse ajal ja pärast katset. Kas graafiku muutus algas ja lõppes täpselt samal hetkel kui katse? Mis seda selgitab?
