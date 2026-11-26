@@ -56,7 +56,7 @@ Masina näidud → keskne kogumine → päringud ja alarmid → rikke uurimine
 | N3 | [Mõõdik, aegrida, agent](week03/lecture.md) · *veebiõpe* | top, free, df, Zabbix Cloud |
 | N4 | [Agent suhtleb serveriga](week04/lecture.md) | Zabbix agent 2, Ansible |
 | N5 | [Server küsib mõõdikuid](week05/lecture.md) | Prometheus, node_exporter, PromQL |
-| N6 | Numbrid pildiks ja alarm | Grafana, Alertmanager |
+| N6 | [Töölaud ja alarm](week06/lecture.md) | Grafana, Alertmanager |
 | N7 | Aegrea andmebaas teisiti | Telegraf, InfluxDB |
 | N8 | Logid sildi järgi | Loki, Grafana Alloy |
 | N9 | Logid täisotsinguga | OpenSearch |

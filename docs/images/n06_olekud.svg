@@ -1,0 +1,77 @@
+<svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="o6u" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1565c0"/></marker>
+  </defs>
+  <rect width="900" height="480" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Alarmi olekud ajas</text>
+
+  <!-- vasakud sildid -->
+  <g font-size="12" fill="#546e7a">
+    <text x="20" y="58">protsessori kasutus, %</text>
+    <text x="20" y="320">alarmi olek</text>
+    <text x="20" y="396">teated</text>
+  </g>
+
+  <!-- teljed -->
+  <g font-size="11" fill="#546e7a" text-anchor="end">
+    <text x="112" y="264">0%</text>
+    <text x="112" y="169">50%</text>
+    <text x="112" y="74">100%</text>
+  </g>
+  <line x1="120" y1="66" x2="120" y2="260" stroke="#90a4ae"/>
+  <line x1="120" y1="260" x2="840" y2="260" stroke="#90a4ae"/>
+  <g font-size="11" text-anchor="middle" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">
+    <text x="120" y="280">0:00</text><text x="210" y="280">1:00</text><text x="300" y="280">2:00</text><text x="390" y="280">3:00</text><text x="480" y="280">4:00</text><text x="570" y="280">5:00</text><text x="660" y="280">6:00</text><text x="750" y="280">7:00</text><text x="840" y="280">8:00</text>
+  </g>
+  <!-- hindamise sammud iga 15 s -->
+  <g stroke="#ff8f00" stroke-width="1.5">
+    <line x1="120" y1="260" x2="120" y2="266"/><line x1="142.5" y1="260" x2="142.5" y2="266"/><line x1="165" y1="260" x2="165" y2="266"/><line x1="187.5" y1="260" x2="187.5" y2="266"/>
+    <line x1="210" y1="260" x2="210" y2="266"/><line x1="232.5" y1="260" x2="232.5" y2="266"/><line x1="255" y1="260" x2="255" y2="266"/><line x1="277.5" y1="260" x2="277.5" y2="266"/>
+    <line x1="300" y1="260" x2="300" y2="266"/><line x1="322.5" y1="260" x2="322.5" y2="266"/><line x1="345" y1="260" x2="345" y2="266"/><line x1="367.5" y1="260" x2="367.5" y2="266"/>
+    <line x1="390" y1="260" x2="390" y2="266"/><line x1="412.5" y1="260" x2="412.5" y2="266"/><line x1="435" y1="260" x2="435" y2="266"/><line x1="457.5" y1="260" x2="457.5" y2="266"/>
+    <line x1="480" y1="260" x2="480" y2="266"/><line x1="502.5" y1="260" x2="502.5" y2="266"/><line x1="525" y1="260" x2="525" y2="266"/><line x1="547.5" y1="260" x2="547.5" y2="266"/>
+    <line x1="570" y1="260" x2="570" y2="266"/><line x1="592.5" y1="260" x2="592.5" y2="266"/><line x1="615" y1="260" x2="615" y2="266"/><line x1="637.5" y1="260" x2="637.5" y2="266"/>
+    <line x1="660" y1="260" x2="660" y2="266"/><line x1="682.5" y1="260" x2="682.5" y2="266"/><line x1="705" y1="260" x2="705" y2="266"/><line x1="727.5" y1="260" x2="727.5" y2="266"/>
+    <line x1="750" y1="260" x2="750" y2="266"/><line x1="772.5" y1="260" x2="772.5" y2="266"/><line x1="795" y1="260" x2="795" y2="266"/><line x1="817.5" y1="260" x2="817.5" y2="266"/>
+    <line x1="840" y1="260" x2="840" y2="266"/>
+  </g>
+
+  <!-- olekute piirid -->
+  <g stroke="#b0bec5" stroke-width="1" stroke-dasharray="3 4">
+    <line x1="210" y1="70" x2="210" y2="335"/>
+    <line x1="300" y1="70" x2="300" y2="335"/>
+    <line x1="570" y1="70" x2="570" y2="335"/>
+  </g>
+
+  <!-- lävi -->
+  <line x1="120" y1="108" x2="840" y2="108" stroke="#c62828" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="128" y="100" font-size="12" font-weight="700" fill="#c62828">lävi 80%</text>
+
+  <!-- kasutus -->
+  <polyline fill="none" stroke="#00796b" stroke-width="2.5" stroke-linejoin="round"
+    points="120,203 165,197 192,155 210,104 237,85 300,89 345,83 390,81 435,87 480,85 525,89 552,93 570,112 597,175 660,199 750,203 840,201"/>
+
+  <!-- olekuriba -->
+  <rect x="120" y="302" width="90" height="30" fill="#eceff1" stroke="#90a4ae"/>
+  <text x="165" y="322" text-anchor="middle" font-size="12" font-weight="700" fill="#546e7a">Inactive</text>
+  <rect x="210" y="302" width="90" height="30" fill="#fff3e0" stroke="#ef6c00"/>
+  <text x="255" y="322" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">Pending</text>
+  <rect x="300" y="302" width="270" height="30" fill="#ffebee" stroke="#c62828"/>
+  <text x="435" y="322" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">Firing</text>
+  <rect x="570" y="302" width="270" height="30" fill="#eceff1" stroke="#90a4ae"/>
+  <text x="705" y="322" text-anchor="middle" font-size="12" font-weight="700" fill="#546e7a">Inactive</text>
+  <text x="255" y="350" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#e65100">for: 1m</text>
+
+  <!-- teated -->
+  <line x1="345" y1="334" x2="345" y2="372" stroke="#1565c0" stroke-width="2" marker-end="url(#o6u)"/>
+  <text x="345" y="392" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">Discordi teade: FIRING</text>
+  <text x="345" y="408" text-anchor="middle" font-size="11" fill="#546e7a">group_wait 30 s pärast Firing'ut</text>
+  <line x1="570" y1="334" x2="570" y2="372" stroke="#1565c0" stroke-width="2" marker-end="url(#o6u)"/>
+  <text x="570" y="392" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">Discordi teade: RESOLVED</text>
+  <text x="570" y="408" text-anchor="middle" font-size="11" fill="#546e7a">kasutus langes alla läve</text>
+
+  <!-- legend -->
+  <line x1="120" y1="434" x2="120" y2="442" stroke="#ff8f00" stroke-width="1.5"/>
+  <text x="130" y="442" font-size="12" fill="#546e7a">Oranž kriips ajateljel: Prometheus hindab reeglit iga 15 s.</text>
+  <text x="130" y="460" font-size="12" fill="#546e7a">Pending muutub Firing'uks, kui tingimus on kehtinud terve for-aja.</text>
+</svg>

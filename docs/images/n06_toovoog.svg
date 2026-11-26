@@ -1,0 +1,69 @@
+<svg viewBox="0 0 900 450" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="t6o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker>
+    <marker id="t6g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00796b"/></marker>
+    <marker id="t6b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker>
+    <marker id="t6u" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1565c0"/></marker>
+  </defs>
+  <rect width="900" height="450" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Mõõdikust töölauale ja teateni</text>
+
+  <!-- jälgitavad masinad -->
+  <rect x="20" y="150" width="150" height="80" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="95" y="176" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">proxmox2</text>
+  <text x="95" y="198" text-anchor="middle" font-size="12" fill="#263238">node_exporter</text>
+  <text x="95" y="217" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">:9100</text>
+  <rect x="20" y="280" width="150" height="80" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="95" y="306" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">proxmox3</text>
+  <text x="95" y="328" text-anchor="middle" font-size="12" fill="#263238">node_exporter</text>
+  <text x="95" y="347" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">:9100</text>
+
+  <!-- proxmox1 -->
+  <rect x="210" y="60" width="470" height="375" rx="12" fill="#fff8e1" stroke="#ff8f00" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="230" y="84" font-size="14" font-weight="700" fill="#e65100">proxmox1 · Docker Compose</text>
+
+  <rect x="225" y="185" width="180" height="140" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="315" y="210" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Prometheus</text>
+  <text x="315" y="228" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">:9090</text>
+  <text x="315" y="252" text-anchor="middle" font-size="12" fill="#5d4037">kogub iga 15 s</text>
+  <text x="315" y="270" text-anchor="middle" font-size="12" fill="#5d4037">hoiab aegridu</text>
+  <text x="315" y="288" text-anchor="middle" font-size="12" fill="#5d4037">hindab alarmireegleid</text>
+  <text x="315" y="306" text-anchor="middle" font-size="12" fill="#5d4037">iga 15 s</text>
+
+  <rect x="500" y="100" width="165" height="90" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="582" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Grafana</text>
+  <text x="582" y="146" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">:3000</text>
+  <text x="582" y="170" text-anchor="middle" font-size="12" fill="#5d4037">töölaud ja paneelid</text>
+
+  <rect x="500" y="320" width="165" height="100" rx="10" fill="#ffffff" stroke="#ff8f00" stroke-width="2"/>
+  <text x="582" y="346" text-anchor="middle" font-size="15" font-weight="700" fill="#e65100">Alertmanager</text>
+  <text x="582" y="366" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">:9093</text>
+  <text x="582" y="388" text-anchor="middle" font-size="12" fill="#5d4037">grupeerib, saadab,</text>
+  <text x="582" y="405" text-anchor="middle" font-size="12" fill="#5d4037">kordab</text>
+
+  <!-- väljund -->
+  <rect x="720" y="100" width="160" height="90" rx="10" fill="#eceff1" stroke="#546e7a" stroke-width="2"/>
+  <text x="800" y="128" text-anchor="middle" font-size="15" font-weight="700" fill="#37474f">brauser</text>
+  <text x="800" y="152" text-anchor="middle" font-size="12" fill="#37474f">inimene vaatab</text>
+  <text x="800" y="170" text-anchor="middle" font-size="12" fill="#37474f">töölauda</text>
+
+  <rect x="720" y="320" width="160" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+  <text x="800" y="348" text-anchor="middle" font-size="15" font-weight="700" fill="#0d47a1">Discord</text>
+  <text x="800" y="370" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#0d47a1">kanal #it-24</text>
+  <text x="800" y="394" text-anchor="middle" font-size="12" fill="#0d47a1">HTTPS webhook</text>
+
+  <!-- nooled -->
+  <line x1="170" y1="200" x2="220" y2="228" stroke="#00796b" stroke-width="2.5" marker-end="url(#t6g)"/>
+  <line x1="170" y1="320" x2="220" y2="292" stroke="#00796b" stroke-width="2.5" marker-end="url(#t6g)"/>
+  <text x="95" y="260" text-anchor="middle" font-size="12" font-weight="700" fill="#00796b">scrape →</text>
+
+  <path d="M315,185 V145 H495" fill="none" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#t6o)"/>
+  <text x="408" y="136" text-anchor="middle" font-size="12" fill="#e65100">PromQL päring</text>
+
+  <path d="M315,325 V370 H495" fill="none" stroke="#ff8f00" stroke-width="2.5" marker-end="url(#t6o)"/>
+  <text x="408" y="390" text-anchor="middle" font-size="12" fill="#e65100">alarm, kui tingimus kehtib</text>
+
+  <line x1="665" y1="145" x2="715" y2="145" stroke="#546e7a" stroke-width="2.5" marker-end="url(#t6b)"/>
+  <line x1="665" y1="370" x2="715" y2="370" stroke="#1565c0" stroke-width="2.5" marker-end="url(#t6u)"/>
+  <text x="692" y="360" text-anchor="middle" font-size="12" fill="#1565c0">teade</text>
+</svg>

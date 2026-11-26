@@ -1,0 +1,57 @@
+<svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="m6b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker>
+    <marker id="m6u" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1565c0"/></marker>
+  </defs>
+  <rect width="900" height="400" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Töölaua muutuja</text>
+
+  <!-- rippmenüü -->
+  <rect x="20" y="66" width="90" height="34" rx="4" fill="#eceff1" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="65" y="88" text-anchor="middle" font-size="13" font-weight="700" fill="#37474f">instance</text>
+  <rect x="110" y="66" width="190" height="34" rx="4" fill="#ffffff" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="122" y="88" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">proxmox2:9100</text>
+  <text x="286" y="88" text-anchor="middle" font-size="13" fill="#37474f">▾</text>
+  <rect x="110" y="100" width="190" height="60" fill="#ffffff" stroke="#546e7a" stroke-width="1.5"/>
+  <rect x="111" y="101" width="188" height="29" fill="#e3f2fd"/>
+  <text x="122" y="120" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#0d47a1">proxmox2:9100</text>
+  <text x="122" y="150" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">proxmox3:9100</text>
+
+  <!-- muutuja päring -->
+  <rect x="420" y="62" width="460" height="64" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="436" y="84" font-size="12" font-weight="700" fill="#e65100">Muutuja päring</text>
+  <text x="436" y="110" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">label_values(up{job="node"}, instance)</text>
+  <line x1="418" y1="94" x2="306" y2="84" stroke="#546e7a" stroke-width="2" marker-end="url(#m6b)"/>
+  <text x="362" y="112" text-anchor="middle" font-size="11" fill="#546e7a">täidab menüü</text>
+  <text x="420" y="152" font-size="13" fill="#263238">Valik menüüs muudab kõigi paneelide päringut korraga.</text>
+
+  <!-- jaotus paneelidele -->
+  <line x1="205" y1="160" x2="205" y2="200" stroke="#1565c0" stroke-width="2"/>
+  <line x1="160" y1="200" x2="740" y2="200" stroke="#1565c0" stroke-width="2"/>
+  <line x1="160" y1="200" x2="160" y2="226" stroke="#1565c0" stroke-width="2" marker-end="url(#m6u)"/>
+  <line x1="450" y1="200" x2="450" y2="226" stroke="#1565c0" stroke-width="2" marker-end="url(#m6u)"/>
+  <line x1="740" y1="200" x2="740" y2="226" stroke="#1565c0" stroke-width="2" marker-end="url(#m6u)"/>
+  <rect x="510" y="180" width="200" height="16" fill="#ffffff"/>
+  <text x="610" y="193" text-anchor="middle" font-size="12" font-family="JetBrains Mono, Menlo, monospace" fill="#1565c0">$instance=proxmox2:9100</text>
+
+  <!-- paneelid -->
+  <rect x="20" y="230" width="280" height="130" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="160" y="254" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">Saadaval mälu</text>
+  <text x="160" y="278" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">node_memory_MemAvailable_bytes</text>
+  <text x="160" y="294" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">{instance="$instance"}</text>
+  <polyline points="40,330 80,326 120,331 160,322 200,325 240,320 280,323" fill="none" stroke="#00796b" stroke-width="2"/>
+
+  <rect x="310" y="230" width="280" height="130" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="450" y="254" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">Protsessori kasutus</text>
+  <text x="450" y="278" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">node_cpu_seconds_total</text>
+  <text x="450" y="294" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">{mode="idle",instance="$instance"}</text>
+  <polyline points="330,338 370,334 410,320 450,312 490,330 530,336 570,333" fill="none" stroke="#00796b" stroke-width="2"/>
+
+  <rect x="600" y="230" width="280" height="130" rx="10" fill="#e0f2f1" stroke="#00796b" stroke-width="2"/>
+  <text x="740" y="254" text-anchor="middle" font-size="14" font-weight="700" fill="#004d40">Juurfailisüsteemi vaba ruum</text>
+  <text x="740" y="278" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">node_filesystem_avail_bytes</text>
+  <text x="740" y="294" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#263238">{mountpoint="/",instance="$instance"}</text>
+  <polyline points="620,322 660,323 700,325 740,326 780,328 820,329 860,331" fill="none" stroke="#00796b" stroke-width="2"/>
+
+  <text x="450" y="388" text-anchor="middle" font-size="12" fill="#546e7a">Grafana asendab $instance enne päringu saatmist Prometheusele menüüs valitud väärtusega.</text>
+</svg>

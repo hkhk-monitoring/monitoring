@@ -1,0 +1,71 @@
+<svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <marker id="a6o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff8f00"/></marker>
+    <marker id="a6b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#546e7a"/></marker>
+    <marker id="a6u" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1565c0"/></marker>
+  </defs>
+  <rect width="900" height="430" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#263238">Alertmanager: grupeeri, suuna, korda</text>
+
+  <!-- alarmid -->
+  <text x="20" y="64" font-size="12" font-weight="700" fill="#546e7a">alarmid Prometheusest</text>
+  <rect x="20" y="75" width="200" height="64" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="120" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="#e65100">ProtsessorKoormatud</text>
+  <text x="120" y="122" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">instance=proxmox2</text>
+  <rect x="20" y="155" width="200" height="64" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="120" y="181" text-anchor="middle" font-size="13" font-weight="700" fill="#e65100">ProtsessorKoormatud</text>
+  <text x="120" y="202" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">instance=proxmox3</text>
+  <rect x="20" y="235" width="200" height="64" rx="8" fill="#fff8e1" stroke="#ff8f00" stroke-width="2"/>
+  <text x="120" y="261" text-anchor="middle" font-size="13" font-weight="700" fill="#e65100">KettaruumOtsas</text>
+  <text x="120" y="282" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#5d4037">instance=proxmox2</text>
+
+  <!-- group_by -->
+  <rect x="260" y="75" width="200" height="224" rx="10" fill="#eceff1" stroke="#546e7a" stroke-width="2"/>
+  <text x="360" y="97" text-anchor="middle" font-size="12" font-weight="700" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">group_by: [alertname]</text>
+  <rect x="272" y="110" width="176" height="90" rx="8" fill="#ffffff" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="360" y="128" text-anchor="middle" font-size="11" fill="#546e7a">grupp 1</text>
+  <text x="360" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="#263238">ProtsessorKoormatud</text>
+  <text x="360" y="172" text-anchor="middle" font-size="12" fill="#263238">2 alarmi</text>
+  <rect x="272" y="215" width="176" height="72" rx="8" fill="#ffffff" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="360" y="232" text-anchor="middle" font-size="11" fill="#546e7a">grupp 2</text>
+  <text x="360" y="253" text-anchor="middle" font-size="12" font-weight="700" fill="#263238">KettaruumOtsas</text>
+  <text x="360" y="274" text-anchor="middle" font-size="12" fill="#263238">1 alarm</text>
+
+  <line x1="220" y1="107" x2="267" y2="140" stroke="#ff8f00" stroke-width="2" marker-end="url(#a6o)"/>
+  <line x1="220" y1="187" x2="267" y2="165" stroke="#ff8f00" stroke-width="2" marker-end="url(#a6o)"/>
+  <line x1="220" y1="267" x2="267" y2="252" stroke="#ff8f00" stroke-width="2" marker-end="url(#a6o)"/>
+
+  <!-- route -->
+  <rect x="500" y="140" width="160" height="90" rx="10" fill="#ffffff" stroke="#546e7a" stroke-width="2"/>
+  <text x="580" y="168" text-anchor="middle" font-size="15" font-weight="700" fill="#37474f">route</text>
+  <text x="580" y="192" text-anchor="middle" font-size="11" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">receiver: discord</text>
+  <text x="580" y="212" text-anchor="middle" font-size="11" fill="#546e7a">kuhu teade läheb</text>
+  <line x1="448" y1="155" x2="495" y2="172" stroke="#546e7a" stroke-width="2" marker-end="url(#a6b)"/>
+  <line x1="448" y1="251" x2="495" y2="208" stroke="#546e7a" stroke-width="2" marker-end="url(#a6b)"/>
+
+  <!-- Discord -->
+  <text x="790" y="64" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">Discord #it-24</text>
+  <rect x="700" y="75" width="180" height="80" rx="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+  <text x="790" y="97" text-anchor="middle" font-size="11" font-weight="700" font-family="JetBrains Mono, Menlo, monospace" fill="#c62828">[FIRING:2]</text>
+  <text x="790" y="117" text-anchor="middle" font-size="12" font-weight="700" fill="#0d47a1">ProtsessorKoormatud</text>
+  <text x="790" y="137" text-anchor="middle" font-size="11" fill="#263238">proxmox2, proxmox3</text>
+  <rect x="700" y="205" width="180" height="80" rx="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+  <text x="790" y="227" text-anchor="middle" font-size="11" font-weight="700" font-family="JetBrains Mono, Menlo, monospace" fill="#c62828">[FIRING:1]</text>
+  <text x="790" y="247" text-anchor="middle" font-size="12" font-weight="700" fill="#0d47a1">KettaruumOtsas</text>
+  <text x="790" y="267" text-anchor="middle" font-size="11" fill="#263238">proxmox2</text>
+  <text x="790" y="304" text-anchor="middle" font-size="11" fill="#546e7a">üks sõnum grupi kohta</text>
+  <line x1="660" y1="172" x2="695" y2="125" stroke="#1565c0" stroke-width="2" marker-end="url(#a6u)"/>
+  <line x1="660" y1="200" x2="695" y2="238" stroke="#1565c0" stroke-width="2" marker-end="url(#a6u)"/>
+
+  <!-- ajastus -->
+  <text x="20" y="338" font-size="12" font-weight="700" fill="#546e7a">Millal Alertmanager saadab</text>
+  <rect x="20" y="350" width="273" height="60" rx="8" fill="#eceff1" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="156" y="374" text-anchor="middle" font-size="12" font-weight="700" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">group_wait 30s</text>
+  <text x="156" y="396" text-anchor="middle" font-size="12" fill="#37474f">esimene teade uue grupi kohta</text>
+  <rect x="313" y="350" width="273" height="60" rx="8" fill="#eceff1" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="449" y="374" text-anchor="middle" font-size="12" font-weight="700" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">group_interval 5m</text>
+  <text x="449" y="396" text-anchor="middle" font-size="12" fill="#37474f">grupp muutus, tuleb uus teade</text>
+  <rect x="607" y="350" width="273" height="60" rx="8" fill="#eceff1" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="743" y="374" text-anchor="middle" font-size="12" font-weight="700" font-family="JetBrains Mono, Menlo, monospace" fill="#37474f">repeat_interval 4h</text>
+  <text x="743" y="396" text-anchor="middle" font-size="12" fill="#37474f">sama alarm kestab, teade uuesti</text>
+</svg>
