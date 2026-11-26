@@ -373,7 +373,10 @@ Loo fail `konf/alertmanager/alertmanager.yml`. Vastuvõtja on antud: Alertmanage
       - name: discord
         discord_configs:
           - webhook_url_file: /saladus/discord_url
+            username: mtamm
     ```
+
+Kanalisse `#it-24` saadavad teateid kõik õppijad. Võti `username` paneb teate saatjaks sinu nime: asenda `mtamm` oma Proxmoxi kasutajanimega.
 
 Marsruudi `route` kirjuta ise faili algusesse ([route](https://prometheus.io/docs/alerting/latest/configuration/#route)). Nõuded:
 
