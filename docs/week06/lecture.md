@@ -161,9 +161,30 @@ Teade jõuab Discordi seega mitte kohe, kui alarm on Firing, vaid umbes `group_w
 
 ## 6. Teavituskanal ja saladus
 
-Discordi kanalisse saab sõnumeid saata **webhooki** kaudu: kanali seadetes tehakse aadress, millele saadetud HTTP-päring ilmub kanalisse sõnumina. Alertmanageril on selleks vastuvõtja tüüp `discord_configs` ([Configuration, discord_config](https://prometheus.io/docs/alerting/latest/configuration/#discord_config)). Sama ülesehitusega on vastuvõtjad e-posti, Slacki, Microsoft Teamsi ja paljude teiste jaoks.
+Alertmanager saadab teate teise teenuse API-le HTTPS-päringuga. Teenus võtab sõnumi vastu ainult siis, kui päringus on saladus, mis tõendab, et saatjal on selleks õigus. Saladus võib olla neljal kujul ja see sõltub teenusest, mitte Alertmanagerist.
 
-Webhooki aadress on saladus. Kes aadressi teab, saab kanalisse sõnumeid saata ilma Discordi kontota. Seepärast ei kirjutata aadressi faili `alertmanager.yml`, vaid eraldi faili, mis on ainult `proxmox1`-s. Seadetes on võti `webhook_url_file`, mis ütleb, millisest failist Alertmanager aadressi loeb. Nii võib `alertmanager.yml` olla repositooriumis.
+<figure markdown="span">
+  ![Neli viisi: webhook Discordis, Slackis ja Teamsis, kus saladus on aadressi lõpus olev token; boti token Telegramis ja Slacki rakenduses koos vestluse ID-ga; integratsioonivõti PagerDutys ja Opsgenies, mis seob alarmi valvegraafikuga; e-post SMTP-serveri kaudu kasutajanime ja parooliga. Iga juures Alertmanageri seadete võti, mis loeb saladuse failist](../images/n06_teavitus.svg)
+  <figcaption>Joonis 6.5. Neli viisi, kuidas Alertmanager tõendab õigust teadet saata (Talvik, 2026).</figcaption>
+</figure>
+
+**Webhook** on kanali seadetes tehtud aadress. Discordi webhooki aadress on kujul `https://discord.com/api/webhooks/<id>/<token>`: token on aadressi sees, seega on kogu aadress saladus. Kes aadressi teab, saab kanalisse postitada ilma Discordi kontota, aga ainult sellesse ühte kanalisse. Seda kasutatakse vestluskanalites kõige sagedamini, sest seadistamiseks piisab ühest aadressist.
+
+**Boti token** kuulub eraldi botikontole. Päringus on token ja kanali või vestluse ID. Bot võib saada rohkem õigusi kui webhook, näiteks postitada mitmesse kanalisse ja sõnumeid lugeda. Seepärast on lekkinud boti token ohtlikum kui webhook.
+
+**Integratsioonivõti** on valvesüsteemides nagu PagerDuty ja Opsgenie. Võti seob alarmi kindla teenuse ja valvegraafikuga. Valvesüsteem otsustab, kellele helistada või SMS saata, ja kordab, kuni keegi teate kinnitab. Kriitilised alarmid lähevad töökohtades tavaliselt sinna, hoiatused vestluskanalisse.
+
+**E-post** kasutab ettevõtte SMTP-serverit, saladus on postkasti kasutajanimi ja parool. E-kiri sobib aruandeks või vähem kiireloomuliseks teateks, sest seda ei loeta kohe.
+
+??? note "Tabel 6.4. Mida tavaliselt kasutatakse"
+    | Eesmärk | Tavaline valik | Saladus |
+    |---|---|---|
+    | meeskonna vestluskanal | Slack, Teams või Discord webhook | webhooki aadress |
+    | öine valve, keegi peab ärkama | PagerDuty või Opsgenie | integratsioonivõti |
+    | isiklik telefon ilma valvesüsteemita | Telegrami bot | boti token |
+    | aruanne, mitte kiire teade | e-post | SMTP parool |
+
+Praktikumis on webhook kursuse Discordi kanalisse `#it-24`. Alertmanageril on selleks vastuvõtja tüüp `discord_configs` ([Configuration, discord_config](https://prometheus.io/docs/alerting/latest/configuration/#discord_config)). Aadressi ei kirjutata faili `alertmanager.yml`, vaid eraldi faili, mis on ainult `proxmox1`-s. Võti `webhook_url_file` ütleb, millisest failist Alertmanager aadressi loeb. Nii võib `alertmanager.yml` olla repositooriumis. Teistel vastuvõtjatel on sama kujuga võtmed `bot_token_file`, `routing_key_file` ja `auth_password_file`.
 
 ```yaml
 receivers:
