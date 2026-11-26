@@ -540,9 +540,125 @@ grep -o '"alertname":"[A-Za-z]*"' logid/n6-protsessor.json
     ??? success "Vastus"
         `rate(...[1m])` on viimase minuti keskmine, seega jõuab väärtus üle 80% alles umbes poole minuti jooksul. Seejärel peab tingimus kehtima veel minuti (`for: 1m`), enne kui alarm on Firing.
 
-## Osa 7 · Kokkuvõte
+## Osa 7 · Töölaud edasi
 
-Vasta README jaotises **Osa 7**:
+Osas 3 tegid töölaua veebiliideses. Nüüd muudad selle tööriistaks, mida kasutatakse ka valves: töölaud tuleb failist, alarmid on graafikul näha, värv näitab sama läve mis reegel ja teatest saab ühe klikiga õigele graafikule.
+
+### 7.1 Töölaud failist
+
+Veebiliideses tehtud töölaud on Grafana andmebaasis. Kui andmeköide kaob, kaob ka töölaud. Grafana oskab töölauad lugeda failidest samamoodi nagu andmeallika ([Provisioning, Dashboards](https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards)). Selleks on vaja kahte asja: **pakkuja** (provider) faili, mis ütleb, millisest kaustast töölauad loetakse, ja kausta, kus on töölaudade JSON-failid.
+
+???+ example "Fail `konf/grafana-toolauad/toolauad.yml`"
+    ```yaml
+    apiVersion: 1
+
+    providers:
+      - name: kursus
+        folder: IT-24
+        type: file
+        options:
+          path: /etc/grafana/toolauad
+    ```
+
+Lisa teenusele `grafana` kaks ühendust, mõlemad ainult lugemiseks:
+
+- kaust `./grafana-toolauad` on konteineris kaustas `/etc/grafana/provisioning/dashboards`;
+- kaust `./toolauad` on konteineris kaustas `/etc/grafana/toolauad`.
+
+??? example "Näidislahendus: teenuse grafana ühendused"
+    ```yaml
+        volumes:
+          - ./grafana:/etc/grafana/provisioning/datasources:ro
+          - ./grafana-toolauad:/etc/grafana/provisioning/dashboards:ro
+          - ./toolauad:/etc/grafana/toolauad:ro
+          - grafana-data:/var/lib/grafana
+    ```
+
+Failis `konf/toolaud.json` on osa 3 töölaud. Veebiliideses salvestatud töölaual on sama `uid`, seega muuda failis kaks välja, et failist tulev töölaud oleks eraldi: `"uid": "n6-kood"` ja `"title": "N6 koodist"`. Kopeeri failid ja käivita Grafana uuesti:
+
+```bash
+ssh proxmox1 "mkdir -p ~/prometheus/toolauad"
+scp -r konf/grafana-toolauad proxmox1:prometheus/
+scp konf/toolaud.json proxmox1:prometheus/toolauad/
+scp konf/compose.yaml proxmox1:prometheus/
+ssh proxmox1 "cd ~/prometheus && docker compose up -d grafana"
+```
+
+??? success "Oodatav tulemus"
+    **Dashboards** all on kaust **IT-24** ja selles töölaud **N6 koodist**. Töölaua ülaosas on märge, et see on failist ja muudatusi veebiliideses salvestada ei saa.
+
+??? question "Kas töölaud jääb alles, kui Grafana andmeköide kustutada?"
+    Proovi: `ssh proxmox1 "cd ~/prometheus && docker compose rm -sf grafana && docker volume rm prometheus_grafana-data && docker compose up -d grafana"`. Grafana küsib uuesti parooli `admin` ja `admin`.
+
+    ??? success "Vastus"
+        Jääb. Andmeallikas ja töölaud tulevad failidest, mis on repositooriumis. Kadus ainult parool ja veebiliideses tehtud töölaud **N6**. Nii hoitakse töölaudu töökohtades: fail on Gitis ja iga Grafana saab sama töölaua.
+
+Järgmised muudatused teed failis `konf/toolaud.json`. Kõige lihtsam on teha muudatus veebiliideses töölaual **N6**, eksportida see uuesti nagu osas 3.4, muuta `uid` ja `title` ning kopeerida fail `proxmox1`-sse. Grafana loeb kausta uuesti iga 10 sekundi järel.
+
+### 7.2 Alarmid graafikul
+
+Prometheus hoiab iga kehtiva alarmi kohta aegrida `ALERTS`. Grafana **annotatsioon** (annotation) märgib graafikule ajavahemiku, kus päring tagastab tulemuse ([Annotate visualizations](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/)).
+
+Ava töölaud **N6**, **Edit → Settings → Annotations → New annotation**:
+
+1. **Name**: `Alarmid`, **Data source**: **Prometheus**, värv punane;
+2. päring: `ALERTS{alertstate="firing", instance="$instance"}`;
+3. **Title**: `{{alertname}}`, salvesta.
+
+Tekita koormuskatse uuesti nagu osas 6.2 ja vaata protsessori paneeli.
+
+??? question "Kui palju hiljem algab punane ala võrreldes graafiku tõusuga?"
+    Võrdle punase ala algust kohaga, kus kõver ületab 80%.
+
+    ??? success "Vastus"
+        Umbes minut, see on reegli `for: 1m`. Graafik ise tõuseb üle 80% umbes poole minuti jooksul pärast katse algust, sest `rate(...[1m])` on minuti keskmine. Punane ala lõpeb mõni sekund pärast seda, kui kõver langeb alla 80%.
+
+### 7.3 Värv näitab sama läve mis reegel
+
+Lisa töölauale paneel visualiseeringuga **Stat** ja protsessori kasutuse päringuga. Paneeli seadetes ([Thresholds](https://grafana.com/docs/grafana/latest/panels-visualizations/configure-thresholds/)):
+
+- **Thresholds**: põhivärv roheline, `70` kollane, `80` punane;
+- **Stat styles → Color mode**: **Background solid**.
+
+Punane läbi on sama mis reeglis `ProtsessorKoormatud`. Kui keegi vaatab töölauda, näeb ta sama piiri, mille järgi alarm tuleb.
+
+??? success "Oodatav tulemus"
+    Tavaolukorras on paneel roheline. Koormuskatse ajal muutub see punaseks umbes samal ajal, kui reegel läheb olekusse Pending.
+
+### 7.4 Paneel iga masina kohta
+
+Kui masinaid on palju, tahab valvaja näha kõiki korraga. Grafana oskab paneeli korrata iga muutuja väärtuse kohta ([Repeating panels](https://grafana.com/docs/grafana/latest/panels-visualizations/configure-panel-options/#configure-repeating-panels)).
+
+1. Muutuja `instance` seadetes lülita sisse **Multi-value** ja **Include All option**.
+2. Stat-paneeli seadetes **Panel options → Repeat options**: **Repeat by variable** `instance`, suund **Horizontal**.
+3. Vali rippmenüüst **All**.
+
+??? success "Oodatav tulemus"
+    Stat-paneele on kaks, kummagi masina kohta üks, ja pealkirjas on masina aadress. Kui Prometheusesse lisandub masin, tekib uus paneel ise.
+
+### 7.5 Teatest graafikule
+
+Valvaja saab teate Discordi ja tahab kohe näha selle masina graafikuid. Lisa reeglile `ProtsessorKoormatud` annotatsioon `dashboard`, mis on töölaua aadress koos õige masinaga. Reegli mallis on masina aadress `{{ $labels.instance }}` ([Templating](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating)):
+
+```yaml
+        annotations:
+          summary: "{{ $labels.instance }}: protsessori kasutus {{ $value | printf \"%.0f\" }}%"
+          dashboard: "http://<proxmox1-IP>:3000/d/n6-kood?var-instance={{ $labels.instance }}"
+```
+
+Lisa Alertmanageri malli `message` sisse iga alarmi juurde ka see link: `{{ .Annotations.dashboard }}`. Kopeeri failid, taaskäivita Prometheus ja Alertmanager ning korda koormuskatset.
+
+??? example "Näidislahendus: message koos lingiga"
+    ```yaml
+            message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ .Annotations.dashboard }}{{ "\n" }}{{ end }}'
+    ```
+
+??? success "Oodatav tulemus"
+    Discordi teates on link. Klikk avab töölaua, kus rippmenüüs on juba õige masin.
+
+## Osa 8 · Kokkuvõte
+
+Vasta README jaotises **Osa 8**:
 
 1. Mitu minutit läks osas 6.1 node_exporteri peatamisest Discordi teateni? Millest see aeg koosnes?
 2. Kui `proxmox2` ja `proxmox3` node_exporter peatuksid korraga, mitu Discordi teadet tuleks ja miks?
@@ -558,6 +674,8 @@ Prometheus, Grafana ja Alertmanager jäävad `proxmox1`-s tööle. N7-s võrdled
     - [ ] Failides `logid/n6-masin.json` ja `logid/n6-protsessor.json` on Firing olekus alarmid.
     - [ ] Discordi kanalisse tuli mõlema rikke kohta FIRING ja RESOLVED teade.
     - [ ] Webhooki aadressi ei ole repositooriumis.
+    - [ ] Töölaud **N6 koodist** tuleb failist ja sellel on alarmide annotatsioon, Stat-paneel lävenditega ja korduv paneel.
+    - [ ] Discordi teates on link töölauale.
 
 ## Töö esitamine
 
