@@ -704,3 +704,37 @@ Tulemuse näed Classroom 50-s.
 
 ??? example "4 · Sama alarm Grafanas"
     Tee Grafanas alarmireegel sama protsessori tingimusega ([Grafana Alerting](https://grafana.com/docs/grafana/latest/alerting/)): **Alerting → Alert rules → New alert rule**. Võrdle Prometheuse reegliga: kus on reegel kirjas, kas see on repositooriumis ja mis juhtub teatega, kui Grafana konteiner seisab.
+
+??? example "5 · Zabbixi andmebaas Grafanas"
+    Grafana ei loe ainult Prometheust. PostgreSQL-i andmeallikaga saab teha graafiku otse SQL-päringust ([PostgreSQL data source](https://grafana.com/docs/grafana/latest/datasources/postgres/)). Siin joonistad N4 Zabbixi kettaruumi andmed samale töölauale Prometheuse andmetega.
+
+    Zabbixi andmebaas töötab teises Compose'i projektis (`~/zabbix`) ja selle port ei ole masinast väljas lahti. Grafana pääseb sinna, kui see on ühendatud ka Zabbixi projekti võrku `zabbix_default`.
+
+    1. Käivita Zabbix: `ssh proxmox1 "cd ~/zabbix && docker compose start"`. Kontrolli mälu nagu kodutöös 2.
+    2. Tee Grafanale ainult lugemise õigusega andmebaasi kasutaja. Vali oma parool:
+        ```bash
+        ssh proxmox1 "cd ~/zabbix && docker compose exec -T postgres psql -U zabbix -c \"CREATE ROLE grafana LOGIN PASSWORD '<parool>'; GRANT pg_read_all_data TO grafana;\""
+        ```
+    3. Lisa failis `konf/compose.yaml` teenusele `grafana` teine võrk ja kirjelda see faili lõpus. Kui Zabbixi projekti `proxmox1`-s pole, ei käivitu Grafana enam: siis eemalda need read.
+        ```yaml
+          grafana:
+            networks: [default, zabbix]
+
+        networks:
+          zabbix:
+            name: zabbix_default
+            external: true
+        ```
+    4. Kopeeri `compose.yaml` ja käivita `docker compose up -d grafana`. Grafanas **Connections → Data sources → Add → PostgreSQL**: **Host URL** `postgres:5432`, **Database** `zabbix`, **Username** `grafana`, parool, **TLS/SSL Mode** `disable`, **Save & test**.
+    5. Lisa töölauale paneel andmeallikaga PostgreSQL, režiim **Code**, vorming **Time series** ([Query editor](https://grafana.com/docs/grafana/latest/datasources/postgres/query-editor/)):
+        ```sql
+        SELECT to_timestamp(h.clock) AS time, h.value, hs.host AS metric
+        FROM history h
+        JOIN items i ON i.itemid = h.itemid
+        JOIN hosts hs ON hs.hostid = i.hostid
+        WHERE i.key_ = 'vfs.fs.size[/,pfree]' AND $__unixEpochFilter(h.clock)
+        ORDER BY 1
+        ```
+
+    Võrdle seda Prometheuse juurfailisüsteemi paneeliga. Kas väärtused on samad? Kumb päring on lihtsam kirjutada ja miks hoiab Zabbix andmeid SQL-tabelis, Prometheus aga aegridade andmebaasis?
+
