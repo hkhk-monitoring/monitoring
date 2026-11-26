@@ -557,6 +557,9 @@ Tulemuse näed Classroom 50-s.
 ??? example "3 · Üks rike, üks teade"
     Kui masin ei vasta, ei ole selle protsessori ega ketta alarmidel mõtet. Alertmanageri **inhibit rule** vaigistab ühe alarmi, kui teine kehtib ([inhibit_rule](https://prometheus.io/docs/alerting/latest/configuration/#inhibit_rule)). Lisa reegel: kui `MasinEiVasta` on Firing, vaigistatakse sama `instance`-ga alarmid, mille `severity` on `hoiatus`. Kontrolli süntaksit `amtool check-config` käsuga.
 
+??? example "4 · Sama alarm Grafanas"
+    Tee Grafanas alarmireegel sama protsessori tingimusega ([Grafana Alerting](https://grafana.com/docs/grafana/latest/alerting/)): **Alerting → Alert rules → New alert rule**. Võrdle Prometheuse reegliga: kus on reegel kirjas, kas see on repositooriumis ja mis juhtub teatega, kui Grafana konteiner seisab.
+
 ??? example "5 · Sama kanal Zabbixist"
     Discordi webhook ei sõltu Prometheusest: sama aadressi kaudu võib teateid saata iga tööriist. Zabbix 7.0-l on Discordi meediatüüp valmis ([Discord integratsioon](https://www.zabbix.com/integrations/discord)).
 
@@ -567,6 +570,3 @@ Tulemuse näed Classroom 50-s.
     5. Tekita N4 kettaruumi probleem uuesti (`fallocate` nagu N4 osas 4) ja kontrolli, et Discordi tuleb Zabbixi teade.
 
     Võrdle Alertmanageriga: kus on teate tekst kirjas, kas seadistus on failis või andmebaasis ja kas sama nimega probleemid mitmest masinast tulevad ühe teatena.
-
-??? example "4 · Sama alarm Grafanas"
-    Tee Grafanas alarmireegel sama protsessori tingimusega ([Grafana Alerting](https://grafana.com/docs/grafana/latest/alerting/)): **Alerting → Alert rules → New alert rule**. Võrdle Prometheuse reegliga: kus on reegel kirjas, kas see on repositooriumis ja mis juhtub teatega, kui Grafana konteiner seisab.
