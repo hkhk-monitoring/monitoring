@@ -504,6 +504,22 @@ grep -o '"alertname":"[A-Za-z]*"\|"state":"[a-z]*"' logid/n6-masin.json
 ??? success "Oodatav tulemus"
     Read `"alertname":"MasinEiVasta"` ja `"state":"firing"`. Discordi kanalisse tuleb teade pealkirjaga `[FIRING:1] MasinEiVasta`, mille all on sildid ja `summary` tekst. Teate saatja nimi on see, mille õpetaja webhookile andis.
 
+??? warning "Kui alarm on Firing, aga Discordi teadet ei tule"
+    Vaata Alertmanageri logist, mis teate saatmisel juhtus:
+
+    ```bash
+    ssh proxmox1 "cd ~/prometheus && docker compose logs alertmanager | grep -i discord | tail -5"
+    ```
+
+    | Logis | Põhjus | Paranda |
+    |---|---|---|
+    | `read webhook_url_file` või `no such file` | faili `~/prometheus/saladus/discord_url` ei ole | loo fail ploki „Kui faili `discord_url` pole“ järgi |
+    | `401` või `404` | aadress on vale või poolik | kopeeri aadress uuesti tervikuna |
+    | `timeout` või `connection refused` | `proxmox1` ei pääse internetti pordil 443 | kontrolli `ssh proxmox1 "curl -sI https://discord.com"` |
+    | Discordi kohta ridu pole | alarm ei jõudnud Alertmanagerini | ava `http://<proxmox1-IP>:9093`: kui alarmi pole, kontrolli plokki `alerting` osast 5.3 |
+
+    Pärast faili või seadete parandamist käivita Alertmanager uuesti: `ssh proxmox1 "cd ~/prometheus && docker compose restart alertmanager"`.
+
 Käivita node_exporter uuesti ja jälgi, mis Discordi tuleb:
 
 ```bash
@@ -530,9 +546,6 @@ grep -o '"alertname":"[A-Za-z]*"' logid/n6-protsessor.json
 
 ??? success "Oodatav tulemus"
     Grafana paneelil tõuseb protsessori kasutus 100 lähedale. Umbes 1,5 minuti pärast on reegel Pending, siis Firing. Failis on `"alertname":"ProtsessorKoormatud"`. Discordi tuleb teade, ja pärast katse lõppu teade `[RESOLVED]`.
-
-??? warning "Kui alarm on Firing, aga Discordi teadet ei tule"
-    Ava Alertmanageri veebiliides: kui alarm on seal, jõudis see kohale ja viga on teate saatmisel. Vaata logi: `ssh proxmox1 "cd ~/prometheus && docker compose logs alertmanager | grep -i discord"`. Rida `unexpected status code 401` või `404` tähendab, et webhooki aadress on vale või kustutatud. Ühenduse viga tähendab, et `proxmox1` ei pääse internetti pordil 443.
 
 ??? question "Miks graafik tõusis kohe, aga alarm tuli alles poolteist minutit hiljem?"
     Mõtle, mis on päringus `[1m]` ja mis on reeglis `for: 1m`.
