@@ -355,7 +355,13 @@ ssh proxmox1 "ls -l ~/prometheus/saladus/"
     Rida `-rw-r--r-- ... discord_url`. Fail on loetav kõigile, sest Alertmanager töötab konteineris kasutajana `nobody`. Teised kasutajad faili ei näe, sest kodukaust on suletud.
 
 ??? warning "Kui faili `discord_url` pole"
-    Ütle õpetajale. Seni saad teha osa 5 lõpuni ja osas 6 jälgida alarme Alertmanageri veebiliideses, Discordi teade tuleb pärast faili lisamist.
+    Küsi õpetajalt webhooki aadress ja loo fail ise. Käsk `read -s` loeb aadressi ekraanile näitamata, nii et see ei jää ka käsuajalukku:
+
+    ```bash
+    read -rsp "Webhooki aadress: " URL; echo
+    printf '%s\n' "$URL" | ssh proxmox1 "mkdir -p ~/prometheus/saladus && cat > ~/prometheus/saladus/discord_url && chmod 644 ~/prometheus/saladus/discord_url"
+    unset URL
+    ```
 
 ### 5.1 Alertmanageri seaded
 
