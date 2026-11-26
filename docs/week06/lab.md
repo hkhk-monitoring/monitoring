@@ -26,7 +26,7 @@ Lõpus tekitad kaks riket: peatad node_exporteri ja koormad protsessorit. Mõlem
 
 <figure markdown="span">
   ![proxmox1 Docker Compose projektis Prometheus pordil 9090, Grafana pordil 3000 ja Alertmanager pordil 9093 ning saladuse fail; proxmox2 ja proxmox3 node_exporter pordil 9100; sinu arvutist brauser ja Git; Alertmanager saadab teate internetis olevasse Discordi pordil 443](../images/n06_topoloogia.svg)
-  <figcaption>Joonis 6.5. Praktikumi topoloogia (Talvik, 2026).</figcaption>
+  <figcaption>Joonis 6.6. Praktikumi topoloogia (Talvik, 2026).</figcaption>
 </figure>
 
 Esimesed failid on näidatud tervikuna, järgmised kirjutad nõuete järgi ise. Näidislahendus on kokkuvolditud plokis. Kui tuleb veateade, ava plokk, mis algab sõnaga **Kui**.
@@ -345,7 +345,7 @@ ssh proxmox1 "cd ~/prometheus && docker compose restart prometheus"
 
 ## Osa 5 · Alertmanager ja Discord
 
-Alertmanager saab alarmid Prometheuselt ja saadab teate Discordi kanalisse `#it-24`. Webhooki aadress on saladus. Õpetaja on selle kopeerinud `proxmox1`-sse faili `~/prometheus/saladus/discord_url`. Kontrolli, et fail on olemas, aga ära näita selle sisu ekraanil:
+Alertmanager saab alarmid Prometheuselt ja saadab teate Discordi kanalisse `#it-24`. Discord võtab teate vastu webhooki kaudu: aadressi lõpus on token, seega on kogu aadress saladus (loengu joonis 6.5). Õpetaja on selle kopeerinud `proxmox1`-sse faili `~/prometheus/saladus/discord_url`. Kontrolli, et fail on olemas, aga ära näita selle sisu ekraanil:
 
 ```bash
 ssh proxmox1 "ls -l ~/prometheus/saladus/"
