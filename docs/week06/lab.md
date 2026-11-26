@@ -284,6 +284,8 @@ Lisa samasse loendisse `rules` kaks reeglit. Nõuded:
 - `ProtsessorKoormatud`: protsessori kasutus on üle 80% vähemalt 1 minuti, `severity: hoiatus`, `summary` ütleb masina ja kasutuse protsendi;
 - `MasinEiVasta`: job'i `node` target ei vasta (`up` väärtus 0) vähemalt 1 minuti, `severity: kriitiline`, `summary` ütleb masina.
 
+Teate teksti `summary` kirjuta mõlemal reeglil oma sõnadega. Valvaja loeb seda öösel telefonist, seega peab tekstist aru saama ilma graafikut avamata: milline masin, mis juhtus, väärtus ja mida esimesena kontrollida. Masina aadress on `{{ $labels.instance }}`, tingimuse väärtus `{{ $value }}` ([Templating](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating)).
+
 ??? tip "Vihje"
     Protsessori tingimus on osa 3.2 päring ilma muutujata, mille lõppu on lisatud võrdlus. N5 lisaülesandes 2 kirjutasid päringu, mis tagastab ainult target'id, mille kogumine ebaõnnestus.
 
@@ -295,7 +297,7 @@ Lisa samasse loendisse `rules` kaks reeglit. Nõuded:
             labels:
               severity: hoiatus
             annotations:
-              summary: "{{ $labels.instance }}: protsessori kasutus {{ $value | printf \"%.0f\" }}%"
+              summary: "<sinu tekst>"
 
           - alert: MasinEiVasta
             expr: up{job="node"} == 0
@@ -303,7 +305,7 @@ Lisa samasse loendisse `rules` kaks reeglit. Nõuded:
             labels:
               severity: kriitiline
             annotations:
-              summary: "{{ $labels.instance }}: Prometheus ei saa mõõdikuid kätte"
+              summary: "<sinu tekst>"
     ```
 
 ### 4.3 Reeglid Prometheusesse
