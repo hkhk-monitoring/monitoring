@@ -380,25 +380,25 @@ Kanalisse `#it-24` saadavad teateid kõik õppijad. Võti `username` paneb teate
 
 Vaikimisi teates on kõik sildid ja aadress Prometheuse veebiliidesesse, see on pikk ja raskesti loetav. Teate kuju määrab **mall** (template): `title` on pealkiri, `message` on sisu. Mallis on `{{ .Status }}` olek (`firing` või `resolved`), `{{ .CommonLabels.alertname }}` alarmi nimi ja `{{ range .Alerts }}…{{ end }}` käib läbi kõik grupi alarmid. Näited on lehel [Notification template examples](https://prometheus.io/docs/alerting/latest/notification_examples/), Discordi jaoks sobib „Ranging over all received Alerts“.
 
-Lisa samasse `discord_configs` kirjesse mall. Nõuded:
+Kanalis on kõigi õppijate teated, seega peab sinu nimi olema alarmi enda sees, mitte ainult saatja nimes. Prometheus lisab igale alarmile sildid, mis on failis `prometheus.yml` plokis `global` võtme `external_labels` all ([Configuration, global](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#configuration-file)).
 
-- pealkirjas on olek suurtähtedega ja alarmi nimi, näiteks `FIRING · MasinEiVasta`;
+Nõuded:
+
+- igal sinu Prometheuse alarmil on silt `oppija`, mille väärtus on sinu Proxmoxi kasutajanimi;
+- teate pealkirjas on olek suurtähtedega, sinu nimi ja alarmi nimi, näiteks `FIRING · mtamm · MasinEiVasta`;
 - sisus on iga grupi alarmi `summary` eraldi real.
 
+Lisa silt faili `konf/config/prometheus.yml` ja mall samasse `discord_configs` kirjesse.
+
 ??? tip "Vihje"
-    Suurtähed annab funktsioon `toUpper`: `{{ .Status | toUpper }}`. Annotatsioon on ühe alarmi sees kujul `{{ .Annotations.summary }}`. Reavahetus mallis on `{{ "\n" }}`. Mall on YAML-is ühekordsetes jutumärkides.
+    `external_labels` on `global` all samal taandel kui `scrape_interval` ja selle all on sildid kujul `nimi: väärtus`. Grupi ühine silt on mallis `{{ .CommonLabels.<nimi> }}`. Suurtähed annab funktsioon `toUpper`: `{{ .Status | toUpper }}`. Annotatsioon on ühe alarmi sees kujul `{{ .Annotations.summary }}`. Reavahetus mallis on `{{ "\n" }}`. Mall on YAML-is ühekordsetes jutumärkides.
 
-??? example "Näidislahendus: mall"
-    ```yaml
-            title: '{{ .Status | toUpper }} · {{ .CommonLabels.alertname }}'
-            message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
-    ```
+Kui teade on kanalis, kontrolli, et pealkirjas on sinu nimi.
 
-    Discordi teade näeb välja nii:
-
+??? success "Oodatav tulemus"
     ```text
     mtamm
-    FIRING · MasinEiVasta
+    FIRING · mtamm · MasinEiVasta
     192.168.35.13:9100: Prometheus ei saa mõõdikuid kätte
     ```
 
